@@ -13,31 +13,97 @@
 * #ffffff oppure rgb(255, 255, 255) - chiaro
 ***/
 
+/*Importazione Font*/
+@font-face {
+	font-family: "Josefin Sans";
+	src: url("../fonts/JosefinSans-Regular.ttf");
+}
+@font-face {
+	font-family: "RobotoCondensed-Light";
+	src: url("../fonts/RobotoCondensed-Light.ttf");
+}
+@font-face {
+	font-family: "RobotoCondensed-Regular";
+	src: url("../fonts/RobotoCondensed-Regular.ttf");
+}
+@font-face {
+	font-family: "Roboto-Regular";
+	src: url("../fonts/Roboto-Regular.ttf");
+}
 @font-face {
 	font-family: "Roboto-Light";
 	src: url("../fonts/Roboto-Light.ttf");
 }
+@font-face {
+	font-family: "Roboto-Thin";
+	src: url("../fonts/Roboto-Thin.ttf");
+}
+@font-face {
+	font-family: "FontAwesomeSolid";
+	src: url("../fonts/Font Awesome Solid-900.otf");
+}
+@font-face {
+	font-family: "FontAwesomeRegular";
+	src: url("../fonts/Font Awesome Regular-400.otf");
+}
 
+/******************************************************
+* Sezione CSS che modifica i tag in maniera "globale" *
+******************************************************/
 * {
 	box-sizing: border-box;
 	outline: none;
 }
-
-body {
-  font-family: "Roboto-Light", Arial, sans-serif;
-  font-size: 100%;
-  color: #444;
-  margin: 0 0 70px;
+html {
+	min-height: 100%;
+	position: relative;
 }
-
+body {
+	font-family: "Roboto-Light", Arial, sans-serif;
+	font-size: 100%;
+	color: #444;
+	margin: 0 0 70px;
+}
+a {
+	text-decoration: none;
+	color: #333;
+}
+button {
+	height: 40px;
+	border: none;
+	border-radius: 4px;
+	background-color: #3aafa9;
+	color: #ffffff;
+	text-align: center;
+}
+button:hover {
+	background-color: #2b7a78;
+	cursor: pointer;
+}
+button#btn-remove {
+	background-color: rgba(0,0,0,0);
+	height: auto;
+}
+input {
+	background-color: #ffffff;
+}
+input[type="number"] {
+	/*Larghezza dei campi per l'inserimento di quantità e durata noleggio
+	(di default sono troppo larghi)*/
+	width: 50px; 
+}
+label {
+	font-family: "Roboto-Regular", Arial, sans-serif;
+	font-weight: bold;
+	font-size: 14px;
+}
 header {
   font-family: 'Josefin Sans', Arial, sans-serif;
   background-color: #2b7a78;
-  color: #ffffff;
-  min-height: 60px;
+	color: #ffffff;
+	min-height: 60px;
   box-shadow: 0px -6px rgba(23, 37, 42, 0.1) inset;
 }
-
 footer {
 	background-color: #2b7a78;
 	color: rgba(255,255,255,0.6);
@@ -52,14 +118,103 @@ footer {
 	width: 100%;
 	overflow: hidden;
 }
-
 footer p {
 	margin: 0;
 }
-
+hr {
+	color: #ccc;
+	border: 1px solid #eee;
+	margin: 0px 0;
+}
 /*Contenitore largo 90% e centrato orizzontalmente rispetto all'elemento padre*/
 .container {
 	width: 90%;
 	margin: auto;
 	overflow: hidden;
+}
+/*Contenitori larghi 50% e 30% addossati a sinistra (per tenerli uno vicino
+all'altro se usati insieme)*/
+.col-50 {
+	width: 50%;
+	float: left;
+}
+.col-30 {
+	width: 33%;
+	float: left;
+	display: inline-block;
+}
+.col-50-centered {
+	width: 50%;
+	margin: 0 auto;
+}
+/*CSS per messaggi d'errore (utilizzato in login e registrazione)*/
+.error {
+	font-size: 14px;
+	border-radius: 5px;
+	border-color: #f5c6cb;
+	color: #721c24;
+	padding: 20px;
+	background-color: #f8d7da;
+}
+.info {
+	font-size: 14px;
+	border-radius: 5px;
+	border-color: #f5c6cb;
+	color: #2b7a78;
+	padding: 20px;
+	background-color: #def2f1;
+}
+
+/********************************************
+* Sezione per form di login e registrazione *
+*********************************************/
+#form-container {
+	padding: 10px;
+	margin: 10px auto;
+	max-width: 768px;
+}
+.box {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding: 20px 40px;
+	background-color: rgba(222, 242, 241, 0.6);
+	box-shadow: 0px 2px 10px #ccc;
+	border-radius: 2px;
+}
+.box .col-50 {
+	float: left;
+	padding: 0 4px;
+	width: 50%;
+}
+#sign-in-box {
+	text-align: center;
+}
+#sign-form small {
+	display: block;
+	margin-top: 0;
+	margin-bottom: 10px;
+	font-size: 12px;
+	font-weight: bold;
+}
+#sign-form input {
+	width: 100%;
+	border: 1px solid #d9d9d9;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 15px;
+	margin-bottom: 10px;
+}
+#sign-form input:focus {
+	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
+}
+#sign-form button {
+	width: 100%;
+	height: 40px;
+	border: none;
+	border-radius: 4px;
+	background-color: #3aafa9;
+	color: #ffffff;
+}
+#sign-form button:hover {
+	background-color: #2b7a78;
 }
