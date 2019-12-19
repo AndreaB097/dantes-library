@@ -6,9 +6,10 @@ pageEncoding="UTF-8" import="java.util.Calendar"%>
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
-	<title>Dante's Library</title>
+	<title>Dante's Library | Registrazione</title>
 	<link rel="stylesheet" href="./css/style.css"/>
-	<link rel="stylesheet" href="./css/jquery-ui.css">
+	<script src="./scripts/fontawesome.js"></script>
+	<script src="./scripts/jquery-3.4.1.min.js"></script>
 </head>
 <body>
 
