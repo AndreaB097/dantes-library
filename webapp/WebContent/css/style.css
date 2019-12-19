@@ -5,7 +5,7 @@
 
 
 /***
-*						Palette colori:
+* Palette colori:
 * #17252a oppure rgb(23, 37, 42) - scuro
 * #2b7a78 oppure rgb(43, 122, 120)
 * #3aafa9 oppure rgb(58, 175, 169)
@@ -45,6 +45,19 @@
 @font-face {
 	font-family: "FontAwesomeRegular";
 	src: url("../fonts/Font Awesome Regular-400.otf");
+}
+
+/********************************************************************
+* Classe che rimuove l'highlight (la selezione blu del mouse)       *
+* all'elemento sul quale viene applicata (i link la maggior parte). *
+*********************************************************************/
+.noSelect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /******************************************************
@@ -87,10 +100,17 @@ button#btn-remove {
 input {
 	background-color: #ffffff;
 }
+input:focus {
+	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
+}
 input[type="number"] {
-	/*Larghezza dei campi per l'inserimento di quantit√† e durata noleggio
+	/*Larghezza dei campi per l'inserimento di quantit‡ e durata noleggio
 	(di default sono troppo larghi)*/
 	width: 50px; 
+	padding: 7px;
+	border: 1px solid #d9d9d9;
+	border-radius: 5px;
+	font-size: 14px;
 }
 label {
 	font-family: "Roboto-Regular", Arial, sans-serif;
@@ -98,11 +118,11 @@ label {
 	font-size: 14px;
 }
 header {
-  font-family: 'Josefin Sans', Arial, sans-serif;
-  background-color: #2b7a78;
+  	font-family: 'Josefin Sans', Arial, sans-serif;
+ 	background-color: #2b7a78;
 	color: #ffffff;
 	min-height: 60px;
-  box-shadow: 0px -6px rgba(23, 37, 42, 0.1) inset;
+  	box-shadow: 0px -6px rgba(23, 37, 42, 0.1) inset;
 }
 footer {
 	background-color: #2b7a78;
@@ -126,12 +146,14 @@ hr {
 	border: 1px solid #eee;
 	margin: 0px 0;
 }
+
 /*Contenitore largo 90% e centrato orizzontalmente rispetto all'elemento padre*/
 .container {
 	width: 90%;
 	margin: auto;
 	overflow: hidden;
 }
+
 /*Contenitori larghi 50% e 30% addossati a sinistra (per tenerli uno vicino
 all'altro se usati insieme)*/
 .col-50 {
@@ -147,22 +169,36 @@ all'altro se usati insieme)*/
 	width: 50%;
 	margin: 0 auto;
 }
-/*CSS per messaggi d'errore (utilizzato in login e registrazione)*/
-.error {
-	font-size: 14px;
-	border-radius: 5px;
-	border-color: #f5c6cb;
-	color: #721c24;
-	padding: 20px;
-	background-color: #f8d7da;
+
+/*******************************************
+* Sezione per le voci del menu responsive  *
+*******************************************/
+a.menu-icon img {
+	width: 15px;
 }
-.info {
-	font-size: 14px;
-	border-radius: 5px;
-	border-color: #f5c6cb;
+#search-responsive {
+	display: none;
+	width: 95%;
+	margin: auto;
+}
+#search-responsive input, #search-responsive button {
+	box-shadow: 0px 2px 4px #555;
+	box-sizing: border-box;
+	height: 50px;
+	float: left;
+	border: none;
+}
+#search-responsive input {
+	width: 85%;
+	border-right: 2px solid rgba(58, 175, 169, 0.2);
+	border-radius: 6px 0px 0px 6px;
+	padding: 10px 20px;
+}
+#search-responsive button {
+	width: 15%;
+	background-color: #ffffff;
 	color: #2b7a78;
-	padding: 20px;
-	background-color: #def2f1;
+	border-radius: 0px 6px 6px 0px;
 }
 
 /********************************************
@@ -217,4 +253,100 @@ all'altro se usati insieme)*/
 }
 #sign-form button:hover {
 	background-color: #2b7a78;
+}
+
+/*******************************
+* Sezione per il menu (navbar) *
+********************************/
+header #logo {
+	float: left;
+	height: 60px;
+	padding: 3px;
+}
+header nav a {
+	color: #ffffff;
+  	display: block;
+	font-size: 14px;
+  	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+  	padding: 24px 20px 24px 20px;
+	float: right;
+}
+header #menu a span {
+	font-size: 13px;
+	max-width: 70px;
+	margin: 4px 0px 0px 3px;
+	overflow: hidden;
+	white-space: nowrap;
+ 	text-overflow: ellipsis;
+  	float: right;
+}
+header #menu a:hover, header #logo:hover {	
+	box-shadow: 0px -6px #3aafa9 inset;   
+}
+header nav #search {
+	width: 27%;
+	padding-top: 16px; /*Allinea con il resto dei pulsanti*/
+	float: right; /*!! Serve per far allargare la barra verso sinistra.*/
+}
+header nav #search input {
+	padding: 10px;
+	font-size: 14px;
+	float: right;
+	border: none;
+	border-radius: 4px;
+	width: 0%;
+}
+header #menu-responsive a {
+  display: none;
+}
+
+/********************
+* Media Queries     *
+* Breakpoint: 900px *
+********************/
+@media(max-width: 900px) {
+	.container {
+	  width: 100%;
+	}
+	#search-responsive {
+	  padding: 20px 0px 10px 0px;
+	  margin-bottom: 10px;
+	}
+	header #menu {
+	/*Nasconde tutti i link della navbar*/
+	  display: none;
+	}
+	header #menu-responsive a.menu-icon {
+	  float: right;
+	  display: block;
+	}
+	header #menu-responsive a:active,
+	header #menu-responsive button:hover {
+	  box-shadow: none;
+	  background-color: #3aafa9;
+	  color: #ffffff;
+	  cursor: pointer;
+	}
+	header #menu-responsive.responsive a.menu-icon {
+	  position: absolute;
+	  right: 0;
+	  top: 0;
+	}    
+	header #menu-responsive.responsive a,
+	header #menu-responsive.responsive form {
+	  clear: both;
+	  float: none;
+	  display: block;
+	  text-align: left;
+	  overflow: hidden;
+	  white-space: nowrap;
+	  text-overflow: ellipsis;
+	}
+	.box .col-50 {
+	  padding: 0;
+	  width: 100%;
+	  float: none;
+	}
 }

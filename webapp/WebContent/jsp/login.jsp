@@ -8,12 +8,11 @@ pageEncoding="UTF-8"%>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
 	<title>Dante's Library | Accedi</title>
 	<link rel="stylesheet" href="./css/style.css"/>
+	<script src="./scripts/fontawesome.js"></script>
+	<script src="./scripts/jquery-3.4.1.min.js"></script>
 </head>
 <body>
-    
-
-	
-
+<%@ include file="./jsp/layout/header.jsp"%>
 <div id="form-container">
 <h2>Accedi</h2>
 	<form id="sign-form" class="box" action="login" method="post">
@@ -31,8 +30,6 @@ pageEncoding="UTF-8"%>
 		<button type="submit">Registrati</button>
 	</form>
 </div>
-	
-<%@ include file="../layout/footer.jsp" %>
-
+<%@ include file="./jsp/layout/footer.jsp"%>
 </body>
 </html>
