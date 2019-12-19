@@ -7,12 +7,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
 	<title>Dante's Library | Contatti biblioteca</title>
 	<link rel="stylesheet" href="./css/style.css"/>
+	<link rel="stylesheet" href="./css/jquery-ui.css">
 	<script src="./scripts/fontawesome.js"></script>
 	<script src="./scripts/jquery-3.4.1.min.js"></script>
 </head>
 <body>
 
-<%@ include file="../layout/header.jsp" %>
+<%@ include file="./jsp/layout/header.jsp" %>
 
 <div class="container">
 	<div style="padding: 10px">
@@ -22,7 +23,7 @@
 	</div>
 </div>
 
-<%@ include file="../layout/footer.jsp" %>
+<%@ include file="./jsp/layout/footer.jsp" %>
 
 </body>
 </html>

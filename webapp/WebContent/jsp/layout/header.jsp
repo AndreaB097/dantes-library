@@ -1,10 +1,10 @@
 <header>
   <div class="container">
-    <a href="./index.jsp"><img id="logo" src="./images/logo.png" /></a>
+    <a href="./index.jsp"><img id="logo" title="HOMEPAGE" src="./images/logo.png" /></a>
 	<nav id="menu">
-	  <a class="menu-ui" href="#"><i class="fas fa-question-circle fa-lg"></i></a>
-	  <a href="./login.jsp"><i class="fas fa-user fa-lg"></i></a>
-	  <a id="search-icon" type="submit"><i class="fas fa-search fa-lg"></i></a>
+	  <a class="menu-ui" href="./contacts.jsp" title="CONTATTI"><i class="fas fa-question-circle fa-lg"></i></a>
+	  <a href="./login.jsp" title="ACCEDI"><i class="fas fa-user fa-lg"></i></a>
+	  <a id="search-icon" type="submit" title="CERCA"><i class="fas fa-search fa-lg"></i></a>
 	  <form id="search" action="./search" onsubmit="return cerca()">
 		<input type="search" name="q" placeholder="Ricerca per titolo, autore, genere, ..."/>
 	  </form>
@@ -53,7 +53,7 @@
 	
 	<nav id="menu-responsive" class="topnav">
 	  <a href="./login.jsp"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Accedi</a>
-	  <a href="#"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
+	  <a href="./contacts.jsp"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
 	<form id="search-responsive" action="./search" onsubmit="return cerca()">
 		<input type="search" name="q" placeholder="Cerca un libro..." />
 		<button type="submit"><i class="fas fa-search fa-lg"></i></button>

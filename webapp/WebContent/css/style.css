@@ -302,6 +302,62 @@ header #menu-responsive a {
   display: none;
 }
 
+/********************************************
+* Stile per i Tooltip(suggerimento) che     *
+* compaiono al passaggio del mouse sul menu *
+********************************************/
+.ui-tooltip {
+	background: rgb(43, 122, 120) !important;
+	border:none !important;
+	border-radius: 2px !important;
+	padding: 10px 15px !important;
+	color: #ffffff !important;
+	font: normal 13px "Josefin Sans", sans-serif !important;
+	box-shadow: 1px 1px 5px #666 !important;
+}
+.form-tooltip {
+	background: #fafafa !important;
+	padding: 5px 15px !important;
+	color: #000 !important;
+	border-radius: 2px !important;
+	font: normal 15px "Roboto-Light", sans-serif !important;
+	box-shadow: 2px 2px 4px 1px #666 !important;
+}
+.arrow {
+	width: 100px;
+	height: 16px;
+	overflow: hidden;
+	position: absolute;
+	left: 50%;
+	margin-left: -35px;
+	bottom: -16px;
+}
+.arrow.top {
+	top: -16px;
+	bottom: auto;
+}
+.arrow.left {
+	left: 20%;
+}
+.arrow:after {
+	background: #666 !important;
+	content: "";
+	position: absolute;
+	left: 24px;
+	top: -20px;
+	width: 25px;
+	height: 25px;
+	box-shadow: 6px 5px 9px -9px black;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+.arrow.top:after {
+	background-color: #2b7a78 !important;
+	bottom: -23px;
+	top: auto;
+}
+
 /********************
 * Media Queries     *
 * Breakpoint: 900px *
