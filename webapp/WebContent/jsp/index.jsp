@@ -14,11 +14,11 @@
 	<script src="./scripts/jquery-zoom.js"></script>
 </head>
 <body>
-<%@include file="./layout/header.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 <div class="container">
   <h1>Dante's Library</h1>
 </div>
 
-<%@include file="./layout/footer.jsp" %>
+<%@include file="./jsp/layout/footer.jsp" %>
 </body>
 </html>

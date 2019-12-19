@@ -10,10 +10,7 @@ pageEncoding="UTF-8"%>
 	<link rel="stylesheet" href="./css/style.css"/>
 </head>
 <body>
-    
-
-	
-
+<%@ include file="./jsp/layout/header.jsp"%>
 <div id="form-container">
 <h2>Accedi</h2>
 	<form id="sign-form" class="box" action="login" method="post">
@@ -31,8 +28,6 @@ pageEncoding="UTF-8"%>
 		<button type="submit">Registrati</button>
 	</form>
 </div>
-	
-<%@ include file="../layout/footer.jsp" %>
-
+<%@ include file="./jsp/layout/footer.jsp"%>
 </body>
 </html>
