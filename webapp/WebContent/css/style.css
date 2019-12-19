@@ -1,3 +1,18 @@
+/*******************************************
+* Nome file: style.css                     *
+* Autori: Buongusto Andrea, Salierno Marco *
+********************************************/
+
+
+/***
+*						Palette colori:
+* #17252a oppure rgb(23, 37, 42) - scuro
+* #2b7a78 oppure rgb(43, 122, 120)
+* #3aafa9 oppure rgb(58, 175, 169)
+* #def2f1 oppure rgb(222, 242, 241)
+* #ffffff oppure rgb(255, 255, 255) - chiaro
+***/
+
 /*Importazione Font*/
 @font-face {
 	font-family: "Josefin Sans";
@@ -31,14 +46,14 @@
 	font-family: "FontAwesomeRegular";
 	src: url("../fonts/Font Awesome Regular-400.otf");
 }
-* {
-	box-sizing: border-box;
-	outline: none;
-}
 
 /******************************************************
 * Sezione CSS che modifica i tag in maniera "globale" *
 ******************************************************/
+* {
+	box-sizing: border-box;
+	outline: none;
+}
 html {
 	min-height: 100%;
 	position: relative;
@@ -73,7 +88,7 @@ input {
 	background-color: #ffffff;
 }
 input[type="number"] {
-	/*Larghezza dei campi per l'inserimento di quantit‡ e durata noleggio
+	/*Larghezza dei campi per l'inserimento di quantit√† e durata noleggio
 	(di default sono troppo larghi)*/
 	width: 50px; 
 }
