@@ -53,10 +53,11 @@ public class UsersDAO {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO users(name, surname, email, password, "
 					+ "codice_fiscale, address) VALUES(?, ?, ?, ?, ?, ?);");
-			ps.setString(3, user.getName());
-			ps.setString(4, user.getSurname());
-			ps.setString(1, user.getEmail());
-			ps.setString(2, user.getPassword());
+
+			ps.setString(1, user.getName());
+			ps.setString(2, user.getSurname());
+			ps.setString(3, user.getEmail());
+			ps.setString(4, user.getPassword());
 			ps.setString(5,	user.getCodice_fiscale());
 			ps.setString(6, user.getAddress());
 			
@@ -65,6 +66,25 @@ public class UsersDAO {
 			conn.close();
 			
 			return true;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		
+		return false;
+	}
+	
+	public static boolean checkEmail(String email) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT users.email FROM users WHERE email = '" + email + "'");
+			
+			ResultSet result = ps.executeQuery();
+			
+			if(!result.isBeforeFirst()) { /*Nessuna corrispondenza trovata nel DB, restituisco true*/
+				conn.close();
+				return true;
+			}
 		}
 		catch(SQLException e) {
 			System.out.println("Errore Database: " + e.getMessage());
