@@ -23,7 +23,7 @@ pageEncoding="UTF-8" import="java.util.Calendar"%>
 
 <div id="error-list" tabindex="-1"></div>
 
-<form id="sign-form" class="box" action="register" method="post" onsubmit="return validateSubmit()">
+<form id="sign-form" class="box" action="register" method="post">
   <small>(Attenzione! TUTTI i campi sono obbligatori.)</small>
   <div class="col-50">
     <label for="name">Nome</label>				
@@ -40,8 +40,8 @@ pageEncoding="UTF-8" import="java.util.Calendar"%>
 		title="La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero." />
 	<label for="repeat">Ripeti password</label>
 	<input id="repeat" type="password" name="password" placeholder="Conferma password" />
-	  <label for="codice fiscale">Codice fiscale</label>
-	  <input id="codice fiscale" type="text" name="codice fiscale" placeholder="Inserisci il tuo codice fiscale"/>
+	  <label for="codice_fiscale">Codice fiscale</label>
+	  <input id="codice_fiscale" type="text" name="codice_fiscale" placeholder="Inserisci il tuo codice fiscale"/>
 		<label for="address">Indirizzo</label>
 		<input id="address" type="text" name="address" placeholder="Via Roma 10" />
 	<br><br>

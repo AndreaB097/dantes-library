@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<%@ include file="./jsp/layout/header.jsp" %>
+<%@ include file="/jsp/layout/header.jsp" %>
 
 <div class="container">
 	<div style="padding: 10px">
