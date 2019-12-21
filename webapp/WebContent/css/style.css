@@ -260,7 +260,7 @@ a.menu-icon img {
 ********************************/
 header #logo {
 	float: left;
-	height: 60px;
+	height: 67px;
 	padding: 3px;
 }
 header nav a {
@@ -300,6 +300,25 @@ header nav #search input {
 }
 header #menu-responsive a {
   display: none;
+}
+
+/***********************
+* Sezione pagina libro *
+************************/
+div.book-container {
+	display: block;
+	overflow: auto;
+	padding: 20px;
+}
+div.cover, div.details {
+	width: 50%;
+	float: left;
+}
+div.cover {
+	text-align: center;
+}
+div.cover img {
+	width: 300px;
 }
 
 /********************************************

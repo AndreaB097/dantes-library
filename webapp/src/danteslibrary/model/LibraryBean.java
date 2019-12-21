@@ -1,7 +1,5 @@
 package danteslibrary.model;
 
-import java.time.LocalDate;
-
 public class LibraryBean {
 	
 	private String name;

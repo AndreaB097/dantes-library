@@ -15,7 +15,8 @@
 <body>
 <%@include file="./jsp/layout/header.jsp" %>
 <div class="container">
-  <h1>Dante's Library</h1>
+  <h1>Dante's Library Homepage</h1>
+  <a href="./book?id=1">Cliccami (test libro)</a>
 </div>
 
 <%@include file="./jsp/layout/footer.jsp" %>

@@ -1,5 +1,7 @@
 package danteslibrary.model;
 
+import java.util.ArrayList;
+
 public class BooksBean {
 	
 	private int book_code;
@@ -7,8 +9,8 @@ public class BooksBean {
 	private String publisher;
 	private int quantity;
 	private String cover;
-	private String[] authors;
-	private String[] genres;
+	private ArrayList<String> authors;
+	private ArrayList<String> genres;
 	
 	public int getBook_code() {
 		return book_code;
@@ -40,16 +42,16 @@ public class BooksBean {
 	public void setCover(String cover) {
 		this.cover = cover;
 	}
-	public String[] getAuthors() {
+	public ArrayList<String> getAuthors() {
 		return authors;
 	}
-	public void setAuthors(String[] authors) {
+	public void setAuthors(ArrayList<String> authors) {
 		this.authors = authors;
 	}
-	public String[] getGenres() {
+	public ArrayList<String> getGenres() {
 		return genres;
 	}
-	public void setGenres(String[] genres) {
+	public void setGenres(ArrayList<String> genres) {
 		this.genres = genres;
 	}
 	
