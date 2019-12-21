@@ -2,7 +2,7 @@ package danteslibrary.model;
 
 import java.time.LocalDate;
 
-public class Bookings {
+public class BookingsBean {
 	
 	private int booking_code;
 	private LocalDate start_date;

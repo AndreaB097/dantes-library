@@ -2,7 +2,7 @@ package danteslibrary.model;
 
 import java.time.LocalDate;
 
-public class Library {
+public class LibraryBean {
 	
 	private String name;
 	private String logo;

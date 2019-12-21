@@ -1,6 +1,6 @@
 package danteslibrary.model;
 
-public class Books {
+public class BooksBean {
 	
 	private int book_code;
 	private String title;

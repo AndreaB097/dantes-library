@@ -1,6 +1,6 @@
 package danteslibrary.model;
 
-public class Card {
+public class CardBean {
 	
 	private int card_code;
 	private String codice_fiscale;

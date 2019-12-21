@@ -24,7 +24,7 @@ public class DBConnection  {
 
 		String db_name = "danteslibrary";
 		String db_username = "root";
-		String db_password = "LaMiaPassword1!";
+		String db_password = "root";
 		String url = "jdbc:mysql://localhost:3306/"+ db_name + "?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true"
 				+ "&useLegacyDatetimeCode=false&serverTimezone=UTC";
 		
