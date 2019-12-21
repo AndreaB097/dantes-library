@@ -4,6 +4,8 @@ import java.sql.*;
 
 import danteslibrary.model.UsersBean;
 import danteslibrary.util.DBConnection;
+import java.util.ArrayList;
+
 
 public class UsersDAO {
 	
@@ -92,4 +94,99 @@ public class UsersDAO {
 		
 		return false;
 	}
+	
+	public UsersBean getUserByEmail(String user_email) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT users.name, users.surname, users.email, users.codice_fiscale, users.address FROM users WHERE email = ?");
+			ps.setString(1, user_email);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
+				return null;
+			
+			if(result.first()) {
+				/*Ottengo i dati dell'utente dal DB*/
+				String name = result.getString("name");
+				String surname = result.getString("surname");
+				String email = result.getString("email");
+				String codice_fiscale = result.getString("codice_fiscale");
+				String address = result.getString("address");
+				
+				conn.close();
+				
+				UsersBean user = new UsersBean();
+				user.setEmail(email);
+				user.setName(name);
+				user.setSurname(surname);
+				user.setCodice_fiscale(codice_fiscale);
+				user.setAddress(address);
+				
+				return user;
+			}
+			else {
+				conn.close();
+				return null;
+			}
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		return null;
+	}
+	
+	
+	public ArrayList<UsersBean> getAllUsers() {
+		
+		ArrayList<UsersBean> users = new ArrayList<UsersBean>();
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT users.name, users.surname, users.email, users.codice_fiscale, users.address FROM users;");
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
+				return null;
+			
+			while(result.next()) {
+				/*Ottengo i dati dell'utente dal DB*/
+				String email = result.getString("email");
+				String name = result.getString("name");
+				String surname = result.getString("surname");
+				String codice_fiscale = result.getString("codice_fiscale");
+				String address = result.getString("address");
+				
+				/*Costruisco il Bean da aggiungere poi all'array con tutti
+				 * gli altri utenti*/
+				UsersBean user = new UsersBean();
+				user.setEmail(email);
+				user.setName(name);
+				user.setSurname(surname);
+				user.setCodice_fiscale(codice_fiscale);
+				user.setAddress(address);
+				users.add(user);
+			}
+			conn.close();
+			return users;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		return null;
+	}
+	
+	public int removeUser(String email) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE email = ?");
+			ps.setString(1, email);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Databammse: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	
 }

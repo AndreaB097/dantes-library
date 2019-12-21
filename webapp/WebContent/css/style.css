@@ -378,6 +378,121 @@ div.cover img {
 }
 
 /********************
+* Media Pannello di amministrazione     *
+********************/
+.sidebar-responsive {
+	display: none;
+}
+.sidebar {
+	box-shadow: 0px 0px 5px 3px #ddd;
+	width: 20%;
+	margin: 10px 7px;
+	color: #667788;
+	float: left;
+}
+.sidebar section {
+	border-bottom: 1px solid #ccc;
+	padding: 20px 30px;
+}
+.sidebar section.active {
+	background-color: #3aafa9;
+	color: #ffffff;
+}
+.sidebar section:hover:not(.active) {
+	background-color: #f4f4f4;
+	cursor: pointer;
+}
+.section-container {
+	float: left;
+	margin: 10px 7px;
+	padding: 5px 10px;
+	box-shadow: 0px 0px 5px 3px #ddd;
+	width: 75%;
+	display: inline;
+}
+.section-container h3 {
+	padding: 10px 0;
+	border-bottom: 1px solid #ccc;
+}
+.section-container h2 {
+	padding: 10px 0;
+	border-bottom: 1px solid #ccc;
+	margin-top: 0px;
+}
+.section-container p {
+	font-size: 18px;
+}
+
+
+.section-container input {
+	width: 50%;
+	border: 1px solid #d9d9d9;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 16px;
+	margin-bottom: 20px;
+	display: block;
+}
+.section-container input:focus {
+	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
+}
+.section-container #search-bar {
+	max-width: 650px;
+	height: 50px;
+}
+.section-container #search-bar input, .section-container #search-bar button {
+	box-shadow: 0px 0px 2px 2px #ccc;
+	height: 100%;
+	float: left;
+	border: none;
+}
+.section-container #search-bar input {
+	width: 90%;
+	border-right: 2px solid rgba(58, 175, 169, 0.2);
+	border-radius: 6px 0px 0px 6px;
+	padding: 10px 20px;
+}
+.section-container #search-bar button {
+	width: 10%;
+	background-color: #ffffff;
+	color: #2b7a78;
+	border-radius: 0px 6px 6px 0px;
+}
+.section-container #search-bar button:hover {
+	background-color: #3aafa9;
+	color: #ffffff;
+}
+
+.section-container #show-all-btn {
+	width: 150px;
+	height: 40px;
+	margin: 20px 0 40px 0;
+}
+.section-container .overflow-container {
+	height: 550px;
+	width: auto;
+	overflow: auto;
+	scrollbar-width: thin;
+	display: block;
+}
+.section-container table {
+	margin-top: 20px;
+	border-collapse: collapse;
+	text-align: center;
+}
+.section-container table td {
+	padding: 20px;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+
+
+
+.section-container #search-bar input {
+	margin: 0;
+}
+
+/********************
 * Media Queries     *
 * Breakpoint: 900px *
 ********************/
