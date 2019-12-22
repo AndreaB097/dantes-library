@@ -8,7 +8,7 @@ public class ManagersBean {
 	private String surname;
 	private String address;
 	private String phone;
-	private String role;
+	private int[] role;
 	
 	public String getEmail() {
 		return email;
@@ -46,10 +46,10 @@ public class ManagersBean {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public String getRole() {
+	public int[] getRole() {
 		return role;
 	}
-	public void setRole(String role) {
+	public void setRole(int[] role) {
 		this.role = role;
 	}
 

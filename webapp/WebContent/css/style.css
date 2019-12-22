@@ -377,9 +377,9 @@ div.cover img {
 	top: auto;
 }
 
-/********************
-* Media Pannello di amministrazione     *
-********************/
+/******************************
+* Pannello di amministrazione * 
+*******************************/
 .sidebar-responsive {
 	display: none;
 }
@@ -422,8 +422,6 @@ div.cover img {
 .section-container p {
 	font-size: 18px;
 }
-
-
 .section-container input {
 	width: 50%;
 	border: 1px solid #d9d9d9;
@@ -485,9 +483,6 @@ div.cover img {
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
 }
-
-
-
 .section-container #search-bar input {
 	margin: 0;
 }

@@ -4,16 +4,16 @@ import java.time.LocalDate;
 
 public class BookingsBean {
 	
-	private int booking_code;
+	private int booking_id;
 	private LocalDate start_date;
 	private LocalDate end_date;
 	private int state_id;
 	
-	public int getBooking_code() {
-		return booking_code;
+	public int getBooking_id() {
+		return booking_id;
 	}
-	public void setBooking_code(int booking_code) {
-		this.booking_code = booking_code;
+	public void setBooking_id(int booking_id) {
+		this.booking_id = booking_id;
 	}
 	public LocalDate getStart_date() {
 		return start_date;
@@ -33,4 +33,5 @@ public class BookingsBean {
 	public void setState_id(int state_id) {
 		this.state_id = state_id;
 	}
+
 }

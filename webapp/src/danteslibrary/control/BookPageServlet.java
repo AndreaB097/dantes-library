@@ -13,13 +13,13 @@ public class BookPageServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		String book_code = request.getParameter("id");
-		if(book_code == null || book_code.equals("")) {
+		String book_id = request.getParameter("id");
+		if(book_id == null || book_id.equals("")) {
 			response.sendError(404);
 			return;
 		}
 		BooksDAO dao = new BooksDAO();
-		request.setAttribute("book", dao.findProductById(book_code));
+		request.setAttribute("book", dao.findBookById(book_id));
 		request.getRequestDispatcher("book_details.jsp").forward(request, response);
 	}
 	

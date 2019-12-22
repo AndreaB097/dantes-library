@@ -26,6 +26,7 @@ import="java.util.ArrayList, danteslibrary.model.BooksBean"%>
 		</div>
 		<div class="details">
 			<h1><%=book.getTitle() %></h1>
+			<p><%=book.getDescription() %></p>
 			<p><strong>Genere: </strong>
 			<%for(String s : book.getGenres()) {%>
 				<%=s %>
