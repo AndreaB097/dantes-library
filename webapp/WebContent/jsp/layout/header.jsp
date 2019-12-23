@@ -8,9 +8,14 @@
 	  <a class="menu-ui" href="./contacts.jsp" title="CONTATTI"><i class="fas fa-question-circle fa-lg"></i></a>
 	  <% if(session.getAttribute("user") != null) {%>
 		<a href="./profile.jsp" title="AREA UTENTE"><i class="fas fa-user fa-lg"></i><span>${user.name}</span></a>
-	<%} else { %>
-	  <a href="./login.jsp" title="ACCEDI"><i class="fas fa-user fa-lg"></i></a>
-	<%} %>
+	  <%} else if(session.getAttribute("admin") != null) { %>
+	  	<script>
+			$(".menu-ui").hide();
+		</script>
+		<a href="./admin.jsp" title="PANNELLO DI CONTROLLO"><i class="fas fa-user-shield fa-lg"></i><span>${admin.name}</span></a>
+		<%} else {%>
+			<a href="./login.jsp" title="ACCEDI"><i class="fas fa-user fa-lg"></i></a>
+		<%} %>
 	  <a id="search-icon" type="submit" title="CERCA"><i class="fas fa-search fa-lg"></i></a>
 	  <form id="search" action="./search" onsubmit="return cerca()">
 		<input type="search" name="q" placeholder="Ricerca per titolo, autore, genere, ..."/>
@@ -61,10 +66,12 @@
 	<nav id="menu-responsive" class="topnav">
 	<% if(session.getAttribute("user") != null) {%>
 		<a href="./profile.jsp" class="hide-tooltip"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;${user.name}</a>
-	<%} else { %>
-	  <a href="./login.jsp"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Accedi</a>
-	<% } %>
-	  <a href="./contacts.jsp"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
+	<%} else if(session.getAttribute("admin") != null) { %>
+		<a href="./admin.jsp" class="hide-tooltip"><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;&nbsp;${admin.name}</a>
+	<%} else {%>
+		<a href="./login.jsp"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Accedi</a>
+	<%} %>
+	<a href="./contacts.jsp"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
 	<form id="search-responsive" action="./search" onsubmit="return cerca()">
 		<input type="search" name="q" placeholder="Cerca un libro..." />
 		<button type="submit"><i class="fas fa-search fa-lg"></i></button>

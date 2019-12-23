@@ -134,6 +134,47 @@ public class UsersDAO {
 		return null;
 	}
 	
+	public ArrayList<UsersBean> getUsersByFilter(int filter, String keyword) {
+		String[] filters = {"name", "surname", "email", "codice_fiscale"};
+		ArrayList<UsersBean> users = new ArrayList<UsersBean>();
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT users.name, users.surname, users.email, users.codice_fiscale, users.address FROM users WHERE "+filters[filter]+" = ?");
+			ps.setString(1, keyword);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
+				return null;
+			
+			/* Itero fin quando non ci sono piu' utenti */
+			while(result.next()) {
+				/*Ottengo i dati dell'utente dal DB*/
+				String name = result.getString("name");
+				String surname = result.getString("surname");
+				String email = result.getString("email");
+				String codice_fiscale = result.getString("codice_fiscale");
+				String address = result.getString("address");
+				
+				UsersBean user = new UsersBean();
+				user.setEmail(email);
+				user.setName(name);
+				user.setSurname(surname);
+				user.setCodice_fiscale(codice_fiscale);
+				user.setAddress(address);
+				
+				/*Aggiungo l'utente all'Arraylist*/
+				users.add(user);
+			}
+			conn.close();
+			return users;
+
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
 	
 	public ArrayList<UsersBean> getAllUsers() {
 		

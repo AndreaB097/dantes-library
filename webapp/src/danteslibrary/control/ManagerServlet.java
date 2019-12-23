@@ -31,22 +31,32 @@ public class ManagerServlet extends HttpServlet {
 		/*[ FUNZIONALITÀ AMMINISTRATORE ]
 		 * disponibili solo se è autenticato (admin != null)*/
 		if(session.getAttribute("admin") != null) {
-			/* - Ricerca account utente tramite email
-			 * - Ricerca ordini di un utente tramite mail
-			 *(queste funzionalità condividono il codice poichè entrambe ricevono
-			 *in input l'indirizzo email di un utente)*/
-			if(request.getParameter("user_email") != null && request.getParameter("user_email") != "") {
-				String user_email = request.getParameter("user_email");
-				UsersDAO dao = new UsersDAO();
-				UsersBean bean = dao.getUserByEmail(user_email);
-				request.setAttribute("user_search", bean);
-
+			/* - Ricerca account utente tramite email */
+			
+			if(request.getParameter("keyword") != null && request.getParameter("keyword") != "") {
+				String keyword = request.getParameter("keyword");
+				/*filter puo' assumere 4 valori:
+				 * - 0: nome
+				 * - 1: cognome
+				 * - 2: email
+				 * - 3: codice fiscale */
+				int filter = Integer.parseInt(request.getParameter("filter"));
+				if(filter < 0 || filter > 3) {
+					request.setAttribute("info", "Filtro non valido.");
+					request.getRequestDispatcher("admin.jsp").forward(request, response);
+					return;
+				} 
+				else {
+					UsersDAO dao = new UsersDAO();
+					ArrayList<UsersBean> users = dao.getUsersByFilter(filter, keyword);
+					request.setAttribute("users", users);
+				}
 			}
 			/* - Mostra tutti gli utenti presenti nel database*/
 			else if(request.getParameter("all_users") != null) {
 				UsersDAO dao = new UsersDAO();
 				ArrayList<UsersBean> users = dao.getAllUsers();
-				request.setAttribute("all_users", users);
+				request.setAttribute("users", users);
 			}
 			/* - Rimozione utente dal database (data la mail in input)*/
 			else if(request.getParameter("remove_user") != null) {

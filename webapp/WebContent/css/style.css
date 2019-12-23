@@ -170,6 +170,24 @@ all'altro se usati insieme)*/
 	margin: 0 auto;
 }
 
+/*CSS per messaggi informativo (utilizzato per errori o comunicazioni)*/
+.error {
+	font-size: 14px;
+	border-radius: 5px;
+	border-color: #f5c6cb;
+	color: #721c24;
+	padding: 20px;
+	background-color: #f8d7da;
+}
+.info {
+	font-size: 14px;
+	border-radius: 5px;
+	border-color: #f5c6cb;
+	color: #2b7a78;
+	padding: 20px;
+	background-color: #def2f1;
+}
+
 /*******************************************
 * Sezione per le voci del menu responsive  *
 *******************************************/
@@ -438,19 +456,24 @@ div.cover img {
 	max-width: 650px;
 	height: 50px;
 }
-.section-container #search-bar input, .section-container #search-bar button {
+.section-container #search-bar .search-field,
+.section-container #search-bar .search-button {
 	box-shadow: 0px 0px 2px 2px #ccc;
 	height: 100%;
 	float: left;
 	border: none;
 }
-.section-container #search-bar input {
+.section-container .ui-button {
+	background: none !important;
+	font-size: 15px;
+}
+.section-container #search-bar .search-field {
 	width: 90%;
 	border-right: 2px solid rgba(58, 175, 169, 0.2);
 	border-radius: 6px 0px 0px 6px;
 	padding: 10px 20px;
 }
-.section-container #search-bar button {
+.section-container #search-bar .search-button {
 	width: 10%;
 	background-color: #ffffff;
 	color: #2b7a78;
@@ -534,4 +557,74 @@ div.cover img {
 	  width: 100%;
 	  float: none;
 	}
+	/*Pagina amministratori - responsive*/
+	div.sidebar {
+		display: none;
+	}
+	div.sidebar-responsive {
+		display: block;
+		box-shadow: 0px 0px 5px 3px #ddd;
+		color: #667788;
+		width: 95%;
+		margin: 10px auto;
+		overflow: hidden;
+	}
+	div.sidebar-responsive section {
+		width: 25%;
+		height: 80px;
+		display: block;
+		float: left;
+		border: none;
+		text-align: center;
+		margin: 0 auto;
+		padding: 20px 10px;
+		font-size: 17px;
+	}
+	div.sidebar-responsive section p {
+		margin: 0 auto;
+		display: inline-block;
+	}
+	div.sidebar-responsive section.active {
+		background-color: #3aafa9;
+		color: #ffffff;
+	}
+	div.sidebar-responsive section:hover:not(.active) {
+		background-color: #f4f4f4;
+		cursor: pointer;
+	}
+	div.section-container {
+		float: none;
+		display: block;
+		width: 95%;
+		margin: 10px auto;
+	}
+	div.section-container input,
+	div.section-container .overflow-container table {
+		width: 100%;
+	}
+	div.section-container #search-bar .search-field {
+		width: 85%;
+		font-size: 12px;
+		padding: 5px 10px;
+	}
+	div.section-container #search-bar .search-button {
+		width: 15%;
+	}
+	div.section-container .overflow-container {
+		height: auto;
+		width: 100%;
+		margin: 0;
+	}
+	div.section-container form.overflow-container {
+		overflow: hidden;
+	}
+	div.section-container .overflow-container th {
+		font-size: 12px;
+		font-weight: bold;
+	}
+	div.section-container .overflow-container td {
+		padding: 7px 4px;
+		font-size: 14px;
+	}
+	
 }

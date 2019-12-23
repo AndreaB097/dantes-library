@@ -30,7 +30,7 @@ create table if not exists users(
     surname varchar(30) not null,
     email varchar(100) primary key,
     password varchar(191) not null,
-    codice_fiscale char(16) not null,
+    codice_fiscale char(16) unique not null,
     address varchar(100) not null
 );
 

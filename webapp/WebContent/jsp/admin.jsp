@@ -23,7 +23,7 @@ java.util.Date"%>
 <% if(session.getAttribute("admin") == null) { %>
 <!-- Sezione LOGIN Gestori -->
 <div id="form-container">
-	<h2>Accedi come Amministratore</h2>
+	<h2>Accedi come Gestore</h2>
 	<form id="sign-form" class="box" action="admin" method="post">
 		<label for="enail">Email</label>
 		<input id="email" type="text" name="email"/>
@@ -64,19 +64,32 @@ java.util.Date"%>
 		<div class="section-container">
 			<h2>Gestione account utenti</h2>
 			<form method="post">	
+				<p>Ricerca per: 
+				<select class="dropdownFilters" name="filter">
+  					<option value="0">Nome</option>
+  					<option value="1">Cognome</option>
+  					<option value="2">Email</option>
+  					<option value="3">Codice Fiscale</option>
+				</select>
+				</p>
 				<div id="search-bar">
-					<input type="text" name="user_email" placeholder="Inserisci l'email dell'utente da cercare"/>
-					<button type="submit" formaction="admin?account"><i class="fas fa-search"></i></button>
+					<input class="search-field" type="text" name="keyword" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<button class="search-button" type="submit" formaction="admin?users"><i class="fas fa-search"></i></button>
 				</div>
-				<button id="show-all-btn" type="submit" formaction="admin?all_users">Mostra tutti</button>
+				<script>
+				$(document).ready(function() {
+				    $('.dropdownFilters').selectmenu();
+				});
+				</script>
+				
 			</form>
-		
+			<button id="show-all-btn" onClick="window.location = 'admin?all_users'">Mostra tutti</button>
 			<% if(request.getAttribute("info") != null) { %>
-				<div class="info">L'utente è stato rimosso con successo.</div>
+				<div class="info">L'utente <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
 			<% } %>
 			<div class="overflow-container">
 			<table>
-			<%if(request.getAttribute("user_search") != null) { %>
+			<%if(request.getAttribute("users") != null) { %>		
 					<tr>
 						<th>Email</th>
 						<th>Nome</th>
@@ -84,38 +97,15 @@ java.util.Date"%>
 						<th>Codice fiscale</th>
 						<th>Indirizzo</th>
 					</tr>
+			<%	@SuppressWarnings("unchecked")
+				ArrayList<UsersBean> users = (ArrayList<UsersBean>) request.getAttribute("users");
+				for(UsersBean user : users)	{ %>
 					<tr>
-						<td>${user_search.email}</td>
-						<td>${user_search.name}</td>
-						<td>${user_search.surname}</td>
-						<td>${user_search.codice_fiscale}</td>
-						<td>${user_search.address}</td>
-						<td>
-							<form action="admin?account" method="post">
-								<input type="hidden" name="remove_user" value="${user_search.email}">
-								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
-							</form>
-						</td>
-					</tr>
-			<% } else if(request.getAttribute("all_users") != null) { %>
-				<tr>
-						<th>Email</th>
-						<th>Nome</th>
-						<th>Cognome</th>
-						<th>Codice Fiscale</th>
-						<th>Indirizzo</th>
-				</tr>
-				<%
-				@SuppressWarnings("unchecked")
-				ArrayList<UsersBean> users = (ArrayList<UsersBean>)request.getAttribute("all_users");
-				for(int i = 0; i < users.size(); i++) {
-					UsersBean user = users.get(i); %>
-					<tr>
-						<td><%=user.getEmail()%></td>
-						<td><%=user.getName()%></td>
-						<td><%=user.getSurname()%></td>
-						<td><%=user.getCodice_fiscale()%></td>
-						<td><%=user.getAddress()%></td>
+						<td><%=user.getEmail() %></td>
+						<td><%=user.getName() %></td>
+						<td><%=user.getSurname() %></td>
+						<td><%=user.getCodice_fiscale() %></td>
+						<td><%=user.getAddress() %></td>
 						<td>
 							<form action="admin?account" method="post">
 								<input type="hidden" name="remove_user" value="<%=user.getEmail()%>">
@@ -123,12 +113,47 @@ java.util.Date"%>
 							</form>
 						</td>
 					</tr>
-			<% }
+			<%  } 
 			} %>
 			</table>
 			</div> <!-- fine overflow-container -->
 		</div> <!-- fine sezione Account -->
+	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->
+	<script>
+		$(".section-container").hide();
+		$(".sidebar section, .sidebar-responsive section").removeClass("active");
+		<%if(request.getParameter("account") != null) {%>
+			$(".section-container").eq(0).show();
+			$(".sidebar section").eq(0).addClass("active");
+			$(".sidebar-responsive section").eq(0).addClass("active");
+		<% } else if(request.getParameter("orders") != null) {%>
+			$(".section-container").eq(1).show();
+			$(".sidebar section").eq(1).addClass("active");
+			$(".sidebar-responsive section").eq(1).addClass("active");
+		<%} else if(request.getParameter("products") != null) { %>
+			$(".section-container").eq(2).show();
+			$(".sidebar section").eq(2).addClass("active");
+			$(".sidebar-responsive section").eq(2).addClass("active");
+		<%} else if(request.getParameter("administrators") != null) { %>
+			$(".section-container").eq(3).show();
+			$(".sidebar section").eq(3).addClass("active");
+			$(".sidebar-responsive section").eq(3).addClass("active"); 
+		<%} else {%>
+			$(".section-container").eq(0).show();
+			$(".sidebar section").eq(0).addClass("active");
+			$(".sidebar-responsive section").eq(0).addClass("active");
+		<%}%>
 		
+			$("section").click(function() {
+				if($("section").hasClass("active")) {
+					$("section").removeClass("active");
+					$(".section-container").hide();
+					$(this).addClass("active");
+					$(".section-container").eq($(this).index()).show();
+				}
+			});
+			
+		</script>
 	</div>
 <%} /*Chiusura dell'else in cima (quello che fa iniziare il pannello di controllo)*/%>
 	

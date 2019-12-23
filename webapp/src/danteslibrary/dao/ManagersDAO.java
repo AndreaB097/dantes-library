@@ -13,7 +13,9 @@ public class ManagersDAO {
 	public ManagersBean login(String email, String password) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT managers.email  FROM managers WHERE email = ? AND password = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"SELECT managers.email, managers.name, managers.surname, managers.address, managers.phone "
+					+ "FROM managers WHERE email = ? AND password = ?");
 			ps.setString(1, email);
 			ps.setString(2,	password);
 			ResultSet result = ps.executeQuery();
@@ -26,6 +28,10 @@ public class ManagersDAO {
 
 				ManagersBean admin = new ManagersBean();
 				admin.setEmail(result.getString("email"));
+				admin.setName(result.getString("name"));
+				admin.setName(result.getString("surname"));
+				admin.setAddress(result.getString("address"));
+				admin.setPhone(result.getString("phone"));
 				conn.close();
 				
 				return admin;
