@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"
-import="java.util.ArrayList, danteslibrary.model.BooksBean"%>
+import="java.util.ArrayList, danteslibrary.model.BooksBean, java.time.*, 
+java.time.format.*, java.util.Locale"%>
 
 <!doctype html>
 <html>
@@ -39,6 +40,66 @@ import="java.util.ArrayList, danteslibrary.model.BooksBean"%>
 			</p>
 			<%if(book.getQuantity() > 0) {%>
 			<p style="color: #0cc481"><strong>Disponibile</strong></p>
+			
+			<p>Data inizio prestito 
+			<%int day = LocalDate.now().getDayOfMonth();
+			  int month = LocalDate.now().getMonthValue();
+			  int year = LocalDate.now().getYear(); %>
+				<select class="dropdown" name="day">
+  					<%for(int i = 1; i <= 31; i++) { 
+  						if(i == day) { %>
+  							<option value="<%=i%>" selected><%=i %></option>
+  					  <%} 
+  						else {%>
+  					 		<option value="<%=i%>"><%=i %></option>
+  				  <%   }
+  					}%>
+				</select>
+				<select class="dropdown" name="month">
+  					<%for(int i = 1; i <= 12; i++) {
+  					  	if(i < month) { %>
+  							<option value="<%=month%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					<%	}
+  					  	else if(i == month) {%>
+  				      	<option value="<%=month%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  				    <%  }
+  					  	else { %>
+  					  	<option value="<%=month%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					<%  }
+  					}%>
+				</select>
+				<select class="dropdown" name="year">
+  					<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
+				</select>
+				</p>
+				<p>Data fine prestito 
+				<select class="dropdown" name="day">
+  					<%for(int i = 1; i <= 31; i++) { 
+  						if(i == day) { %>
+  							<option value="<%=i%>" selected><%=i %></option>
+  					  <%} 
+  						else {%>
+  					 		<option value="<%=i%>"><%=i %></option>
+  				  <%   }
+  					}%>
+				</select>
+				<select style="max-height: 100px" class="dropdown" name="month">
+  					<%for(int i = 1; i <= 12; i++) {
+  					  	if(i < month) { %>
+  							<option value="<%=month%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					<%	}
+  					  	else if(i == month) {%>
+  				      	<option value="<%=month%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  				    <%  }
+  					  	else { %>
+  					  	<option value="<%=month%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					<%  }
+  					}%>
+				</select>
+				<select class="dropdown" name="year">
+  					<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
+				</select>
+				</p>
 			<button>Prenota</button>
 			<%} else {%>
 			<p style="color: #eb4034"><strong>Non Disponibile</strong></p>
@@ -46,6 +107,14 @@ import="java.util.ArrayList, danteslibrary.model.BooksBean"%>
 		</div>
 	</div>
 </div>
+
+<script>
+$(document).ready(function() {
+   $('.dropdown').selectmenu({
+   	width: '150px'
+   })
+});
+</script>
 	
 <%@ include file="./jsp/layout/footer.jsp" %>
 

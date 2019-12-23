@@ -198,6 +198,8 @@ a.menu-icon img {
 	display: none;
 	width: 95%;
 	margin: auto;
+	padding: 10px 0px 10px 0px;
+	margin-bottom: 10px;
 }
 #search-responsive input, #search-responsive button {
 	box-shadow: 0px 2px 4px #555;
@@ -225,7 +227,7 @@ a.menu-icon img {
 #form-container {
 	padding: 10px;
 	margin: 10px auto;
-	max-width: 768px;
+	max-width: 500px;
 }
 .box {
 	margin-top: 20px;
@@ -300,7 +302,7 @@ header #menu a span {
  	text-overflow: ellipsis;
   	float: right;
 }
-header #menu a:hover, header #logo:hover {	
+header #menu a:hover, header #logo:hover {
 	box-shadow: 0px -6px #3aafa9 inset;   
 }
 header nav #search {
@@ -338,6 +340,7 @@ div.cover {
 div.cover img {
 	width: 300px;
 }
+.ui-selectmenu-menu .ui-menu {max-height: 200px;}
 
 /********************************************
 * Stile per i Tooltip(suggerimento) che     *
@@ -426,7 +429,6 @@ div.cover img {
 	padding: 5px 10px;
 	box-shadow: 0px 0px 5px 3px #ddd;
 	width: 75%;
-	display: inline;
 }
 .section-container h3 {
 	padding: 10px 0;
@@ -487,10 +489,10 @@ div.cover img {
 .section-container #show-all-btn {
 	width: 150px;
 	height: 40px;
-	margin: 20px 0 40px 0;
+	margin: 20px 0;
 }
 .section-container .overflow-container {
-	height: 550px;
+	height: 350px;
 	width: auto;
 	overflow: auto;
 	scrollbar-width: thin;
@@ -518,10 +520,14 @@ div.cover img {
 	.container {
 	  width: 100%;
 	}
-	#search-responsive {
-	  padding: 20px 0px 10px 0px;
-	  margin-bottom: 10px;
+	.box .col-50 {
+	  padding: 0;
+	  width: 100%;
+	  float: none;
 	}
+	/**
+	* Menu(header) responsive
+	**/
 	header #menu {
 	/*Nasconde tutti i link della navbar*/
 	  display: none;
@@ -552,12 +558,17 @@ div.cover img {
 	  white-space: nowrap;
 	  text-overflow: ellipsis;
 	}
-	.box .col-50 {
-	  padding: 0;
-	  width: 100%;
-	  float: none;
+	/**
+	* Pagina libro - responsive
+	**/
+	div.book-container div.cover,
+	div.book-container div.details {
+		float: none;
+		width: 100%;
 	}
-	/*Pagina amministratori - responsive*/
+	/**
+	* Pagina amministratori - responsive
+	**/
 	div.sidebar {
 		display: none;
 	}
