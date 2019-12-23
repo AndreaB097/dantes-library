@@ -224,7 +224,7 @@ public class UsersDAO {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Databammse: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		return result;
 	}

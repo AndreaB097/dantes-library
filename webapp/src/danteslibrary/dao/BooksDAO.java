@@ -7,6 +7,43 @@ import java.util.ArrayList;
 
 public class BooksDAO {
 	
+public ArrayList<BooksBean> getAllBooks() {
+		
+		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity FROM books;");
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
+				return null;
+			
+			while(result.next()) {
+				/*Ottengo i dati del libro dal DB*/
+				int book_id = result.getInt("book_id");
+				String title = result.getString("title");
+				String publisher = result.getString("publisher");
+				int quantity = result.getInt("quantity");
+				ArrayList<String> genres = retrieveBookGenres(book_id);
+				ArrayList<String> authors = retrieveBookAuthors(book_id);
+				
+				BooksBean book = new BooksBean();
+				book.setBook_id(book_id);
+				book.setTitle(title);
+				book.setPublisher(publisher);
+				book.setQuantity(quantity);
+				book.setGenres(genres);
+				book.setAuthors(authors);
+				books.add(book);
+			}
+			conn.close();
+			return books;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		return null;
+	}
+	
 	public BooksBean findBookById(String id) {
 		
 		try {
@@ -94,5 +131,65 @@ public class BooksDAO {
 		}
 		
 		return null;	
+	}
+	
+	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) {
+		
+		String[] filters = {"title", "authors.name", "publisher", "genres.name"};
+		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity FROM books, authors, genres WHERE "+filters[filter]+" = ? GROUP BY title;");
+			ps.setString(1, keyword);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
+				return null;
+			
+			/* Itero fin quando non ci sono piu' libri */
+			while(result.next()) {
+				/*Ottengo i dati del libro dal DB*/
+				int book_id = result.getInt("book_id");
+				String title = result.getString("title");
+				String publisher = result.getString("publisher");
+				int quantity = result.getInt("quantity");
+				ArrayList<String> genres = retrieveBookGenres(book_id);
+				ArrayList<String> authors = retrieveBookAuthors(book_id);
+				
+				BooksBean book = new BooksBean();
+				book.setBook_id(book_id);
+				book.setTitle(title);
+				book.setPublisher(publisher);
+				book.setQuantity(quantity);
+				book.setGenres(genres);
+				book.setAuthors(authors);
+				
+				/*Aggiungo il libro all'Arraylist*/
+				books.add(book);
+			}
+			conn.close();
+			return books;
+
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	public int removeBook(String book_id) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM books WHERE book_id = ?");
+			ps.setString(1, book_id);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		return result;
 	}
 }

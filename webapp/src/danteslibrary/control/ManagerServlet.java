@@ -14,8 +14,7 @@ import danteslibrary.model.*;
 
 
 @WebServlet("/admin")
-@MultipartConfig /*Necessario perché nella pagina admin.jsp abbiamo una form
- 				con enctype="multipart/form-data"*/
+
 public class ManagerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -31,9 +30,9 @@ public class ManagerServlet extends HttpServlet {
 		/*[ FUNZIONALITÀ AMMINISTRATORE ]
 		 * disponibili solo se è autenticato (admin != null)*/
 		if(session.getAttribute("admin") != null) {
-			/* - Ricerca account utente tramite email */
-			
-			if(request.getParameter("keyword") != null && request.getParameter("keyword") != "") {
+
+			/*--Sezione Utente--*/
+			if(request.getParameter("keyword_users") != null && request.getParameter("keyword") != "") {
 				String keyword = request.getParameter("keyword");
 				/*filter puo' assumere 4 valori:
 				 * - 0: nome
@@ -64,6 +63,39 @@ public class ManagerServlet extends HttpServlet {
 				dao.removeUser(request.getParameter("remove_user"));
 				request.setAttribute("info", request.getParameter("remove_user"));
 			}
+		
+			/* -- Sezione Libro -- */	
+				if(request.getParameter("keyword_book") != null && request.getParameter("keyword_book") != "") {
+					String keyword = request.getParameter("keyword_book");
+					/*filter puo' assumere 4 valori:
+					 * - 0: titolo
+					 * - 1: autore
+					 * - 2: casa editrice
+					 * - 3: Genere */
+					int filter = Integer.parseInt(request.getParameter("filter"));
+					if(filter < 0 || filter > 3) {
+						request.setAttribute("info", "Filtro non valido.");
+						request.getRequestDispatcher("admin.jsp").forward(request, response);
+						return;
+					} 
+					else {
+						BooksDAO dao_books = new BooksDAO();
+						ArrayList<BooksBean> books = dao_books.getBooksByFilter(filter, keyword);
+						request.setAttribute("books", books);
+					}
+				}
+				else if(request.getParameter("all_books") != null) {
+					BooksDAO dao = new BooksDAO();
+					ArrayList<BooksBean> books = dao.getAllBooks();
+					request.setAttribute("books", books);
+				}
+				else if(request.getParameter("remove_book") != null) {
+					BooksDAO dao = new BooksDAO();
+					dao.removeBook(request.getParameter("remove_book"));
+					request.setAttribute("info", request.getParameter("remove_book"));
+				}
+			
+
 			request.getRequestDispatcher("admin.jsp").forward(request, response);
 			return;
 		}

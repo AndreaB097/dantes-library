@@ -25,7 +25,7 @@ java.util.Date"%>
 <div id="form-container">
 	<h2>Accedi come Gestore</h2>
 	<form id="sign-form" class="box" action="admin" method="post">
-		<label for="enail">Email</label>
+		<label for="email">Email</label>
 		<input id="email" type="text" name="email"/>
 		<label for="password">Password</label>
 		<input id="password" type="password" name="password"/><br/><br/>
@@ -73,7 +73,7 @@ java.util.Date"%>
 				</select>
 				</p>
 				<div id="search-bar">
-					<input class="search-field" type="text" name="keyword" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<input class="search-field" type="text" name="keyword_users" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
 					<button class="search-button" type="submit" formaction="admin?users"><i class="fas fa-search"></i></button>
 				</div>
 				<script>
@@ -118,6 +118,78 @@ java.util.Date"%>
 			</table>
 			</div> <!-- fine overflow-container -->
 		</div> <!-- fine sezione Account -->
+		
+		<!-- Libri -->
+		<div class="section-container">
+			<h2>Gestione Libri</h2>
+			<form method="post">
+				<p>Ricerca per: 
+				<select class="dropdownFilters" name="filter">
+  					<option value="0">Titolo</option>
+  					<option value="1">Autore</option>
+  					<option value="2">Casa Editrice</option>
+  					<option value="3">Genere</option>
+				</select>
+				</p>
+				<div id="search-bar">
+					<input class="search-field" type="text" name="keyword_book" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<button class="search-button" type="submit" formaction="admin?books"><i class="fas fa-search"></i></button>
+				</div>
+				
+			</form>
+		
+			<button id="show-all-btn2" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
+			<%if(request.getAttribute("info") != null) { %>
+				<div class="info">Il libro <%=session.getAttribute("info") %> è stato rimosso con successo.</div>
+			<%session.removeAttribute("info"); 
+			} %>
+			
+			<script>
+
+			
+			$(document).ready(function() {
+			    $('.dropdownFilters').selectmenu();
+			});
+			</script>
+			
+			<table>
+			<%if(request.getAttribute("books") != null) { %>		
+					<tr>
+						<th>Id</th>
+						<th>Titolo</th>
+						<th>Autore</th>
+						<th>Casa Editrice</th>
+						<th>Genere</th>
+						<th>Quantita'</th>
+					</tr>
+			<%	@SuppressWarnings("unchecked")
+				ArrayList<BooksBean> books = (ArrayList<BooksBean>) request.getAttribute("books");
+				for(BooksBean book : books)	{ %>
+					<tr>
+						<td><%=book.getBook_id() %></td>
+						<td><%=book.getTitle() %></td>
+						<td> <% for(String s : book.getAuthors()) { %>
+							                <%=s%>
+							         <% }%>
+						</td>
+						<td><%=book.getPublisher() %></td>
+												<td> <% for(String s : book.getGenres()) { %>
+							                <%=s%>
+							         <% }%>
+						</td>
+						<td><%=book.getQuantity() %></td>
+						<td>
+							<form action="admin?books" method="post">
+								<input type="hidden" name="remove_book" value="<%=book.getBook_id()%>">
+								<button id="btn-remove2" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+							</form>
+						</td>
+					</tr>
+			<%  } 
+			} %>
+			</table>
+		</div>
+		
 	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->
 	<script>
 		$(".section-container").hide();
@@ -126,18 +198,26 @@ java.util.Date"%>
 			$(".section-container").eq(0).show();
 			$(".sidebar section").eq(0).addClass("active");
 			$(".sidebar-responsive section").eq(0).addClass("active");
-		<% } else if(request.getParameter("orders") != null) {%>
+		<% } else if(request.getParameter("books") != null) {%>
 			$(".section-container").eq(1).show();
 			$(".sidebar section").eq(1).addClass("active");
 			$(".sidebar-responsive section").eq(1).addClass("active");
-		<%} else if(request.getParameter("products") != null) { %>
+		<%} else if(request.getParameter("cards") != null) { %>
 			$(".section-container").eq(2).show();
 			$(".sidebar section").eq(2).addClass("active");
 			$(".sidebar-responsive section").eq(2).addClass("active");
-		<%} else if(request.getParameter("administrators") != null) { %>
+		<%} else if(request.getParameter("bookings") != null) { %>
 			$(".section-container").eq(3).show();
 			$(".sidebar section").eq(3).addClass("active");
-			$(".sidebar-responsive section").eq(3).addClass("active"); 
+			$(".sidebar-responsive section").eq(3).addClass("active");
+			<%} else if(request.getParameter("managers") != null) { %>
+			$(".section-container").eq(4).show();
+			$(".sidebar section").eq(4).addClass("active");
+			$(".sidebar-responsive section").eq(4).addClass("active");
+			<%} else if(request.getParameter("library_manager") != null) { %>
+			$(".section-container").eq(5).show();
+			$(".sidebar section").eq(5).addClass("active");
+			$(".sidebar-responsive section").eq(5).addClass("active"); 
 		<%} else {%>
 			$(".section-container").eq(0).show();
 			$(".sidebar section").eq(0).addClass("active");
