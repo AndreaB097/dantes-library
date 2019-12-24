@@ -34,11 +34,12 @@ create table if not exists users(
     address varchar(100) not null
 );
 
-create table if not exists card(
+create table if not exists cards(
 	card_id int auto_increment primary key,
     codice_fiscale char(16) not null unique,
     associated boolean not null default false
 );
+alter table cards AUTO_INCREMENT = 10000; /*Auto increment parte da 10000*/
 
 create table if not exists books(
 	book_id int auto_increment primary key,
@@ -86,14 +87,19 @@ create table if not exists booking_states(
 
 create table if not exists bookings(
 	booking_id int auto_increment primary key,
+    email varchar(100), /*facoltativo per gli utenti non registrati*/
     start_date date not null,
     end_date date not null,
     state_id int not null,
-    foreign key(state_id) references booking_states(state_id)
+    card_id int not null,
+    book_id int not null,
+    foreign key(state_id) references booking_states(state_id),
+    foreign key(card_id) references cards(card_id),
+    foreign key(book_id) references books(book_id)
 );
 
 create table if not exists library(
-	name varchar(100) primary key,
-    logo varchar(191) default "./images/logo.png",
-    contacts text not null 
+	name varchar(100) primary key default "Dante's Library",
+    logo varchar(191) not null default "./images/logo.png",
+    contacts text
 );

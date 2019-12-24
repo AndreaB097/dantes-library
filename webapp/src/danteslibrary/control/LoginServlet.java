@@ -37,15 +37,28 @@ public class LoginServlet extends HttpServlet {
 			UsersBean user = udao.login(email, password);		
 			if(user != null) {
 				session.setAttribute("user", user);
+				session.removeAttribute("admin"); /*Distruggo la sessione dell'admin nel caso
+													in cui sia collegato*/
 			}
 			else {
-				/* TODO
-				 * Manda messaggio di errore. Autenticazione fallita*/
+				request.setAttribute("error", "Indirizzo e-mail o password non validi.");
+				request.getRequestDispatcher("login.jsp").forward(request, response);
 				return;
 			}
 		}
 		
-		response.sendRedirect("index.jsp");
+		/*Se l'autenticazione va a buon fine, l'utente viene reindirizzato nella
+		 * pagina visitata precedentemente. Se non aveva visitato alcuna pagina
+		 * (referer nullo) allora il redirect viene fatto all'homepage.*/
+		String address;
+		if(session.getAttribute("referer") != null ) {
+			address = (String) session.getAttribute("referer");
+			session.removeAttribute("referer");
+		}
+		else
+			address= "index.jsp";
+		
+		response.sendRedirect(address);
 		return;
 	}
 	

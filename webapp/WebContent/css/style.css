@@ -126,10 +126,9 @@ header {
 }
 footer {
 	background-color: #2b7a78;
-	color: rgba(255,255,255,0.6);
+	color: rgba(255,255,255,0.8);
 	text-align: center;
-	font-size: 12px;
-	font-weight: bold;
+	font-size: 13px;
 	height: 70px;
 	line-height: 70px;
 	position: absolute;
@@ -279,9 +278,25 @@ a.menu-icon img {
 * Sezione per il menu (navbar) *
 ********************************/
 header #logo {
+	display: table;
 	float: left;
+}
+header #logo img {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: right;
 	height: 67px;
-	padding: 3px;
+	padding: 10px 0px;
+}
+header #logo span {
+	display: table-cell;
+	vertical-align: middle;
+	max-width: 200px;
+	text-align: left;
+	font-size: 18px;
+	color: #ffffff;
+	overflow: hidden;
+ 	text-overflow: ellipsis;
 }
 header nav a {
 	color: #ffffff;
@@ -290,7 +305,7 @@ header nav a {
   	text-align: center;
 	text-decoration: none;
 	text-transform: uppercase;
-  	padding: 24px 20px 24px 20px;
+  	padding: 24px 18px 24px 20px;
 	float: right;
 }
 header #menu a span {
@@ -328,7 +343,7 @@ header #menu-responsive a {
 div.book-container {
 	display: block;
 	overflow: auto;
-	padding: 20px;
+	padding: 10px;
 }
 div.cover, div.details {
 	width: 50%;
@@ -338,9 +353,83 @@ div.cover {
 	text-align: center;
 }
 div.cover img {
-	width: 300px;
+	max-width: 250px;
 }
-.ui-selectmenu-menu .ui-menu {max-height: 200px;}
+.ui-selectmenu-menu .ui-menu {
+	max-height: 200px;
+}
+
+/*****************************
+* Sezione Pagina del profilo *
+*****************************/
+#bookings-list-responsive {
+	display: none;
+}
+.dropdown-btn {
+	background-color: #eee;
+	color: #444;
+	cursor: pointer;
+	padding: 10px;
+	margin: 10px 0;
+	width: 100%;
+	border: none;
+	text-align: left;
+	font-size: 19px;
+}
+.dropdown-btn:hover {
+	background-color: #2b7a78;
+	color: #ffffff;
+}
+.dropdown-btn.active {
+	background-color: #2b7a78;
+	color: #ffffff;
+}
+.dropdown-btn.active:after {
+	font-family: "FontAwesomeSolid";
+	content: "\f078";/* Codice per il carattere "freccia" di FontAwesome */
+}
+.dropdown-btn:after {
+	font-family: "FontAwesomeSolid";
+	content: "\f054"; /* Codice per il carattere "freccia" di FontAwesome */
+	font-size: 14px;
+  float: right;
+  margin-left: 5px;
+}
+div#user-info {
+	text-align: left;
+	padding-left: 20px;
+}
+.profile-container {
+	max-width: 700px;
+	margin: 20px auto;
+	padding: 10px;
+	text-align: center;
+}
+
+.profile-container #name {
+	color: #777;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 10px;
+	display: block;
+}
+div.dropdown-content {
+	width: 100%;
+}
+div.dropdown-content table {
+	border-collapse: collapse;
+}
+div.dropdown-content table td {
+	width: 20%;
+	padding: 15px;
+	border-top: 1px solid #aabbcc;
+	border-bottom: 1px solid #aabbcc;
+}
+div.dropdown-content table th {
+		background-color: #aabbcc;
+	}
+div.dropdown-content table tr:nth-child(even) {
+	background-color: rgba(170, 187, 204, 0.1);
+}
 
 /********************************************
 * Stile per i Tooltip(suggerimento) che     *

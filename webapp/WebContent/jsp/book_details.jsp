@@ -29,13 +29,27 @@ java.time.format.*, java.util.Locale"%>
 			<h1><%=book.getTitle() %></h1>
 			<p><%=book.getDescription() %></p>
 			<p><strong>Genere: </strong>
-			<%for(String s : book.getGenres()) {%>
-				<%=s %>
+			<%
+			ArrayList<String> genres = book.getGenres();
+			for(int i = 0; i < genres.size(); i++) {%>
+				
+				<%if((i+1) < genres.size()) { %>
+					<%=genres.get(i) + ", " %>	
+				<%} else { %>
+					<%=genres.get(i) %>
+				<%} %>
 			<%} %>
 			</p>
 			<p><strong>Autori: </strong>
-			<%for(String s : book.getAuthors()) {%>
-				<%=s %>
+			<%
+			ArrayList<String> authors = book.getAuthors();
+			for(int i = 0; i < authors.size(); i++) {%>
+				
+				<%if((i+1) < authors.size()) { %>
+					<%=authors.get(i) + ", " %>	
+				<%} else { %>
+					<%=authors.get(i) %>
+				<%} %>
 			<%} %>
 			</p>
 			<%if(book.getQuantity() > 0) {%>

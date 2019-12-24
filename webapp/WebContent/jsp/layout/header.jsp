@@ -1,6 +1,13 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"
+    import="danteslibrary.model.LibraryBean"%>
+
 <header>
+<script>
+$.post("library");
+</script>
   <div class="container">
-    <a href="./index.jsp"><img id="logo" title="HOMEPAGE" src="./images/logo.png" /></a>
+    <a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${library.logo}" /><span> ${library.name}</span></a>
 	<nav id="menu">
 	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp" title="LOGOUT"><i class="fas fa-sign-out-alt fa-lg"></i></a>
@@ -31,9 +38,9 @@
 			});
 		}
 	});
-	/*Se l'utente clicca l'icona per la ricerca, la barra si estende (o si restringe se era gia'  estesa).
+	/*Se l'utente clicca l'icona per la ricerca, la barra si estende (o si restringe se era gia'Â  estesa).
 	Ma, se all'interno della barra l'utente non scrive niente e clicca di nuovo sull'icona, non succede niente.
-	Invece, se l'utente ha scritto qualcosa, allora il submit andra'  a buon fine (cerca() restituisce true) e verra' 
+	Invece, se l'utente ha scritto qualcosa, allora il submit andra'Â  a buon fine (cerca() restituisce true) e verra'Â 
 	reindirizzato alla jsp dedicata alla ricerca dei libri.*/
 	$("#search-icon").click(function() {
 	

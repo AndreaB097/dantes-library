@@ -19,6 +19,7 @@
 	<div style="padding: 10px">
 		<section id="social">
 			<h2>Contattaci</h2>
+			<p>${library.contacts}</p>
 		</section>
 	</div>
 </div>
