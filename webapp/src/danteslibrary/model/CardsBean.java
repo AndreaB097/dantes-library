@@ -1,10 +1,13 @@
 package danteslibrary.model;
 
-public class CardBean {
+public class CardsBean {
 	
 	private int card_id;
 	private String codice_fiscale;
 	private boolean associated;
+	private String name;
+	private String surname;
+	private String email;
 	
 	public int getCard_id() {
 		return card_id;
@@ -23,6 +26,24 @@ public class CardBean {
 	}
 	public void setAssociated(boolean associated) {
 		this.associated = associated;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSurname() {
+		return surname;
+	}
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }

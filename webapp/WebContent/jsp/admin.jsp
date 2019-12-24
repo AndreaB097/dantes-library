@@ -138,7 +138,7 @@ java.util.Date"%>
 				
 			</form>
 		
-			<button id="show-all-btn2" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
+			<button id="show-all-btn" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
 			<%if(request.getAttribute("info") != null) { %>
 				<div class="info">Il libro <%=session.getAttribute("info") %> è stato rimosso con successo.</div>
 			<%session.removeAttribute("info"); 
@@ -181,7 +181,7 @@ java.util.Date"%>
 						<td>
 							<form action="admin?books" method="post">
 								<input type="hidden" name="remove_book" value="<%=book.getBook_id()%>">
-								<button id="btn-remove2" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
 							</form>
 						</td>
 					</tr>
@@ -189,6 +189,72 @@ java.util.Date"%>
 			} %>
 			</table>
 		</div>
+		
+		<!-- Tessera -->
+		<div class="section-container">
+			<h2>Gestione Tessere</h2>
+			<form method="post">
+				<p>Ricerca per: 
+				<select class="dropdownFilters" name="filter">
+  					<option value="0">Nome</option>
+  					<option value="1">Cognome</option>
+  					<option value="2">Email</option>
+  					<option value="3">Codice fiscale</option>
+  					<option value="4">Codice tessera</option>
+  					
+				</select>
+				</p>
+				<div id="search-bar">
+					<input class="search-field" type="text" name="keyword_card" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<button class="search-button" type="submit" formaction="admin?cards"><i class="fas fa-search"></i></button>
+				</div>
+				
+			</form>
+		
+			<button id="show-all-btn" onClick="window.location = 'admin?cards&all_cards'">Mostra tutti</button>
+			<%if(request.getAttribute("info") != null) { %>
+				<div class="info">La tessera <%=session.getAttribute("info") %> è stato rimossa con successo.</div>
+			<%session.removeAttribute("info"); 
+			} %>
+			
+			<table>
+			<%if(request.getAttribute("cards") != null) { %>		
+					<tr>
+						<th>Nome</th>
+						<th>Cognome</th>
+						<th>Email</th>
+						<th>Codice fiscale</th>
+						<th>Codice tessera</th>
+						<th>Associata</th>
+					</tr>
+			<%	@SuppressWarnings("unchecked")
+				ArrayList<CardsBean> cards = (ArrayList<CardsBean>) request.getAttribute("cards");
+				for(CardsBean card : cards)	{ %>
+					<tr>
+					 <% if (card.getName() != null && card.getSurname()!= null && card.getEmail()!= null ) {%>
+						<td><%=card.getName() %></td>
+						<td><%=card.getSurname() %></td>
+						<td><%=card.getEmail() %></td>
+					<% } else { %>
+					 	<td><td>
+					 	<td><td>
+					 	<td><td>
+					 <%} %>
+						<td><%=card.getCodice_fiscale() %></td>
+						<td><%=card.getCard_id() %></td>
+						<td><%=card.isAssociated() %></td>
+						<td>
+							<form action="admin?cards" method="post">
+								<input type="hidden" name="remove_cards" value="<%=card.getCard_id()%>">
+								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+							</form>
+						</td>
+					</tr>
+			<%  } 
+			} %>
+			</table>
+		</div>
+		
 		
 	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->
 	<script>
@@ -235,7 +301,7 @@ java.util.Date"%>
 			
 		</script>
 	</div>
-<%} /*Chiusura dell'else in cima (quello che fa iniziare il pannello di controllo)*/%>
+<% } /*Chiusura dell'else in cima (quello che fa iniziare il pannello di controllo)*/%>
 	
 <%@include file="./jsp/layout/footer.jsp" %>
 

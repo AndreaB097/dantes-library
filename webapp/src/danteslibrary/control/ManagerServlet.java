@@ -32,8 +32,8 @@ public class ManagerServlet extends HttpServlet {
 		if(session.getAttribute("admin") != null) {
 
 			/*--Sezione Utente--*/
-			if(request.getParameter("keyword_users") != null && request.getParameter("keyword") != "") {
-				String keyword = request.getParameter("keyword");
+			if(request.getParameter("keyword_users") != null && request.getParameter("keyword_users") != "") {
+				String keyword = request.getParameter("keyword_users");
 				/*filter puo' assumere 4 valori:
 				 * - 0: nome
 				 * - 1: cognome
@@ -93,6 +93,35 @@ public class ManagerServlet extends HttpServlet {
 					BooksDAO dao = new BooksDAO();
 					dao.removeBook(request.getParameter("remove_book"));
 					request.setAttribute("info", request.getParameter("remove_book"));
+				}
+				
+				
+				/* -- Sezione Tessera -- */	
+				if(request.getParameter("keyword_card") != null && request.getParameter("keyword_card") != "") {
+					String keyword = request.getParameter("keyword_card");
+					/*filter puo' assumere 5 valori:
+					 * - 0: Nome
+					 * - 1: Cognome
+					 * - 2: Email
+					 * - 3: Codice fiscale
+					 * - 4: Codice_tessera */
+					int filter = Integer.parseInt(request.getParameter("filter"));
+					if(filter < 0 || filter > 4) {
+						request.setAttribute("info", "Filtro non valido.");
+						request.getRequestDispatcher("admin.jsp").forward(request, response);
+						return;
+					} 
+					else {
+						CardsDAO dao_cards = new CardsDAO();
+						ArrayList<CardsBean> cards = dao_cards.getCardsByFilter(filter, keyword);
+						request.setAttribute("cards", cards);
+					}
+				}
+				else if(request.getParameter("all_cards") != null) {
+
+				}
+				else if(request.getParameter("remove_cards") != null) {
+
 				}
 			
 
