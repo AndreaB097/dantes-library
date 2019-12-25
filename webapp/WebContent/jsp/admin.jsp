@@ -119,7 +119,7 @@ java.util.Date"%>
 			</div> <!-- fine overflow-container -->
 		</div> <!-- fine sezione Account -->
 		
-		<!-- Libri -->
+		<!--  Sezione Libri -->
 		<div class="section-container">
 			<h2>Gestione Libri</h2>
 			<form method="post">
@@ -245,7 +245,7 @@ java.util.Date"%>
 						<td><%=card.isAssociated() %></td>
 						<td>
 							<form action="admin?cards" method="post">
-								<input type="hidden" name="remove_cards" value="<%=card.getCard_id()%>">
+								<input type="hidden" name="remove_card" value="<%=card.getCard_id()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
 							</form>
 						</td>
@@ -254,6 +254,8 @@ java.util.Date"%>
 			} %>
 			</table>
 		</div>
+		
+		
 		
 		
 	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->

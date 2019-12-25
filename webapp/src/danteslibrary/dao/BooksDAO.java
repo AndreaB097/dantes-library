@@ -185,6 +185,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			ps.setString(1, book_id);
 			result = ps.executeUpdate();
 			conn.close();
+			System.out.println("mt");
 			return result;
 		}
 		catch(SQLException e) {
