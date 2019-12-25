@@ -139,8 +139,8 @@ public ArrayList<BooksBean> getAllBooks() {
 		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity FROM books, authors, genres WHERE "+filters[filter]+" = ? GROUP BY title;");
-			ps.setString(1, keyword);
+			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity, books.cover FROM books, authors, genres WHERE "+filters[filter]+" LIKE ? GROUP BY title;");
+			ps.setString(1, "%"+keyword+"%");
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 				return null;
@@ -151,6 +151,7 @@ public ArrayList<BooksBean> getAllBooks() {
 				int book_id = result.getInt("book_id");
 				String title = result.getString("title");
 				String publisher = result.getString("publisher");
+				String cover = result.getString("cover");
 				int quantity = result.getInt("quantity");
 				ArrayList<String> genres = retrieveBookGenres(book_id);
 				ArrayList<String> authors = retrieveBookAuthors(book_id);
@@ -159,6 +160,7 @@ public ArrayList<BooksBean> getAllBooks() {
 				book.setBook_id(book_id);
 				book.setTitle(title);
 				book.setPublisher(publisher);
+				book.setCover(cover);
 				book.setQuantity(quantity);
 				book.setGenres(genres);
 				book.setAuthors(authors);
@@ -185,7 +187,6 @@ public ArrayList<BooksBean> getAllBooks() {
 			ps.setString(1, book_id);
 			result = ps.executeUpdate();
 			conn.close();
-			System.out.println("mt");
 			return result;
 		}
 		catch(SQLException e) {

@@ -7,6 +7,8 @@ import danteslibrary.dao.UsersDAO;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import danteslibrary.model.*;
 
 @WebServlet("/register")
@@ -23,15 +25,28 @@ public class RegistrationServlet extends HttpServlet {
 			response.sendRedirect("index.jsp");
 			return;
 		}
-		
+		/*Controllo se l'email e' gia' in uso*/
 		String email = request.getParameter("email");
 		if(UsersDAO.checkEmail(email) == false) {
-			//TO DO: MESSAGGIO D'ERRORE
+			response.setContentType("application/json");
+			PrintWriter pw = response.getWriter();
+			pw.write("false");
+			pw.close();
+			return;
 		}
+		/*Controllo se il codice fiscale e' gia' in uso*/
+		String codice_fiscale = request.getParameter("codice_fiscale");
+		if(UsersDAO.checkCodiceFiscale(codice_fiscale) == false) {
+			response.setContentType("application/json");
+			PrintWriter pw = response.getWriter();
+			pw.write("false");
+			pw.close();
+			return;
+		}
+		
 		String password = request.getParameter("password");
 		String name = request.getParameter("name");
 		String surname = request.getParameter("surname");
-		String codice_fiscale = request.getParameter("codice_fiscale");
 		String address = request.getParameter("address");
 		
 		

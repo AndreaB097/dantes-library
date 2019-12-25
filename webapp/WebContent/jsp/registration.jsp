@@ -23,7 +23,7 @@ pageEncoding="UTF-8" import="java.util.Calendar"%>
 
 <div id="error-list" tabindex="-1"></div>
 
-<form id="sign-form" class="box" action="register" method="post">
+<form id="sign-form" class="box" action="register" method="post" onsubmit="return validateSubmit()">
   <small>(Attenzione! TUTTI i campi sono obbligatori.)</small>
   <div class="col-50">
     <label for="name">Nome</label>				
@@ -48,8 +48,108 @@ pageEncoding="UTF-8" import="java.util.Calendar"%>
 	
 	<button type="submit">Conferma</button>
 </form>
-</div>	
+</div>
 
+<script>
+var errors = [];
+	function validateSubmit() {
+		var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+		var codice_fiscale_regex = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i;
+		
+		var name = document.getElementById("name").value;
+		var surname = document.getElementById("surname").value;
+		var email = document.getElementById("email").value;
+		var password = document.getElementById("password").value;
+		var repeat = document.getElementById("repeat").value;
+		var codice_fiscale = document.getElementById("codice_fiscale").value;
+		var address = document.getElementById("address").value;
+		
+		/* COMMENTATA PER TESTING. BISOGNA RIMUOVERE I COMMENTI AL TERMINE
+		if(!codice_fiscale.match(codice_fiscale_regex))
+			errors.push("Inserire un codice fiscale valido.");
+		*/
+		if(!email.match(mailformat)) {
+			errors.push("Indirizzo email non valido.");
+		}
+		
+		$.ajax({
+			url: "register",
+			async: false,
+			data: {email : email},
+			type: "POST",
+			dataType: "json",
+			success: function(response) {
+				if(response == false)
+					errors.push("Questo indirizzo email è già in uso.");
+			}
+		});
+		
+		$.ajax({
+			url: "register",
+			async: false,
+			data: {codice_fiscale : codice_fiscale},
+			type: "POST",
+			dataType: "json",
+			success: function(response) {
+				if(response == false)
+					errors.push("Questo codice fiscale è già in uso. Se non ti risulta, per favore contatta la biblioteca.");
+			}
+		});
+		
+		if(!name || !surname || !email || !password || !repeat || !codice_fiscale || !address) {
+			errors.push("Non tutti i campi sono stati compilati.");
+		}
+		if(password.length < 6 || !(/\d/.test(password))) {
+			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
+		}
+		if(password != repeat) {
+			errors.push("Le password non corrispondono.");
+		}
+	
+		if(errors.length != 0) {
+			var errors_div = document.getElementById("error-list");
+			var txt = "<ul>";
+			$(errors_div).hide();
+			errors_div.className = "error";
+			errors.forEach(showErrors);
+			errors_div.innerHTML = txt;
+			
+			function showErrors(value, index, array) {
+				txt = txt + "<li>" + value + "</li>";
+			}
+			
+			errors_div.innerHTML = txt + "</ul>";
+			$(errors_div).fadeIn(300);
+			errors = [];
+			errors_div.focus();
+			return false;
+		}
+		
+		$("#error-list").hide();
+		return true;
+	}
+
+</script>
+<script>
+$( function() {
+   	$( "input" ).tooltip({
+     		position: {
+       		my: "center bottom-3",
+       		at: "center top",
+       		using: function( position, feedback ) {
+				$( this ).css( position );
+				$( "<div>" )
+	            .addClass( "arrow" )
+	            .addClass( feedback.vertical )
+	            .addClass( feedback.horizontal )
+	            .appendTo( this );
+			}
+     		},
+     		tooltipClass: "form-tooltip"
+   	});
+
+	});
+</script>
 
 <%@ include file="./jsp/layout/footer.jsp"%>
 

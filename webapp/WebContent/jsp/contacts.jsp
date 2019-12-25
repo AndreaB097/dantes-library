@@ -5,23 +5,20 @@
 <head>
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
-	<title>Dante's Library | Contatti biblioteca</title>
+	<title>Dante's Library | Risultati ricerca</title>
 	<link rel="stylesheet" href="./css/style.css"/>
-	<link rel="stylesheet" href="./css/jquery-ui.css">
-	<script src="./scripts/fontawesome.js"></script>
+	<link rel="stylesheet" href="./css/jquery-ui.css"/>
+	<script src="./scripts/fontawesome.js" ></script>
 	<script src="./scripts/jquery-3.4.1.min.js"></script>
+	<script src="./scripts/jquery-ui.js"></script>
 </head>
 <body>
 
-<%@ include file="/jsp/layout/header.jsp" %>
+<%@ include file="./jsp/layout/header.jsp" %>
 
 <div class="container">
-	<div style="padding: 10px">
-		<section id="social">
-			<h2>Contattaci</h2>
-			<p>${library.contacts}</p>
-		</section>
-	</div>
+	<h2>Contattaci</h2>
+	<p>${applicationScope.library.contacts}</p>
 </div>
 
 <%@ include file="./jsp/layout/footer.jsp" %>

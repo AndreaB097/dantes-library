@@ -95,6 +95,25 @@ public class UsersDAO {
 		return false;
 	}
 	
+	public static boolean checkCodiceFiscale(String codice_fiscale) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT users.codice_fiscale FROM users WHERE codice_fiscale = '" + codice_fiscale + "'");
+			
+			ResultSet result = ps.executeQuery();
+			
+			if(!result.isBeforeFirst()) { /*Nessuna corrispondenza trovata nel DB, restituisco true*/
+				conn.close();
+				return true;
+			}
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		
+		return false;
+	}
+	
 	public UsersBean getUserByEmail(String user_email) {
 		try {
 			Connection conn = DBConnection.getConnection();

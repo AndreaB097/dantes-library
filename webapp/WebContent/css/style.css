@@ -88,6 +88,7 @@ button {
 	background-color: #3aafa9;
 	color: #ffffff;
 	text-align: center;
+	box-shadow: 0px 0px 2px 1px #aaa;
 }
 button:hover {
 	background-color: #2b7a78;
@@ -113,7 +114,7 @@ input[type="number"] {
 	font-size: 14px;
 }
 label {
-	font-family: "Roboto-Regular", Arial, sans-serif;
+	font-family: "Roboto-Light", Arial, sans-serif;
 	font-weight: bold;
 	font-size: 14px;
 }
@@ -130,7 +131,6 @@ footer {
 	text-align: center;
 	font-size: 13px;
 	height: 70px;
-	line-height: 70px;
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -139,11 +139,12 @@ footer {
 }
 footer p {
 	margin: 0;
+	padding: 20px;
 }
 hr {
 	color: #ccc;
-	border: 1px solid #eee;
-	margin: 0px 0;
+	border: 1px solid rgba(240, 240, 240, 0.6);
+	margin: 0;
 }
 
 /*Contenitore largo 90% e centrato orizzontalmente rispetto all'elemento padre*/
@@ -226,15 +227,17 @@ a.menu-icon img {
 #form-container {
 	padding: 10px;
 	margin: 10px auto;
-	max-width: 500px;
+	max-width: 400px;
+}
+#form-container h2 {
+	margin: 0;
 }
 .box {
-	margin-top: 20px;
-	margin-bottom: 20px;
-	padding: 20px 40px;
-	background-color: rgba(222, 242, 241, 0.6);
-	box-shadow: 0px 2px 10px #ccc;
-	border-radius: 2px;
+	margin: 8px 0;
+	padding: 15px;
+	background-color: #ffffff;
+	box-shadow: 0px 0px 3px 1px #ccc;
+	border-radius: 4px;
 }
 .box .col-50 {
 	float: left;
@@ -255,8 +258,8 @@ a.menu-icon img {
 	width: 100%;
 	border: 1px solid #d9d9d9;
 	border-radius: 5px;
-	font-size: 14px;
-	padding: 15px;
+	font-size: 12px;
+	padding: 10px;
 	margin-bottom: 10px;
 }
 #sign-form input:focus {
@@ -321,9 +324,10 @@ header #menu a:hover, header #logo:hover {
 	box-shadow: 0px -6px #3aafa9 inset;   
 }
 header nav #search {
-	width: 27%;
+	min-width: 450px;
 	padding-top: 16px; /*Allinea con il resto dei pulsanti*/
 	float: right; /*!! Serve per far allargare la barra verso sinistra.*/
+	overflow: hidden;
 }
 header nav #search input {
 	padding: 10px;
@@ -332,6 +336,16 @@ header nav #search input {
 	border: none;
 	border-radius: 4px;
 	width: 0%;
+}
+header nav #search #search-filters-button {
+	width: 0px;
+	float: right;
+	background-color: #ffffff;
+	border: none;
+	border-radius: 4px;
+	padding: 10px;
+	margin-left: 5px;
+	font-size: 14px;
 }
 header #menu-responsive a {
   display: none;
@@ -359,6 +373,32 @@ div.cover img {
 	max-height: 200px;
 }
 
+/************************
+* Sezione Ricerca libri *
+*************************/
+.row {
+	padding: 5px;
+	height: 160px;
+	display: block;
+}
+.row img {
+	float: left;
+	margin-right: 15px;
+	height: 150px;
+}
+.row a strong#book-title {
+	/*Nome prodotto*/
+	color: #3aafa9;
+	font-size: 17px;
+}
+.row a span {
+	display: block;
+	padding: 3px 0;
+	font-size: 15px;
+}
+.row a:hover {
+	text-decoration: underline;
+}
 /*****************************
 * Sezione Pagina del profilo *
 *****************************/

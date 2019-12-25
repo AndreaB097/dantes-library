@@ -3,11 +3,8 @@
     import="danteslibrary.model.LibraryBean"%>
 
 <header>
-<script>
-$.post("library");
-</script>
   <div class="container">
-    <a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${library.logo}" /><span> ${library.name}</span></a>
+    <a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${applicationScope.library.logo}" /><span> ${applicationScope.library.name}</span></a>
 	<nav id="menu">
 	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp" title="LOGOUT"><i class="fas fa-sign-out-alt fa-lg"></i></a>
@@ -25,34 +22,46 @@ $.post("library");
 		<%} %>
 	  <a id="search-icon" type="submit" title="CERCA"><i class="fas fa-search fa-lg"></i></a>
 	  <form id="search" action="./search" onsubmit="return cerca()">
-		<input type="search" name="q" placeholder="Ricerca per titolo, autore, genere, ..."/>
+			<select id="search-filters" class="dropdownFilters" name="filter">
+  				<option value="0">Titolo</option>
+  				<option value="1">Autore</option>
+  				<option value="2">Casa Editrice</option>
+  				<option value="3">Genere</option>
+			</select>
+		<input type="search" name="q" placeholder="Seleziona il filtro ed effettua la ricerca"/>
 	  </form>
 	
 	<script>
-	$("#search input").hide();
 	/*Se al caricamento della pagina l'input non e' vuoto, la barra di ricerca deve rimanere larga*/
+	$("#search input").hide();
+	$("#search-filters").hide();
 	$(document).ready(function() {
+		$('.dropdownFilters').selectmenu();
+		$("#search-filters-button").hide();
 		if($("#search input").val() != "") {
-			$("#search input").animate({width : "100%"}, 500, function() {
+			$("#search input").animate({width : "68%"}, 500, function() {
 				$("#search input").show();
+			});
+			$("#search-filters-button").animate({width : "130px"}, 500, function() {
+				$("#search-filters-button").show();
 			});
 		}
 	});
-	/*Se l'utente clicca l'icona per la ricerca, la barra si estende (o si restringe se era gia'  estesa).
+	/*Se l'utente clicca l'icona per la ricerca, la barra si estende (o si restringe se era gia' estesa).
 	Ma, se all'interno della barra l'utente non scrive niente e clicca di nuovo sull'icona, non succede niente.
 	Invece, se l'utente ha scritto qualcosa, allora il submit andra'  a buon fine (cerca() restituisce true) e verra' 
 	reindirizzato alla jsp dedicata alla ricerca dei libri.*/
 	$("#search-icon").click(function() {
 	
 		if($("#search input").val() == "" && $("#search input").is(":hidden")) {
-			$("#search input").show();
-			$("#search input").animate({width : "100%"}, 500);
+			$("#search input, #search-filters-button").show();
+			$("#search input").animate({width : "68%"}, 500);
+			$("#search-filters-button").animate({width : "130px"}, 500);
 		}
 		else if($("#search input").val() == "" && $("#search input").is(":visible")) {
-			$("#search input").animate({width : "0%"}, 500, function() {
-				$("#search input").hide();
+			$("#search input, #search-filters-button").animate({width : "1px"}, 500, function() {
+				$("#search input, #search-filters-button").hide();
 			});
-
 		}
 		else {
 			$("#search").submit();	

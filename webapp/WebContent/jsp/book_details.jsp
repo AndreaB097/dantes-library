@@ -31,9 +31,8 @@ java.time.format.*, java.util.Locale"%>
 			<p><strong>Genere: </strong>
 			<%
 			ArrayList<String> genres = book.getGenres();
-			for(int i = 0; i < genres.size(); i++) {%>
-				
-				<%if((i+1) < genres.size()) { %>
+			for(int i = 0; i < genres.size(); i++) {
+				if((i+1) < genres.size()) { %>
 					<%=genres.get(i) + ", " %>	
 				<%} else { %>
 					<%=genres.get(i) %>
@@ -43,9 +42,8 @@ java.time.format.*, java.util.Locale"%>
 			<p><strong>Autori: </strong>
 			<%
 			ArrayList<String> authors = book.getAuthors();
-			for(int i = 0; i < authors.size(); i++) {%>
-				
-				<%if((i+1) < authors.size()) { %>
+			for(int i = 0; i < authors.size(); i++) {
+				if((i+1) < authors.size()) { %>
 					<%=authors.get(i) + ", " %>	
 				<%} else { %>
 					<%=authors.get(i) %>
