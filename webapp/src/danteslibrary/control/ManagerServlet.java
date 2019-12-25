@@ -128,9 +128,47 @@ public class ManagerServlet extends HttpServlet {
 					request.setAttribute("info", request.getParameter("remove_card"));
 				}
 			
-
+				/* -- Sezione Prenotazione -- */	
+				if(request.getParameter("keyword_booking") != null && request.getParameter("keyword_booking") != "") {
+					String keyword = request.getParameter("keyword_booking");
+					/*filter puo' assumere 8 valori:
+					 * - 0: Codice prenotazione
+					 * - 1: Id Libro
+					 * - 2: Data inizio
+					 * - 3: Data fine
+					 * - 4: Stato
+					 * - 5: Email
+					 * - 6: Codice fiscale
+					 * - 7: Codice tessera
+					 *  */
+					int filter = Integer.parseInt(request.getParameter("filter"));
+					if(filter < 0 || filter > 7) {
+						request.setAttribute("info", "Filtro non valido.");
+						request.getRequestDispatcher("admin.jsp").forward(request, response);
+						return;
+					} 
+					else {
+						BookingsDAO dao_bookings = new BookingsDAO();
+						ArrayList<BookingsBean> bookings = dao_bookings.getBookingsByFilter(filter, keyword);
+						request.setAttribute("bookings", bookings);
+					}
+				}
+				else if(request.getParameter("all_bookings") != null) {
+					BookingsDAO dao = new BookingsDAO();
+					ArrayList<BookingsBean> bookings = dao.getAllBookings();
+					request.setAttribute("bookings", bookings);
+				}
+				else if(request.getParameter("remove_booking") != null) {
+					BookingsDAO dao = new BookingsDAO();
+					dao.removeBooking(request.getParameter("remove_booking"));
+					request.setAttribute("info", request.getParameter("remove_booking"));
+				}	
+				
+				
 			request.getRequestDispatcher("admin.jsp").forward(request, response);
 			return;
+			
+			
 		}
 		
 		

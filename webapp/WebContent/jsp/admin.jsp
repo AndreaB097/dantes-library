@@ -255,7 +255,74 @@ java.util.Date"%>
 			</table>
 		</div>
 		
+		<!-- Sezione Prenotazioni -->
+		<div class="section-container">
+			<h2>Gestione Prenotazioni</h2>
+			<form method="post">
+				<p>Ricerca per: 
+				<select class="dropdownFilters" name="filter">
+  					<option value="0">Codice prenotazione</option>
+  					<option value="1">Codice Libro</option>
+  					<option value="2">Codice Tessera</option>
+  					<option value="3">Codice fiscale</option>
+  					<option value="4">Stato</option>
+  					<option value="5">Email</option>
+  					<option value="6">Data inizio</option>
+  					<option value="7">Data fine</option>
+				</select>
+				</p>
+				<div id="search-bar">
+					<input class="search-field" type="text" name="keyword_booking" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<button class="search-button" type="submit" formaction="admin?bookings"><i class="fas fa-search"></i></button>
+				</div>
+				
+			</form>
 		
+			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
+			<%if(request.getAttribute("info") != null) { %>
+				<div class="info">La prenotazione <%=session.getAttribute("info") %> è stato rimossa con successo.</div>
+			<%session.removeAttribute("info"); 
+			} %>
+			
+			<script>
+			$(document).ready(function() {
+			    $('.dropdownFilters').selectmenu();
+			});
+			</script>
+			
+			<table>
+			<%if(request.getAttribute("bookings") != null) { %>		
+					<tr>
+						<th>Codice prenotazione</th>
+						<th>Codice Libro</th>
+						<th>Codice Tessera</th>
+						<th>Codice fiscale</th>
+						<th>Stato</th>
+						<th>Data inizio</th>
+						<th>Data fine'</th>
+					</tr>
+			<%	@SuppressWarnings("unchecked")
+				ArrayList<BookingsBean> bookings = (ArrayList<BookingsBean>) request.getAttribute("bookings");
+				for(BookingsBean booking : bookings)	{ %>
+					<tr>
+						<td><%=booking.getBooking_id() %></td>
+						<td><%=booking.getBook_id() %></td>
+						<td><%=booking.getCard_id() %></td>
+						<td><%=booking.getCodice_fiscale() %></td>
+						<td><%=booking.getState_id() %></td>
+						<td><%=booking.getStart_date() %></td>
+						<td><%=booking.getEnd_date() %></td>
+						<td>
+							<form action="admin?bookings" method="post">
+								<input type="hidden" name="remove_booking" value="<%=booking.getBooking_id()%>">
+								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+							</form>
+						</td>
+					</tr>
+			<%  } 
+			} %>
+			</table>
+		</div>
 		
 		
 	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->
