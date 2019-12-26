@@ -6,18 +6,12 @@ java.time.format.*, java.util.Locale"%>
 <!doctype html>
 <html>
 <head>
-	<meta charset="UTF-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<%@include file="./jsp/layout/head.jsp" %>
 	<title>Dante's Library | Dettagli libro</title>
-	<link rel="stylesheet" href="./css/style.css"/>
-	<link rel="stylesheet" href="./css/jquery-ui.css"/>
-	<script src="./scripts/fontawesome.js"></script>
-	<script src="./scripts/jquery-3.4.1.min.js"></script>
-	<script src="./scripts/jquery-ui.js"></script>
 </head>
 <body>
 
-<%@ include file="./jsp/layout/header.jsp" %>
+<%@ include file="./jsp/layout/navbar.jsp" %>
 	
 <div class="container">
 	<div class="book-container">

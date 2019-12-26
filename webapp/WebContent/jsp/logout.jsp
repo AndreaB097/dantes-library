@@ -4,7 +4,7 @@ pageEncoding="UTF-8"%>
 <!doctype html>
 <html>
 <head>
-	<meta charset="UTF-8">
+<%@include file="./jsp/layout/head.jsp" %>
 	<title>Dante's Library | Logout</title>
 </head>
 <body>

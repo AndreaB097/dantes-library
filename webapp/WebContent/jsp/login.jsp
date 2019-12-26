@@ -4,24 +4,18 @@ pageEncoding="UTF-8"%>
 <!doctype html>
 <html>
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+<%@include file="./jsp/layout/head.jsp" %>
 	<title>Dante's Library | Accedi</title>
-	<link rel="stylesheet" href="./css/style.css"/>
-	<link rel="stylesheet" href="./css/jquery-ui.css">
-	<script src="./scripts/fontawesome.js"></script>
-	<script src="./scripts/jquery-3.4.1.min.js"></script>
-	<script src="./scripts/jquery-ui.js"></script>
 </head>
 <body>
-<%@ include file="./jsp/layout/header.jsp"%>
 
-<% if(session.getAttribute("user") != null)
-	response.sendRedirect("profile.jsp"); /*Se l'utente è già autenticato viene 
-											reindirizzato alla pagina del profilo,
-											altrimenti alla pagina che stava visitando
-											prima di fare il login*/
-	session.removeAttribute("referer");
+<%@ include file="./jsp/layout/navbar.jsp"%>
+
+<% if(session.getAttribute("user") != null) {
+	/*Se l'utente è già autenticato viene reindirizzato alla pagina del profilo,
+	Altrimenti alla pagina che stava visitando prima di fare il login*/
+	response.sendRedirect("profile.jsp"); 
+   }
 	session.setAttribute("referer", request.getHeader("referer"));
 %>
 
@@ -45,6 +39,8 @@ pageEncoding="UTF-8"%>
 		<button type="submit">Registrati</button>
 	</form>
 </div>
+
 <%@ include file="./jsp/layout/footer.jsp"%>
+
 </body>
 </html>

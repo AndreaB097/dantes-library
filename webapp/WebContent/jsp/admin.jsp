@@ -1,24 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"
-import="java.util.ArrayList, danteslibrary.model.*,
-java.text.SimpleDateFormat, java.time.LocalDate, java.util.Calendar,
-java.util.Date"%>
+import="java.util.ArrayList, danteslibrary.model.*, java.text.SimpleDateFormat,
+java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 
 <!doctype html>
 <html>
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Dante's Library | Gestore</title>
-	<link rel="stylesheet" href="./css/style.css"/>
-	<link rel="stylesheet" href="./css/jquery-ui.css"/>
-	<script src="./scripts/fontawesome.js"></script>
-	<script src="./scripts/jquery-3.4.1.min.js"></script>
-	<script src="./scripts/jquery-ui.js"></script>
+<%@include file="./jsp/layout/head.jsp" %>
+	<title>Dante's Library | Area Gestori</title>
 </head>
 <body>
     
-<%@include file="./jsp/layout/header.jsp" %>
+<%@include file="./jsp/layout/navbar.jsp" %>
 	
 <% if(session.getAttribute("admin") == null) { %>
 <!-- Sezione LOGIN Gestori -->
