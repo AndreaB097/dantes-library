@@ -80,7 +80,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<% if(request.getAttribute("info") != null) { %>
 				<div class="info">L'utente <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
 			<% } %>
-			<div class="overflow-container">
 			<table>
 			<%if(request.getAttribute("users") != null) { %>		
 					<tr>
@@ -109,7 +108,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } 
 			} %>
 			</table>
-			</div> <!-- fine overflow-container -->
 		</div> <!-- fine sezione Account -->
 		
 		<!--  Sezione Libri -->
@@ -229,7 +227,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td><%=card.getSurname() %></td>
 						<td><%=card.getEmail() %></td>
 					<% } else { %>
-					 	<td>AAA<td>
+					 	<td><td>
 					 	<td><td>
 					 	<td><td>
 					 <%} %>
@@ -292,7 +290,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<th>Codice fiscale</th>
 						<th>Stato</th>
 						<th>Data inizio</th>
-						<th>Data fine'</th>
+						<th>Data fine</th>
 					</tr>
 			<%	@SuppressWarnings("unchecked")
 				ArrayList<BookingsBean> bookings = (ArrayList<BookingsBean>) request.getAttribute("bookings");
@@ -302,7 +300,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td><%=booking.getBook_id() %></td>
 						<td><%=booking.getCard_id() %></td>
 						<td><%=booking.getCodice_fiscale() %></td>
-						<td><%=booking.getState_id() %></td>
+						<td><%=booking.getState_name() %></td>
 						<td><%=booking.getStart_date() %></td>
 						<td><%=booking.getEnd_date() %></td>
 						<td>

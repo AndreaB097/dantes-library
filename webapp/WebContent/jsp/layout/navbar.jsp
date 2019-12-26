@@ -23,7 +23,7 @@ $.post("library");
 			<a href="./login.jsp" title="ACCEDI"><i class="fas fa-user fa-lg"></i></a>
 		<%} %>
 	  <a id="search-icon" type="submit" title="CERCA"><i class="fas fa-search fa-lg"></i></a>
-	  <form id="search" action="./search" onsubmit="return cerca()">
+	  <form id="search" action="./search">
 			<select id="search-filters" class="dropdownFilters" name="filter">
   				<option value="0">Titolo</option>
   				<option value="1">Autore</option>
@@ -90,11 +90,17 @@ $.post("library");
 		<a href="./login.jsp"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Accedi</a>
 	<%} %>
 	<a href="./contacts.jsp"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
-	<form id="search-responsive" action="./search" onsubmit="return cerca()">
-		<input type="search" name="q" placeholder="Cerca un libro..." />
+	<form id="search-responsive" action="./search">
+		<p>Ricerca per  <select id="search-filters-responsive" class="dropdownFilters" name="filter">
+			<option value="0">Titolo</option>
+			<option value="1">Autore</option>
+			<option value="2">Casa Editrice</option>
+			<option value="3">Genere</option>
+		</select>
+		</p>
+		<input type="search" name="q" placeholder="Seleziona il filtro ed effettua la ricerca" />
 		<button type="submit"><i class="fas fa-search fa-lg"></i></button>
 	</form>
-
 	<script>
 	function showMenu() {
 		var x = document.getElementById("menu-responsive");

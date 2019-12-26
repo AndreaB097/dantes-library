@@ -19,25 +19,27 @@ pageEncoding="UTF-8"%>
 	session.setAttribute("referer", request.getHeader("referer"));
 %>
 
-<div id="form-container">
-<h2>Accedi</h2>
-	<form id="sign-form" class="box" action="login" method="post">
-		<label for="email">Email</label>
-		<input id="email" type="text" name="email"/>
-		<label for="password">Password</label>
-		<input id="password" type="password" name="password"/><br/><br/>
-		
-		<button type="submit">Accedi</button>
-	</form>	
-
-<% if(request.getAttribute("error") != null) { %>
-		<div class="error"><%=request.getAttribute("error") %></div>
-<% } %>
+<div class="container">
+	<div id="form-container">
+	<h2>Accedi</h2>
+		<form id="sign-form" class="box" action="login" method="post">
+			<label for="email">Email</label>
+			<input id="email" type="text" name="email"/>
+			<label for="password">Password</label>
+			<input id="password" type="password" name="password"/><br/><br/>
 			
-	<form id="sign-in-box" class="box" action="registration.jsp">
-		<small>Sei un nuovo utente?&nbsp;&nbsp;&nbsp;</small>
-		<button type="submit">Registrati</button>
-	</form>
+			<button type="submit">Accedi</button>
+		</form>	
+	
+	<% if(request.getAttribute("error") != null) { %>
+			<div class="error"><%=request.getAttribute("error") %></div>
+	<% } %>
+				
+		<form id="sign-in-box" class="box" action="registration.jsp">
+			<small>Sei un nuovo utente?&nbsp;&nbsp;&nbsp;</small>
+			<button type="submit">Registrati</button>
+		</form>
+	</div>
 </div>
 
 <%@ include file="./jsp/layout/footer.jsp"%>

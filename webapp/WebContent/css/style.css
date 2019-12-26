@@ -89,6 +89,7 @@ button {
 	color: #ffffff;
 	text-align: center;
 	box-shadow: 0px 0px 2px 1px #aaa;
+	padding: 4px 8px;
 }
 button:hover {
 	background-color: #2b7a78;
@@ -178,6 +179,7 @@ all'altro se usati insieme)*/
 	color: #721c24;
 	padding: 20px;
 	background-color: #f8d7da;
+	margin: 5px 0;
 }
 .info {
 	font-size: 14px;
@@ -226,8 +228,9 @@ a.menu-icon img {
 *********************************************/
 #form-container {
 	padding: 10px;
-	margin: 10px auto;
 	max-width: 400px;
+	margin-top: 70px;
+	margin: 70px auto;
 }
 #form-container h2 {
 	margin: 0;
@@ -370,7 +373,18 @@ div.cover img {
 	max-width: 250px;
 }
 .ui-selectmenu-menu .ui-menu {
-	max-height: 200px;
+	max-height: 100px;
+}
+.ui-widget {
+	font-size: 16px !important;
+}
+div#start-date,
+div#end-date {
+	padding: 10px 0;
+}
+button#booking-btn {
+	width: 150px;
+	margin-top: 5px;
 }
 
 /************************
@@ -687,6 +701,13 @@ div.dropdown-content table tr:nth-child(even) {
 	  white-space: nowrap;
 	  text-overflow: ellipsis;
 	}
+	header #menu-responsive.responsive form {
+	  text-align: center;
+	}
+	#search-filters-responsive-button {
+		width: 150px;
+		margin: 3px;
+	}
 	/**
 	* Pagina libro - responsive
 	**/
@@ -694,6 +715,9 @@ div.dropdown-content table tr:nth-child(even) {
 	div.book-container div.details {
 		float: none;
 		width: 100%;
+	}
+	div#start-date .ui-widget {
+		margin-top: 3px;
 	}
 	/**
 	* Pagina amministratori - responsive
@@ -765,6 +789,5 @@ div.dropdown-content table tr:nth-child(even) {
 	div.section-container .overflow-container td {
 		padding: 7px 4px;
 		font-size: 14px;
-	}
-	
+	}	
 }

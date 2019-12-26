@@ -46,14 +46,19 @@ java.time.format.*, java.util.Locale"%>
 			</p>
 			<%if(book.getQuantity() > 0) {%>
 			<p style="color: #0cc481"><strong>Disponibile</strong></p>
-			
-			<p>Data inizio prestito 
-			<%int day = LocalDate.now().getDayOfMonth();
-			  int month = LocalDate.now().getMonthValue();
-			  int year = LocalDate.now().getYear(); %>
-				<select class="dropdown" name="day">
+				<% if(request.getAttribute("error") != null) { %>
+					<div class="error"><%=request.getAttribute("error") %></div>
+				<% } %>
+			<%int current_day = LocalDate.now().getDayOfMonth();
+			  int current_month = LocalDate.now().getMonthValue();
+			  int current_year = LocalDate.now().getYear(); %>
+			<form action="booking" method="post">
+				<input type="hidden" name="book_id" value="<%=request.getParameter("id")%>">
+			<label for="start-date">Data inizio prestito</label> 
+			<div id="start-date">
+				<select class="dropdown" name="start_day">
   					<%for(int i = 1; i <= 31; i++) { 
-  						if(i == day) { %>
+  						if(i == current_day) { %>
   							<option value="<%=i%>" selected><%=i %></option>
   					  <%} 
   						else {%>
@@ -61,55 +66,60 @@ java.time.format.*, java.util.Locale"%>
   				  <%   }
   					}%>
 				</select>
-				<select class="dropdown" name="month">
+				<select class="dropdown" name="start_month">
   					<%for(int i = 1; i <= 12; i++) {
-  					  	if(i < month) { %>
-  							<option value="<%=month%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					  	if(i < current_month && i != (current_month % 12) +1) { %>
+  							<option value="<%=i%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
   					<%	}
-  					  	else if(i == month) {%>
-  				      	<option value="<%=month%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					  	else if(i == current_month) {%>
+  				      	<option value="<%=i%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
   				    <%  }
   					  	else { %>
-  					  	<option value="<%=month%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+  					  	<option value="<%=i%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
   					<%  }
   					}%>
 				</select>
-				<select class="dropdown" name="year">
+				<select class="dropdown" name="start_year">
   					<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
+  					<option value="<%=LocalDate.now().getYear() + 1 %>"><%=LocalDate.now().getYear() + 1%></option>
 				</select>
-				</p>
-				<p>Data fine prestito 
-				<select class="dropdown" name="day">
-  					<%for(int i = 1; i <= 31; i++) { 
-  						if(i == day) { %>
-  							<option value="<%=i%>" selected><%=i %></option>
-  					  <%} 
-  						else {%>
-  					 		<option value="<%=i%>"><%=i %></option>
-  				  <%   }
-  					}%>
+			</div>
+			<label for="end-date">Data fine prestito</label>
+			<div id="end-date">
+				<select class="dropdown" name="end_day">
+					<%for(int i = 1; i <= 31; i++) { 
+						if(i == current_day) { %>
+							<option value="<%=i%>" selected><%=i %></option>
+					  <%} 
+						else {%>
+					 		<option value="<%=i%>"><%=i %></option>
+				    <%  }
+					}%>
 				</select>
-				<select style="max-height: 100px" class="dropdown" name="month">
-  					<%for(int i = 1; i <= 12; i++) {
-  					  	if(i < month) { %>
-  							<option value="<%=month%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-  					<%	}
-  					  	else if(i == month) {%>
-  				      	<option value="<%=month%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-  				    <%  }
-  					  	else { %>
-  					  	<option value="<%=month%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-  					<%  }
-  					}%>
+				<select class="dropdown" name="end_month">
+					<%for(int i = 1; i <= 12; i++) {
+					  	if(i < current_month && i != (current_month % 12) +1) { %>
+							<option value="<%=i%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+					<%	}
+					  	else if(i == current_month) {%>
+				      	<option value="<%=i%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+				    <%  }
+					  	else { %>
+					  	<option value="<%=i%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
+					<%  }
+					}%>
 				</select>
-				<select class="dropdown" name="year">
-  					<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
+				<select class="dropdown" name="end_year">
+	 				<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
+	 				<option value="<%=LocalDate.now().getYear() + 1 %>"><%=LocalDate.now().getYear() + 1 %></option>
 				</select>
-				</p>
-			<button>Prenota</button>
+			</div>
+			<button type="submit" id="booking-btn">Prenota</button>
+			</form>
 			<%} else {%>
 			<p style="color: #eb4034"><strong>Non Disponibile</strong></p>
 			<%} %>
+
 		</div>
 	</div>
 </div>
@@ -117,7 +127,7 @@ java.time.format.*, java.util.Locale"%>
 <script>
 $(document).ready(function() {
    $('.dropdown').selectmenu({
-   	width: '150px'
+   	width: '120px'
    })
 });
 </script>

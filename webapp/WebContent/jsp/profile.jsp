@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"
-    import="danteslibrary.model.UsersBean"%>
+    import="java.util.ArrayList,
+    danteslibrary.model.UsersBean, danteslibrary.model.BookingsBean,
+    java.text.SimpleDateFormat, java.time.LocalDate"%>
 
 <!doctype html>
 <html>
@@ -25,11 +27,64 @@
 		<button class="dropdown-btn">Storico prenotazioni</button>
 		<div class="dropdown-content">
 			<table id="bookings-list">
-				<tr><td>TODO: Non ci sono ordini da visualizzare.</td></tr>
+				<%
+				UsersBean user = (UsersBean)session.getAttribute("user");
+				@SuppressWarnings("unchecked")
+				ArrayList<BookingsBean> bookings = (ArrayList<BookingsBean>) session.getAttribute("bookings");
+			if(bookings != null)  {
+				if(!bookings.isEmpty()) { %>
+				<tr>
+					<th>#Prenotazione</th>
+					<th>Libro</th>
+					<th>Data Inizio</th>
+					<th>Data Fine</th>
+					<th>Stato</th>
+				</tr>
+			<% 
+				for(int i = 0; i < bookings.size(); i++) {
+					BookingsBean booking = bookings.get(i);
+					SimpleDateFormat parsedFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					SimpleDateFormat desiredFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+					/*TODO Parsing delle date per formattarle meglio*/
+				%>
+					<tr>
+						<td><%=booking.getBooking_id() %></td>
+						<td><%=booking.getBook_id() %></td>
+						<td><%=booking.getStart_date()%></td>
+						<td><%=booking.getEnd_date()%></td>
+						<td><i><%=booking.getState_name() %></i></td>
+					</tr>
+				<% }
+			}else {%>
+					<tr><td>Non ci sono ordini da visualizzare.</td></tr>
+				<% } %>
 			</table>
-			<!-- Tabella ordini responsive -->
+			<!-- Tabella prenotazioni responsive -->
 			<table id="bookings-list-responsive">
-				<tr><td>Non ci sono ordini da visualizzare.</td></tr>
+			<% if(!bookings.isEmpty()) { %>
+				<tr>
+					<th>#Prenotazioni</th>
+					<th>Libro</th>
+					<th>Data</th>
+				</tr>
+			<%
+				for(int i = 0; i < bookings.size(); i++) {
+					BookingsBean booking = bookings.get(i);
+				%>
+					<tr class="striped">
+						<td><%=bookings.get(i).getBooking_id() %></td>
+						<td><%=bookings.get(i).getBook_id() %></td>
+					</tr>
+					<tr class="striped">
+						<td colspan="2"><strong>Stato: </strong><i><%=bookings.get(i).getState_name() %></i></td>
+					</tr>
+				<% }
+			} else {%>
+			<tr><td>Non ci sono ordini da visualizzare.</td></tr>
+		<% }
+		} else {%>
+		<tr><td>Non ci sono ordini da visualizzare.</td></tr>
+	<% } %>
 			</table>
 		</div>
 		<button class="dropdown-btn">Dati personali</button>

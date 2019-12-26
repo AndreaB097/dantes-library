@@ -2,8 +2,7 @@ create database if not exists danteslibrary;
 use danteslibrary;
 
 create table if not exists roles(
-	role_id int auto_increment primary key,
-	name varchar(50) not null
+	role_name varchar(50) primary key
 );
 
 create table if not exists managers(
@@ -16,12 +15,12 @@ create table if not exists managers(
 );
 
 create table if not exists managers_roles(
-	email varchar(100),
-    role_id int,
-    primary key(email, role_id),
-	foreign key(email) references managers(email)
+    email varchar(100),
+    role_name varchar(50) not null,
+    primary key(email, role_name),
+    foreign key(email) references managers(email)
     on update cascade on delete cascade,
-    foreign key(role_id) references roles(role_id)
+    foreign key(role_name) references roles(role_name)
     on update cascade on delete cascade
 );
 
@@ -81,8 +80,7 @@ create table if not exists books_genres(
 );
 
 create table if not exists booking_states(
-	state_id int auto_increment primary key,
-    name varchar(100) unique not null 
+    state_name varchar(100) primary key
 );
 
 create table if not exists bookings(
@@ -90,10 +88,10 @@ create table if not exists bookings(
     email varchar(100), /*facoltativo per gli utenti non registrati*/
     start_date date not null,
     end_date date not null,
-    state_id int not null,
+    state_name varchar(100) not null,
     card_id int not null,
     book_id int not null,
-    foreign key(state_id) references booking_states(state_id),
+    foreign key(state_name) references booking_states(state_name),
     foreign key(card_id) references cards(card_id),
     foreign key(book_id) references books(book_id)
 );

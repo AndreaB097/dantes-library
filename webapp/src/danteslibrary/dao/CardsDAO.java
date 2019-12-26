@@ -7,8 +7,7 @@ import danteslibrary.model.CardsBean;
 import java.util.ArrayList;
 
 public class CardsDAO {
-	
-		
+
 	public ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
 		String[] filters = {"users.name", "users.surname", "users.email", "cards.codice_fiscale", "card_id"};
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
@@ -102,70 +101,92 @@ public class CardsDAO {
 	}
 	
 	
-public ArrayList<CardsBean> getAllCards() {
-	ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
-	ResultSet result;
-	try {
-		Connection conn = DBConnection.getConnection();
-		PreparedStatement ps = conn.prepareStatement("SELECT cards.*, users.name, users.surname, users.email " 
-				+ "FROM users, cards WHERE cards.associated= true AND users.codice_fiscale = cards.codice_fiscale");
-		result = ps.executeQuery();
-		if(result.isBeforeFirst()) {
-			while (result.next()) {
-				CardsBean card = new CardsBean();
-				card.setCodice_fiscale(result.getString("codice_fiscale"));
-				card.setCard_id(result.getInt("card_id"));
-				card.setAssociated(result.getBoolean("associated"));
-				card.setName(result.getString("name"));
-				card.setSurname(result.getString("surname"));
-				card.setEmail(result.getString("email"));
-				cards.add(card);	
-		   }
-		}
-		else cards = null;
-		if (cards == null)
-			cards = new ArrayList<CardsBean>();
-		ps = conn.prepareStatement("SELECT cards.card_id, cards.codice_fiscale, cards.associated " 
-					+ "FROM cards WHERE cards.associated= false");
+	public ArrayList<CardsBean> getAllCards() {
+		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
+		ResultSet result;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.*, users.name, users.surname, users.email " 
+					+ "FROM users, cards WHERE cards.associated= true AND users.codice_fiscale = cards.codice_fiscale");
 			result = ps.executeQuery();
 			if(result.isBeforeFirst()) {
-				while(result.next()) {
+				while (result.next()) {
 					CardsBean card = new CardsBean();
 					card.setCodice_fiscale(result.getString("codice_fiscale"));
 					card.setCard_id(result.getInt("card_id"));
 					card.setAssociated(result.getBoolean("associated"));
-					card.setName("");
-					card.setSurname("");
-					card.setEmail("");
-					cards.add(card);
-					}
-			}	
-			
-		conn.close();
-		return cards;
-
+					card.setName(result.getString("name"));
+					card.setSurname(result.getString("surname"));
+					card.setEmail(result.getString("email"));
+					cards.add(card);	
+			   }
+			}
+			else cards = null;
+			if (cards == null)
+				cards = new ArrayList<CardsBean>();
+			ps = conn.prepareStatement("SELECT cards.card_id, cards.codice_fiscale, cards.associated " 
+						+ "FROM cards WHERE cards.associated= false");
+				result = ps.executeQuery();
+				if(result.isBeforeFirst()) {
+					while(result.next()) {
+						CardsBean card = new CardsBean();
+						card.setCodice_fiscale(result.getString("codice_fiscale"));
+						card.setCard_id(result.getInt("card_id"));
+						card.setAssociated(result.getBoolean("associated"));
+						card.setName("");
+						card.setSurname("");
+						card.setEmail("");
+						cards.add(card);
+						}
+				}	
+				
+			conn.close();
+			return cards;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		return null;	
 	}
-	catch(SQLException e) {
-		System.out.println("Errore Database: " + e.getMessage());
-	}
-	
-	return null;	
-  }
 
-public int removeCard(String card_id) {
-	int result = 0;
-	try {
-		Connection conn = DBConnection.getConnection();
-		PreparedStatement ps = conn.prepareStatement("DELETE FROM cards WHERE card_id = ?");
-		ps.setString(1, card_id);
-		result = ps.executeUpdate();
-		conn.close();
+	public int removeCard(String card_id) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM cards WHERE card_id = ?");
+			ps.setString(1, card_id);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
 		return result;
 	}
-	catch(SQLException e) {
-		System.out.println("Errore Database: " + e.getMessage());
+	
+	public CardsBean getCardByEmail(String email) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, users WHERE cards.codice_fiscale = users.codice_fiscale "
+					+ "AND users.email = ?");
+			ps.setString(1, email);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst())
+				return null;
+			result.first();
+			CardsBean card = new CardsBean();
+			card.setCard_id(result.getInt("card_id"));
+			card.setCodice_fiscale(result.getString("codice_fiscale"));
+			card.setAssociated(result.getBoolean("associated"));
+				
+			conn.close();
+			return card;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database: " + e.getMessage());
+		}
+		return null;
 	}
-	return result;
-}
 
 }

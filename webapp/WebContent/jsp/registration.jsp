@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8" import="java.util.Calendar"%>
+pageEncoding="UTF-8"%>
 
 <!doctype html>
 <html>
@@ -11,36 +11,38 @@ pageEncoding="UTF-8" import="java.util.Calendar"%>
 
 <%@ include file="./jsp/layout/navbar.jsp"%>
 
-<div id="form-container">
-<h2>Creazione account</h2>
-
-<div id="error-list" tabindex="-1"></div>
-
-<form id="sign-form" class="box" action="register" method="post" onsubmit="return validateSubmit()">
-  <small>(Attenzione! TUTTI i campi sono obbligatori.)</small>
-  <div class="col-50">
-    <label for="name">Nome</label>				
-		<input id="name" type="text" name="name" placeholder="Inserisci il tuo nome"/>
-	</div>
-	<div class="col-50">
-	  <label for="surname">Cognome</label>
-    <input id="surname" type="text" name="surname" placeholder="Inserisci il tuo cognome"/>
-	</div>
-	<label for="email">Email</label>
-  <input id="email" type="text" name="email" placeholder="Inserisci il tuo indirizzo email (es. mariorossi@gmail.com)"/>
-	<label for="password">Password</label>
-	<input id="password" type="password" name="password" placeholder="Inserisci una password"
-		title="La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero." />
-	<label for="repeat">Ripeti password</label>
-	<input id="repeat" type="password" name="password" placeholder="Conferma password" />
-	  <label for="codice_fiscale">Codice fiscale</label>
-	  <input id="codice_fiscale" type="text" name="codice_fiscale" placeholder="Inserisci il tuo codice fiscale"/>
-		<label for="address">Indirizzo</label>
-		<input id="address" type="text" name="address" placeholder="Via Roma 10" />
-	<br><br>
+<div class="container">
+	<div id="form-container">
+	<h2>Creazione account</h2>
 	
-	<button type="submit">Conferma</button>
-</form>
+	<div id="error-list" tabindex="-1"></div>
+	
+	<form id="sign-form" class="box" action="register" method="post" onsubmit="return validateSubmit()">
+	  <small>(Attenzione! TUTTI i campi sono obbligatori.)</small>
+	  <div class="col-50">
+	    <label for="name">Nome</label>				
+			<input id="name" type="text" name="name" placeholder="Inserisci il tuo nome"/>
+		</div>
+		<div class="col-50">
+		  <label for="surname">Cognome</label>
+	    <input id="surname" type="text" name="surname" placeholder="Inserisci il tuo cognome"/>
+		</div>
+		<label for="email">Email</label>
+	  <input id="email" type="text" name="email" placeholder="Inserisci il tuo indirizzo email (es. mariorossi@gmail.com)"/>
+		<label for="password">Password</label>
+		<input id="password" type="password" name="password" placeholder="Inserisci una password"
+			title="La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero." />
+		<label for="repeat">Ripeti password</label>
+		<input id="repeat" type="password" name="password" placeholder="Conferma password" />
+		  <label for="codice_fiscale">Codice fiscale</label>
+		  <input id="codice_fiscale" type="text" name="codice_fiscale" placeholder="Inserisci il tuo codice fiscale"/>
+			<label for="address">Indirizzo</label>
+			<input id="address" type="text" name="address" placeholder="Via Roma 10" />
+		<br><br>
+		
+		<button type="submit">Conferma</button>
+	</form>
+	</div>
 </div>
 
 <script>

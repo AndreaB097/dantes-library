@@ -6,7 +6,10 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 import danteslibrary.model.UsersBean;
+import danteslibrary.model.BookingsBean;
 import danteslibrary.dao.UsersDAO;
+import danteslibrary.dao.BookingsDAO;
+import java.util.ArrayList;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -36,6 +39,10 @@ public class LoginServlet extends HttpServlet {
 			UsersDAO udao = new UsersDAO();
 			UsersBean user = udao.login(email, password);		
 			if(user != null) {
+				BookingsDAO bdao = new BookingsDAO();
+				ArrayList<BookingsBean> bookings = bdao.getUserBookings(email);
+				if(bookings != null)
+					session.setAttribute("bookings", bookings);
 				session.setAttribute("user", user);
 				session.removeAttribute("admin"); /*Distruggo la sessione dell'admin nel caso
 													in cui sia collegato*/

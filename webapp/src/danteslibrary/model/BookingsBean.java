@@ -7,17 +7,35 @@ public class BookingsBean {
 	private int booking_id;
 	private LocalDate start_date;
 	private LocalDate end_date;
-	private int state_id;
+	private String state_name;
 	private String email;
 	private int card_id;
 	private int book_id;
 	private String codice_fiscale;
 	
-	public String getCodice_fiscale() {
-		return codice_fiscale;
+	public int getBooking_id() {
+		return booking_id;
 	}
-	public void setCodice_fiscale(String codice_fiscale) {
-		this.codice_fiscale = codice_fiscale;
+	public void setBooking_id(int booking_id) {
+		this.booking_id = booking_id;
+	}
+	public LocalDate getStart_date() {
+		return start_date;
+	}
+	public void setStart_date(LocalDate start_date) {
+		this.start_date = start_date;
+	}
+	public LocalDate getEnd_date() {
+		return end_date;
+	}
+	public void setEnd_date(LocalDate end_date) {
+		this.end_date = end_date;
+	}
+	public String getState_name() {
+		return state_name;
+	}
+	public void setState_name(String state_name) {
+		this.state_name = state_name;
 	}
 	public String getEmail() {
 		return email;
@@ -37,29 +55,11 @@ public class BookingsBean {
 	public void setBook_id(int book_id) {
 		this.book_id = book_id;
 	}
-	public int getBooking_id() {
-		return booking_id;
+	public String getCodice_fiscale() {
+		return codice_fiscale;
 	}
-	public void setBooking_id(int booking_id) {
-		this.booking_id = booking_id;
-	}
-	public LocalDate getStart_date() {
-		return start_date;
-	}
-	public void setStart_date(LocalDate start_date) {
-		this.start_date = start_date;
-	}
-	public LocalDate getEnd_date() {
-		return end_date;
-	}
-	public void setEnd_date(LocalDate end_date) {
-		this.end_date = end_date;
-	}
-	public int getState_id() {
-		return state_id;
-	}
-	public void setState_id(int state_id) {
-		this.state_id = state_id;
+	public void setCodice_fiscale(String codice_fiscale) {
+		this.codice_fiscale = codice_fiscale;
 	}
 
 }
