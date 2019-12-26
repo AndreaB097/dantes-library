@@ -55,7 +55,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 		<!-- Sezione Utenti -->
 		<div class="section-container">
-			<h2>Gestione account utenti</h2>
+			<h2>Sezione Account Utenti</h2>
 			<form method="post">	
 				<p>Ricerca per: 
 				<select class="dropdownFilters" name="filter">
@@ -114,7 +114,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 		<!--  Sezione Libri -->
 		<div class="section-container">
-			<h2>Gestione Libri</h2>
+			<h2>Sezione Libri</h2>
 			<form method="post">
 				<p>Ricerca per: 
 				<select class="dropdownFilters" name="filter">
@@ -185,7 +185,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 		<!-- Tessera -->
 		<div class="section-container">
-			<h2>Gestione Tessere</h2>
+			<h2>Sezione Tessere</h2>
 			<form method="post">
 				<p>Ricerca per: 
 				<select class="dropdownFilters" name="filter">
@@ -229,7 +229,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td><%=card.getSurname() %></td>
 						<td><%=card.getEmail() %></td>
 					<% } else { %>
-					 	<td><td>
+					 	<td>AAA<td>
 					 	<td><td>
 					 	<td><td>
 					 <%} %>
@@ -250,7 +250,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 		<!-- Sezione Prenotazioni -->
 		<div class="section-container">
-			<h2>Gestione Prenotazioni</h2>
+			<h2>Sezione Prenotazioni</h2>
 			<form method="post">
 				<p>Ricerca per: 
 				<select class="dropdownFilters" name="filter">
@@ -308,6 +308,72 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td>
 							<form action="admin?bookings" method="post">
 								<input type="hidden" name="remove_booking" value="<%=booking.getBooking_id()%>">
+								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+							</form>
+						</td>
+					</tr>
+			<%  } 
+			} %>
+			</table>
+		</div>
+		
+		<!-- Sezione Gestori -->
+		<div class="section-container">
+			<h2>Sezione Gestori</h2>
+			<form method="post">
+				<p>Ricerca per: 
+				<select class="dropdownFilters" name="filter">
+  					<option value="0">Email</option>
+  					<option value="1">Nome</option>
+  					<option value="2">Cognome</option>
+  					<option value="3">Ruolo</option>
+				</select>
+				</p>
+				<div id="search-bar">
+					<input class="search-field" type="text" name="keyword_manager" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<button class="search-button" type="submit" formaction="admin?managers"><i class="fas fa-search"></i></button>
+				</div>
+				
+			</form>
+		
+			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
+			<%if(request.getAttribute("info") != null) { %>
+				<div class="info">Il gestore <%=session.getAttribute("info") %> è stato rimosso con successo.</div>
+			<%session.removeAttribute("info"); 
+			} %>
+			
+			<script>
+			$(document).ready(function() {
+			    $('.dropdownFilters').selectmenu();
+			});
+			</script>
+			
+			<table>
+			<%if(request.getAttribute("managers") != null) { %>		
+					<tr>
+						<th>Email</th>
+						<th>Nome</th>
+						<th>Cognome</th>
+						<th>Indirizzo</th>
+						<th>Telefono</th>
+						<th>Ruolo</th>
+					</tr>
+			<%	@SuppressWarnings("unchecked")
+				ArrayList<ManagersBean> managers = (ArrayList<ManagersBean>) request.getAttribute("managers");
+				for(ManagersBean manager : managers)	{ %>
+					<tr>
+						<td><%=manager.getEmail() %></td>
+						<td><%=manager.getName() %></td>
+						<td><%=manager.getSurname() %></td>
+						<td><%=manager.getAddress() %></td>
+						<td><%=manager.getPhone() %></td>
+						<td> <% for(String s : 	manager.getRole()) { %>
+				               <%=s%>
+				         	<% }%>
+						</td>
+						<td>
+							<form action="admin?managers" method="post">
+								<input type="hidden" name="remove_manager" value="<%=manager.getEmail()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
 							</form>
 						</td>

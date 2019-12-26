@@ -164,6 +164,38 @@ public class ManagerServlet extends HttpServlet {
 					request.setAttribute("info", request.getParameter("remove_booking"));
 				}	
 				
+				/*--Sezione Gestori--*/
+				if(request.getParameter("keyword_manager") != null && request.getParameter("keyword_manager") != "") {
+					String keyword = request.getParameter("keyword_manager");
+					/*filter puo' assumere 4 valori:
+					 * - 0: Email
+					 * - 1: Nome
+					 * - 2: Cognome
+					 * - 3: Ruolo */
+					int filter = Integer.parseInt(request.getParameter("filter"));
+					if(filter < 0 || filter > 3) {
+						request.setAttribute("info", "Filtro non valido.");
+						request.getRequestDispatcher("admin.jsp").forward(request, response);
+						return;
+					} 
+					else {
+						ManagersDAO dao = new ManagersDAO();
+						ArrayList<ManagersBean> managers = dao.getManagersByFilter(filter, keyword);
+						request.setAttribute("managers", managers);
+					}
+				}
+				/* - Mostra tutti i gestori presenti nel database*/
+				else if(request.getParameter("all_managers") != null) {
+					ManagersDAO dao = new ManagersDAO();
+					ArrayList<ManagersBean> managers = dao.getAllManagers();
+					request.setAttribute("managers", managers);
+				}
+				else if(request.getParameter("remove_manager") != null) {
+					ManagersDAO dao = new ManagersDAO();
+					dao.removeManager(request.getParameter("remove_manager"));
+					request.setAttribute("info", request.getParameter("remove_manager"));
+				}
+				
 				
 			request.getRequestDispatcher("admin.jsp").forward(request, response);
 			return;

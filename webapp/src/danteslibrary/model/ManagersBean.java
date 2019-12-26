@@ -1,5 +1,7 @@
 package danteslibrary.model;
 
+import java.util.ArrayList;
+
 public class ManagersBean {
 	
 	private String email;
@@ -8,7 +10,7 @@ public class ManagersBean {
 	private String surname;
 	private String address;
 	private String phone;
-	private int[] role;
+	private ArrayList<String> role;
 	
 	public String getEmail() {
 		return email;
@@ -46,11 +48,12 @@ public class ManagersBean {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public int[] getRole() {
+	public ArrayList<String> getRole() {
 		return role;
 	}
-	public void setRole(int[] role) {
+	public void setRole(ArrayList<String> role) {
 		this.role = role;
 	}
+
 
 }
