@@ -158,13 +158,36 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%if(request.getAttribute("info") != null) { %>
 				<div class="info">Il libro <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
 			<%} %>
-			<script>
-
 			
+			<!--Added-->
+			<button id="btn-book">Aggiungi Libro</button>     
+			<button id="btn-genre">Aggiungi Genere</button>
+			<button id="btn-delgenre">Cancella Genere</button>
+			<!--Added-->
+			
+			<!--Added-->
+			<script>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
 			});
+			$(document).ready(function() {
+				$("#new-book-form").hide();
+				$("#btn-book, #btn-genre").click(function() {
+					$("#new-book-form").slideDown();
+					$("#update-book-form").hide();
+					$("#all-books-div").hide();
+				});
+				$("#btn-all-books").click(function() {
+					$("#all-books-div").slideDown();
+					$("#new-books-form").hide();
+					$("#update-books-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
 			</script>
+			<!--Added-->
 			
 			<table>
 			<%if(request.getAttribute("books") != null) { %>		
@@ -203,6 +226,40 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			} %>
 			</table>
 		</div>
+			
+			<!--Added-->
+			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
+			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
+			<div style="float:left" id="image-preview">
+				<img src="images/no_image.jpg" alt="Nessun immagine">
+			</div>
+			<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
+			<input id="image" type="file" name="file" accept=".jpg, .jpeg">
+					<label for="title">Titolo</label>
+					<input id="title" name="title" type="text">
+					<label for="authors">Autori</label>
+					<input id="authors" name="authors" type="text">
+					<label for="publisher">Casa editrice</label>
+					<input id="publisher" name="publisher" type="text">
+					<label for="genres">Genere</label>
+					<input id="genres" name="genres" type="text">
+					<label for="description">Descrizione</label>
+					<textarea id="description" name="description" rows="6" cols="60" style="resize: none;"></textarea>
+					<script>
+					$("#btn-book").click(function() {
+						$("#new-book-form h3").text("Inserimento Libro");
+					});
+					</script>
+					<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+					<script>
+						$(".cancel").click(function() {
+							$("#image-preview").html('<img src="images/no_image.jpg" alt="Nessun immagine">');
+						});
+					</script>
+		</form>
+		<!--Added-->
+		
 		<%} %>
 		
 		<%if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>

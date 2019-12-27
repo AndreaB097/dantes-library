@@ -39,7 +39,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return books;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database8: " + e.getMessage());
 		}
 		return null;
 	}
@@ -73,7 +73,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return book;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database7: " + e.getMessage());
 		}
 		
 		return null;
@@ -100,11 +100,13 @@ public ArrayList<BooksBean> getAllBooks() {
 			return genres;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database6: " + e.getMessage());
 		}
 		
 		return null;	
 	}
+	
+	
 	
 	public ArrayList<String> retrieveBookAuthors(int book_id) {
 		
@@ -127,7 +129,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return authors;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database5: " + e.getMessage());
 		}
 		
 		return null;	
@@ -173,7 +175,7 @@ public ArrayList<BooksBean> getAllBooks() {
 
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database4: " + e.getMessage());
 		}
 		
 		return null;
@@ -190,7 +192,111 @@ public ArrayList<BooksBean> getAllBooks() {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database3: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	
+	public int updateBook(BooksBean book) {
+		int result = 0;	
+		try {		
+			Connection conn = DBConnection.getConnection();
+			String query = "UPDATE books "
+					+ "SET title='" + book.getTitle().replace("'", "''") + "', "
+					+ "description='" + book.getDescription().replace("'", "''") + "', "
+					+ "publisher=\"" + book.getPublisher() + "\", "
+					+ "quantity=\"" + book.getQuantity() + "\""
+					+ " WHERE book_id =" + book.getBook_id();
+			PreparedStatement ps = conn.prepareStatement(query);
+			result = ps.executeUpdate();
+			ps.close();
+			
+			if(System.getProperty("file.separator") == "\\") {
+				query = "UPDATE books "
+					+ "SET cover='" + book.getCover().replace("\\", "/") + "'"
+					+ " WHERE book_id = " + Integer.toString(book.getBook_id());
+			}
+			else {
+				query = "UPDATE books "
+						+ "SET link='" + book.getCover() + "'"
+						+ " WHERE book_id = " + Integer.toString(book.getBook_id());
+				
+			}
+			ps = conn.prepareStatement(query);
+			result = ps.executeUpdate();
+			ps.close();
+			ArrayList<String> authors = book.getAuthors();
+			for(int i=0; i< authors.size();i++) {
+				query = "INSERT INTO authors(name) VALUES ('" + authors.get(i) + "')";
+				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+				            result = ps.executeUpdate();
+				            ResultSet rs = ps.getGeneratedKeys();
+				int author_id = rs.getInt(1);
+				query = "INSERT INTO book_authors(book_id, author_id) VALUES ("+book.getBook_id()+ ", "+ author_id+ ")";
+				ps = conn.prepareStatement(query);
+				result = ps.executeUpdate();
+				ps.close();
+			}
+			
+			ArrayList<String> genres = book.getGenres();
+			for(int i=0; i< genres.size();i++) {
+				query = "INSERT INTO genres(name) VALUES ('" + genres.get(i) + "')";
+				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+				            result = ps.executeUpdate();
+				            ResultSet rs = ps.getGeneratedKeys();
+				int genre_id = rs.getInt(1);
+				query = "INSERT INTO book_genres(book_id, genre_id) VALUES ("+book.getBook_id()+ ", "+ genre_id+ ")";
+				ps = conn.prepareStatement(query);
+				result = ps.executeUpdate();
+				ps.close();
+			}
+
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database2: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	public int newBook(BooksBean book) {
+		int result = 0;	
+		try {
+			Connection conn = DBConnection.getConnection();
+			String query = "INSERT INTO books(title, description, quantity, "
+					+ "publisher) VALUES ('"
+					+ book.getTitle().replace("'", "''") + "', '" + book.getDescription().replace("'", "''")
+					+ "', \"" + book.getQuantity() + "\", "
+					+ book.getPublisher().replace("'", "''") + ")";
+			PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			result = ps.executeUpdate();
+			ResultSet rs = ps.getGeneratedKeys();
+			rs.next();
+			int book_id = rs.getInt(1);
+			
+			ps.close();
+
+			if(System.getProperty("file.separator") == "\\") {
+				query = "UPDATE books "
+					+ "SET cover='" + book.getCover().replace("\\", "/") + "'"
+					+ " WHERE book_id = " + Integer.toString(book_id);
+			}
+			else {
+				query = "UPDATE books "
+						+ "SET link='" + book.getCover() + "'"
+						+ " WHERE book_id = " + Integer.toString(book_id);
+				
+			}
+			ps = conn.prepareStatement(query);
+			result = ps.executeUpdate();
+			ps.close();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database1: " + e.getMessage());
 		}
 		return result;
 	}
