@@ -65,17 +65,16 @@ create table if not exists books_authors(
 );
 
 create table if not exists genres(
-	genre_id int auto_increment primary key,
-	name varchar(100) not null
+	genre_name varchar(100) primary key
 );
 
 create table if not exists books_genres(
 	book_id int, 
-    genre_id int,
-    primary key(book_id, genre_id),
+    genre_name varchar(100) not null,
+    primary key(book_id, genre_name),
     foreign key(book_id) references books(book_id)
     on update cascade on delete cascade,
-    foreign key(genre_id) references genres(genre_id)
+    foreign key(genre_name) references genres(genre_name)
     on update cascade on delete cascade
 );
 
@@ -92,7 +91,6 @@ create table if not exists bookings(
     card_id int not null,
     book_id int not null,
     foreign key(state_name) references booking_states(state_name),
-    foreign key(card_id) references cards(card_id),
     foreign key(book_id) references books(book_id)
 );
 

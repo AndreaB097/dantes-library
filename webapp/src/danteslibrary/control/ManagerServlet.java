@@ -114,13 +114,15 @@ public class ManagerServlet extends HttpServlet {
 					else {
 						CardsDAO dao_cards = new CardsDAO();
 						ArrayList<CardsBean> cards = dao_cards.getCardsByFilter(filter, keyword);
-						request.setAttribute("cards", cards);
+						if(!cards.isEmpty())
+							request.setAttribute("cards", cards);
 					}
 				}
 				else if(request.getParameter("all_cards") != null) {
 					CardsDAO dao = new CardsDAO();
 					ArrayList<CardsBean> cards = dao.getAllCards();
-					request.setAttribute("cards", cards);
+					if(!cards.isEmpty())
+						request.setAttribute("cards", cards);
 				}
 				else if(request.getParameter("remove_card") != null) {
 					CardsDAO dao = new CardsDAO();

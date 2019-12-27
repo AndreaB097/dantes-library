@@ -19,7 +19,7 @@ pageEncoding="UTF-8"%>
 	session.setAttribute("referer", request.getHeader("referer"));
 %>
 
-<div class="container">
+<div class="container" style="margin-top: 75px">
 	<div id="form-container">
 	<h2>Accedi</h2>
 		<form id="sign-form" class="box" action="login" method="post">

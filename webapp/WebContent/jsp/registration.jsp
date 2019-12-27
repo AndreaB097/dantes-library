@@ -11,7 +11,7 @@ pageEncoding="UTF-8"%>
 
 <%@ include file="./jsp/layout/navbar.jsp"%>
 
-<div class="container">
+<div class="container" style="margin-top: 15px">
 	<div id="form-container">
 	<h2>Creazione account</h2>
 	

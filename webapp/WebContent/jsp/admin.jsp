@@ -31,28 +31,51 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 </div>
 
 <% } 
-	else { %>
+	else { 
+	ManagersBean admin = (ManagersBean) session.getAttribute("admin");
+	ArrayList<String> roles = admin.getRoles();%>
 	<!-- Pannello di controllo Gestori -->
 	<div class="container">
 		<!-- Menu laterale -->
 		<div class="sidebar">
-			<section class="active"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Utenti</section>
-			<section><i class="fas fa-book fa-lg"></i>&nbsp;&nbsp;&nbsp;&nbsp;Libri</section>
-			<section><i class="fas fa-id-card fa-lg"></i>&nbsp;&nbsp;Tessere</section>
-			<section><i class="fas fa-address-book fa-lg"></i>&nbsp;&nbsp;&nbsp;Prenotazioni</section>
-			<section><i class="fas fa-users-cog fa-lg"></i>&nbsp;&nbsp;Gestori</section>
-			<section><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;Gestore biblioteca</section>
+			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
+				<section class="active"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Utenti</section>
+			<%}
+			if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-book fa-lg"></i>&nbsp;&nbsp;&nbsp;&nbsp;Libri</section>
+			<%}
+			if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-id-card fa-lg"></i>&nbsp;&nbsp;Tessere</section>
+			<%}
+			if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-address-book fa-lg"></i>&nbsp;&nbsp;&nbsp;Prenotazioni</section>
+			<%}
+			if(roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-users-cog fa-lg"></i>&nbsp;&nbsp;Gestori</section>
+				<section><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;Gestore biblioteca</section>
+			<%} %>
 		</div>
 		
 		<div class="sidebar-responsive">
-			<section class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Utenti<p></section>
-			<section><i class="fas fa-book fa-lg"></i><br><p>Libri</p></section>
-			<section><i class="fas fa-id-card fa-lg"></i><br><p>Tessere</p></section>
-			<section><i class="fas fa-address-book fa-lg"></i><br><p>Prenotazioni</p></section>
-			<section><i class="fas fa-users-cog fa-lg"></i><br><p>Gestori</p></section>
-			<section><i class="fas fa-user-shield fa-lg"></i><br>Gestore biblioteca</section>
+			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
+				<section class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Utenti<p></section>
+			<%}
+			if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-book fa-lg"></i><br><p>Libri</p></section>
+			<%}
+			if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-id-card fa-lg"></i><br><p>Tessere</p></section>
+			<%}
+			if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-address-book fa-lg"></i><br><p>Prenotazioni</p></section>
+			<%}
+			if(roles.contains("Gestore Biblioteca")) {%>
+				<section><i class="fas fa-users-cog fa-lg"></i><br><p>Gestori</p></section>
+				<section><i class="fas fa-user-shield fa-lg"></i><br>Gestore biblioteca</section>
+			<%} %>
 		</div>
 		
+		<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
 		<!-- Sezione Utenti -->
 		<div class="section-container">
 			<h2>Sezione Account Utenti</h2>
@@ -108,8 +131,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } 
 			} %>
 			</table>
-		</div> <!-- fine sezione Account -->
+		</div> <!-- fine sezione Utenti -->
+		<%} %>
 		
+		<%if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
 		<!--  Sezione Libri -->
 		<div class="section-container">
 			<h2>Sezione Libri</h2>
@@ -131,10 +156,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
 			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">Il libro <%=session.getAttribute("info") %> è stato rimosso con successo.</div>
-			<%session.removeAttribute("info"); 
-			} %>
-			
+				<div class="info">Il libro <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
+			<%} %>
 			<script>
 
 			
@@ -180,7 +203,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			} %>
 			</table>
 		</div>
+		<%} %>
 		
+		<%if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
 		<!-- Tessera -->
 		<div class="section-container">
 			<h2>Sezione Tessere</h2>
@@ -204,9 +229,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?cards&all_cards'">Mostra tutti</button>
 			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">La tessera <%=session.getAttribute("info") %> è stato rimossa con successo.</div>
-			<%session.removeAttribute("info"); 
-			} %>
+				<div class="info">La tessera <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
+			<%} %>
 			
 			<table>
 			<%if(request.getAttribute("cards") != null) { %>		
@@ -245,7 +269,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			} %>
 			</table>
 		</div>
+		<%} %>
 		
+		<%if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
 		<!-- Sezione Prenotazioni -->
 		<div class="section-container">
 			<h2>Sezione Prenotazioni</h2>
@@ -271,9 +297,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
 			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">La prenotazione <%=session.getAttribute("info") %> è stato rimossa con successo.</div>
-			<%session.removeAttribute("info"); 
-			} %>
+				<div class="info">La prenotazione <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
+			<%} %>
 			
 			<script>
 			$(document).ready(function() {
@@ -314,7 +339,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			} %>
 			</table>
 		</div>
+		<%} %>
 		
+		<%if(roles.contains("Gestore Biblioteca")) {%>
 		<!-- Sezione Gestori -->
 		<div class="section-container">
 			<h2>Sezione Gestori</h2>
@@ -336,9 +363,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
 			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">Il gestore <%=session.getAttribute("info") %> è stato rimosso con successo.</div>
-			<%session.removeAttribute("info"); 
-			} %>
+				<div class="info">Il gestore <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
+			<%} %>
 			
 			<script>
 			$(document).ready(function() {
@@ -365,7 +391,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td><%=manager.getSurname() %></td>
 						<td><%=manager.getAddress() %></td>
 						<td><%=manager.getPhone() %></td>
-						<td> <% for(String s : 	manager.getRole()) { %>
+						<td> <% for(String s : 	manager.getRoles()) { %>
 				               <%=s%>
 				         	<% }%>
 						</td>
@@ -380,6 +406,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			} %>
 			</table>
 		</div>
+		
+		<!-- Sezione Gestore biblioteca -->
+		<div class="section-container">
+			<h2>Sezione Gestore biblioteca</h2>
+		</div>
+		<%} %>
 		
 		
 	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->

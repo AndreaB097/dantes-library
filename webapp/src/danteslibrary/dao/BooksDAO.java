@@ -83,8 +83,8 @@ public ArrayList<BooksBean> getAllBooks() {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT DISTINCT name FROM books_genres, genres "
-					+ "WHERE genres.genre_id = books_genres.genre_id AND book_id = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT DISTINCT genres.genre_name FROM books_genres, genres "
+					+ "WHERE genres.genre_name = books_genres.genre_name AND book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
@@ -93,7 +93,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			ArrayList<String> genres = new ArrayList<String>();
 			
 			while(result.next()) {
-				genres.add(result.getString("name"));
+				genres.add(result.getString("genre_name"));
 			}
 
 			conn.close();
@@ -135,7 +135,7 @@ public ArrayList<BooksBean> getAllBooks() {
 	
 	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) {
 		
-		String[] filters = {"title", "authors.name", "publisher", "genres.name"};
+		String[] filters = {"title", "authors.name", "publisher", "genres.genre_name"};
 		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
 		try {
 			Connection conn = DBConnection.getConnection();

@@ -10,7 +10,7 @@ public class ManagersBean {
 	private String surname;
 	private String address;
 	private String phone;
-	private ArrayList<String> role;
+	private ArrayList<String> roles;
 	
 	public String getEmail() {
 		return email;
@@ -48,11 +48,11 @@ public class ManagersBean {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public ArrayList<String> getRole() {
-		return role;
+	public ArrayList<String> getRoles() {
+		return roles;
 	}
-	public void setRole(ArrayList<String> role) {
-		this.role = role;
+	public void setRoles(ArrayList<String> roles) {
+		this.roles = roles;
 	}
 
 

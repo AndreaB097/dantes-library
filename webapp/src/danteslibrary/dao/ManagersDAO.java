@@ -32,6 +32,7 @@ public class ManagersDAO {
 				admin.setName(result.getString("surname"));
 				admin.setAddress(result.getString("address"));
 				admin.setPhone(result.getString("phone"));
+				admin.setRoles(retrieveManagerRoles(email));
 				conn.close();
 				
 				return admin;
@@ -67,7 +68,7 @@ public class ManagersDAO {
 				String surname = result.getString("surname");
 				String address = result.getString("address");
 				String phone = result.getString("phone");
-				ArrayList<String> role = retrieveManagerRoles(email);
+				ArrayList<String> roles = retrieveManagerRoles(email);
 				
 				ManagersBean manager = new ManagersBean();
 				manager.setEmail(email);
@@ -75,7 +76,7 @@ public class ManagersDAO {
 				manager.setSurname(surname);
 				manager.setAddress(address);
 				manager.setPhone(phone);
-				manager.setRole(role);
+				manager.setRoles(roles);
 
 
 				managers.add(manager);
@@ -135,7 +136,7 @@ public class ManagersDAO {
 					String surname = result.getString("surname");
 					String address = result.getString("address");
 					String phone = result.getString("phone");
-					ArrayList<String> role = retrieveManagerRoles(email);
+					ArrayList<String> roles = retrieveManagerRoles(email);
 					
 					ManagersBean manager = new ManagersBean();
 					manager.setEmail(email);
@@ -143,7 +144,7 @@ public class ManagersDAO {
 					manager.setSurname(surname);
 					manager.setAddress(address);
 					manager.setPhone(phone);
-					manager.setRole(role);
+					manager.setRoles(roles);
 					managers.add(manager);
 
 				}
