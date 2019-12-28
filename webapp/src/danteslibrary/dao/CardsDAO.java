@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class CardsDAO {
 
-	public ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
+	public static ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
 		String[] filters = {"users.name", "users.surname", "users.email", "cards.codice_fiscale", "card_id"};
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;
@@ -94,14 +94,12 @@ public class CardsDAO {
 
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database:1 " + e.getMessage());
+			System.out.println("Errore Database metodo getCardsByFilter: " + e.getMessage());
+			return null;
 		}
-		
-		return null;
 	}
 	
-	
-	public ArrayList<CardsBean> getAllCards() {
+	public static ArrayList<CardsBean> getAllCards() {
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;
 		try {
@@ -144,12 +142,12 @@ public class CardsDAO {
 			return cards;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getAllCards: " + e.getMessage());
 		}
 		return null;	
 	}
 
-	public int removeCard(String card_id) {
+	public static int removeCard(String card_id) {
 		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -160,12 +158,12 @@ public class CardsDAO {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo removeCard: " + e.getMessage());
+			return result;
 		}
-		return result;
 	}
 	
-	public CardsBean getCardByEmail(String email) {
+	public static CardsBean getCardByEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, users WHERE cards.codice_fiscale = users.codice_fiscale "
@@ -184,9 +182,52 @@ public class CardsDAO {
 			return card;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getCardByEmail: " + e.getMessage());
+			return null;
 		}
-		return null;
+	}
+	
+	public static CardsBean getCardByCodice_fiscale(String codice_fiscale) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, users WHERE cards.codice_fiscale = users.codice_fiscale "
+					+ "AND cards.codice_fiscale = ?");
+			ps.setString(1, codice_fiscale);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst())
+				return null;
+			result.first();
+			CardsBean card = new CardsBean();
+			card.setCard_id(result.getInt("card_id"));
+			card.setCodice_fiscale(result.getString("codice_fiscale"));
+			card.setAssociated(result.getBoolean("associated"));
+				
+			conn.close();
+			return card;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo getCardByCodice_fiscale: " + e.getMessage());
+			return null;
+		}
 	}
 
+	public static int newCard(String codice_fiscale, boolean associated) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			String query = "INSERT INTO cards(codice_fiscale, associated) "
+					+ "VALUES(?, ?)";
+			PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, codice_fiscale);
+			ps.setBoolean(2, associated);
+	        ps.executeUpdate();
+	        ResultSet rs = ps.getGeneratedKeys();
+	        rs.first();
+	        int card_id = rs.getInt(1);
+	        return card_id;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo newCard: " + e.getMessage());
+			return 0;
+		}
+	}
 }

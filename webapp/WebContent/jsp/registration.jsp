@@ -13,7 +13,7 @@ pageEncoding="UTF-8"%>
 
 <div class="container" style="margin-top: 15px">
 	<div id="form-container">
-	<h2>Creazione account</h2>
+	<h2>1. Creazione account</h2>
 	
 	<div id="error-list" tabindex="-1"></div>
 	
@@ -40,7 +40,7 @@ pageEncoding="UTF-8"%>
 			<input id="address" type="text" name="address" placeholder="Via Roma 10" />
 		<br><br>
 		
-		<button type="submit">Conferma</button>
+		<button type="submit">Avanti</button>
 	</form>
 	</div>
 </div>
