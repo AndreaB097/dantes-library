@@ -190,8 +190,8 @@ public class CardsDAO {
 	public static CardsBean getCardByCodice_fiscale(String codice_fiscale) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, users WHERE cards.codice_fiscale = users.codice_fiscale "
-					+ "AND cards.codice_fiscale = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards WHERE "
+					+ "cards.codice_fiscale = ?");
 			ps.setString(1, codice_fiscale);
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst())
@@ -208,6 +208,45 @@ public class CardsDAO {
 		catch(SQLException e) {
 			System.out.println("Errore Database metodo getCardByCodice_fiscale: " + e.getMessage());
 			return null;
+		}
+	}
+	
+	public static CardsBean getCardById(int card_id) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards WHERE cards.card_id = ?");
+			ps.setInt(1, card_id);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst())
+				return null;
+			result.first();
+			CardsBean card = new CardsBean();
+			card.setCard_id(result.getInt("card_id"));
+			card.setCodice_fiscale(result.getString("codice_fiscale"));
+			card.setAssociated(result.getBoolean("associated"));
+				
+			conn.close();
+			return card;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo getCardById: " + e.getMessage());
+			return null;
+		}
+	}
+	
+	public static int associateCard(int card_id) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE cards SET associated = true WHERE cards.card_id = ?");
+			ps.setInt(1, card_id);
+			int result = ps.executeUpdate();
+			conn.close();
+			
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo associateCard: " + e.getMessage());
+			return 0;
 		}
 	}
 

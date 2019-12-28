@@ -279,8 +279,16 @@ a.menu-icon img {
 	background-color: #3aafa9;
 	color: #ffffff;
 }
-#sign-form button:hover {
+#sign-form button:hover,
+#sign-form button.active {
 	background-color: #2b7a78;
+}
+#sign-form button.disabled {
+	background-color: #cfcfcf;
+}
+div#register-card-div {
+	clear: both;
+	padding: 50px;
 }
 
 /*******************************
@@ -469,7 +477,7 @@ div#user-info {
 	margin-bottom: 10px;
 	display: block;
 }
-.profile-container div#card p {
+.profile-container div#card {
 	padding: 10px;
 	box-shadow: 0px 0px 3px 1px #ccc;
 	border-left: 7px solid #2b7a78;
@@ -480,7 +488,6 @@ div#user-info {
 .profile-container div#card p#card-date {
 	padding: 10px;
 	font-size: 18px;
-	border-left: 7px solid #2b7a78;
 	text-align: center;
 }
 div.dropdown-content {
