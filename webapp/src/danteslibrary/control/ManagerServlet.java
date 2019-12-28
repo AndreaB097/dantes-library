@@ -182,6 +182,31 @@ public class ManagerServlet extends HttpServlet {
 							request.setAttribute("cards", cards);
 					}
 				}
+				
+				else if(request.getParameter("new_card") != null) {
+					CardsDAO dao = new CardsDAO();
+					CardsBean card = new CardsBean();
+					String codice_fiscale = request.getParameter("codice_fiscale");
+					boolean associated= false;
+					associated = request.getParameter( "associated" ) != null;
+					
+					if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
+						try {
+								int card_id = Integer.parseInt(request.getParameter("card_id"));
+								card.setCard_id(card_id);
+							}
+						catch(NumberFormatException  e) {
+							request.setAttribute("error", "Errore formato codice tessera.");
+							return;
+					      	}
+						}
+						
+						card.setCodice_fiscale(codice_fiscale);
+						card.setAssociated(associated);
+						dao.newCardAdmin(card);
+					}
+				
+				
 				else if(request.getParameter("all_cards") != null) {
 					CardsDAO dao = new CardsDAO();
 					ArrayList<CardsBean> cards = dao.getAllCards();
@@ -268,6 +293,7 @@ public class ManagerServlet extends HttpServlet {
 			
 			
 		}
+
 		
 		
 		

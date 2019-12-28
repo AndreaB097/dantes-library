@@ -179,7 +179,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				});
 				$("#btn-all-books").click(function() {
 					$("#all-books-div").slideDown();
-					$("#new-books-form").hide();
+					$("#new-book-form").hide();
 					$("#update-books-form").hide();
 				});
 				<%if(request.getAttribute("error") != null) { %>
@@ -339,7 +339,28 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%if(request.getAttribute("info") != null) { %>
 				<div class="info">La tessera <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
 			<%} %>
+			<button id="btn-card">Aggiungi Tessera</button> 
 			
+			<script>
+			$(document).ready(function() {
+			    $('.dropdownFilters').selectmenu();
+			});
+			$(document).ready(function() {
+				$("#new-card-form").hide();
+				$("#btn-card").click(function() {
+					$("#new-card-form").slideDown();
+					$("#all-cards-div").hide();
+				});
+				$("#btn-all-cards").click(function() {
+					$("#all-cards-div").slideDown();
+					$("#new-card-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
+			</script>    
+
 			<table>
 			<%if(request.getAttribute("cards") != null) { %>		
 					<tr>
@@ -376,6 +397,70 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } 
 			} %>
 			</table>
+			
+			
+			<form id="new-card-form" method="post" class="overflow-container" onsubmit="return validateCard()">
+			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
+
+					<label for="codice_fiscale">Codice fiscale</label>
+					<input id="codice_fiscale" name="codice_fiscale" type="text">
+					<label for="card_id">Codice tessera (facoltativo)</label>
+					<input id="card_id" name="card_id" type="text">
+					<label for="associated">Associata:</label>
+					<input type="checkbox" name="associated" value="associated"> 
+					<script>
+					$("#btn-card").click(function() {
+						$("#new-card-form h3").text("Inserimento Tessera");
+					});
+					</script>
+					<button type="submit" class="save" formaction="admin?cards&new_card"><i class="fas fa-plus fa-lg"></i> Aggiungi Tessera</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+		</form>
+		
+		<script>
+				$("#error-list").hide();
+				var errors = [];
+				function validateBook() {
+					var codice_fiscale = document.getElementById("codice_fiscale").value;
+					var card_id = document.getElementById("card_id").value;
+
+						
+					if(!codice_fiscale) {
+						errors.push("Non tutti i campi sono stati compilati.");
+					}
+				
+					if(errors.length != 0) {
+						if(!document.getElementById("error-list")) {
+							var errors_div = document.createElement("div");
+							errors_div.setAttribute("id", "error-list");
+						}
+						else {
+							var errors_div = document.getElementById("error-list");
+						}
+						var txt = "<ul>";
+						$(".overflow-container h3").before(errors_div);
+						errors_div.className = "error";
+						errors.forEach(showErrors);
+						errors_div.innerHTML = txt;
+						
+						function showErrors(value, index, array) {
+							txt = txt + "<li>" + value + "</li>";
+						}
+						
+						errors_div.innerHTML = txt + "</ul>";
+						$(errors_div).fadeIn(300);
+						errors = [];
+						errors_div.focus();
+						$("#error-list").fadeOut(2500);
+						return false;
+					}
+					
+					$("#error-list").hide();
+					return true;
+				}
+				</script>
+		
+		
 		</div>
 		<%} %>
 		

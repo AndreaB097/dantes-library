@@ -269,4 +269,30 @@ public class CardsDAO {
 			return 0;
 		}
 	}
+	
+	
+	public void newCardAdmin(CardsBean card) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			int card_id = card.getCard_id();
+			PreparedStatement ps;
+			String query;
+			if(card_id != 0) {
+				query = "INSERT INTO cards(card_id, codice_fiscale, associated) VALUES ("+card_id+", '"+card.getCodice_fiscale()+"', "+ card.isAssociated()+")";
+				ps = conn.prepareStatement(query);
+				ps.executeUpdate();
+			 }
+			else { query = "INSERT INTO cards(codice_fiscale, associated) VALUES ('"+card.getCodice_fiscale()+"', "+ card.isAssociated()+")";
+			       ps = conn.prepareStatement(query);
+			       ps.executeUpdate();
+			}
+			  conn.close();
+			  return;
+		   }
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo newCard: " + e.getMessage());
+			return;
+		}
+	}
+	
 }
