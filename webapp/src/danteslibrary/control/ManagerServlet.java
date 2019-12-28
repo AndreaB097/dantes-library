@@ -10,14 +10,12 @@ import java.util.ArrayList;
 
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
-import java.util.Random;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+
 
 
 @WebServlet("/admin")
-@MultipartConfig /*Necessario perché nella pagina admin.jsp abbiamo una form
-con enctype="multipart/form-data"*/
+//@MultipartConfig /*Necessario perché nella pagina admin.jsp abbiamo una form
+//con enctype="multipart/form-data"*/
 
 public class ManagerServlet extends HttpServlet {
 
@@ -92,7 +90,6 @@ public class ManagerServlet extends HttpServlet {
 				else if((request.getParameter("save_book") != null && request.getParameter("save_book") != "")
 						||(request.getParameter("new_book") != null)) {
 					BooksDAO dao = new BooksDAO();
-					BooksBean book = new BooksBean();
 					/*Prelevo tutti i parametri che sono stati passati*/
 					//Part filePart = request.getPart("file"); /*Serve per prelevare dal campo <input type="file">*/
 						/*if(filePart.getSize() != 0) {
@@ -111,19 +108,21 @@ public class ManagerServlet extends HttpServlet {
 						link = path + randomFileName;
 					}*/
 					try {
-						int book_id = Integer.parseInt(request.getParameter("book_id"));
+						//int book_id = Integer.parseInt(request.getParameter("book_id"));
 						String title = request.getParameter("title");
+						int quantity = Integer.parseInt(request.getParameter("quantity"));
 						String publisher = request.getParameter("publisher");
 						String description = request.getParameter("description");
-						int quantity = Integer.parseInt(request.getParameter("quantity"));
 						ArrayList<String> authors = new ArrayList<String>(); 
 						authors.add(request.getParameter("authors"));
 						ArrayList<String> genres = new ArrayList<String>(); 
 						genres.add(request.getParameter("genres"));
-						
+						BooksBean book = new BooksBean();
 						/*Costruisco il libro modificato*/
-						if(request.getParameter("save_book") != null)
-							book.setBook_id(Integer.parseInt(request.getParameter("save_book")));
+						if(request.getParameter("save_book") != null) {
+							int book_id = Integer.parseInt(request.getParameter("book_id"));
+							book.setBook_id(book_id);
+							}
 						book.setTitle(title.toString());
 						book.setDescription(description);
 						book.setPublisher(publisher);

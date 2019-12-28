@@ -225,16 +225,16 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } 
 			} %>
 			</table>
-		</div>
+		
 			
 			<!--Added-->
-			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
+			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()">
 			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
 			<div style="float:left" id="image-preview">
 				<img src="images/no_image.jpg" alt="Nessun immagine">
 			</div>
-			<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
-			<input id="image" type="file" name="file" accept=".jpg, .jpeg">
+					<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
+					<input id="image" type="file" name="file" accept=".jpg, .jpeg">
 					<label for="title">Titolo</label>
 					<input id="title" name="title" type="text">
 					<label for="authors">Autori</label>
@@ -243,6 +243,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<input id="publisher" name="publisher" type="text">
 					<label for="genres">Genere</label>
 					<input id="genres" name="genres" type="text">
+					<label for="quantity">Quantità</label>
+					<input id="quantity" name="quantity" type="text">
 					<label for="description">Descrizione</label>
 					<textarea id="description" name="description" rows="6" cols="60" style="resize: none;"></textarea>
 					<script>
@@ -258,6 +260,55 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						});
 					</script>
 		</form>
+		
+		<script>
+				$("#error-list").hide();
+				var errors = [];
+				function validateBook() {
+					var title = document.getElementById("title").value;
+					var description = document.getElementById("description").value;
+					var authors = document.getElementById("authors").value;
+					var publisher = document.getElementById("publisher").value;
+					var quantity = document.getElementById("quantity").value;
+					var genres = document.getElementById("genres").value;
+						
+					if(!title || !description || !authors || !publisher || !quantity || !genres) {
+						errors.push("Non tutti i campi sono stati compilati.");
+					}
+				
+					if(errors.length != 0) {
+						if(!document.getElementById("error-list")) {
+							var errors_div = document.createElement("div");
+							errors_div.setAttribute("id", "error-list");
+						}
+						else {
+							var errors_div = document.getElementById("error-list");
+						}
+						var txt = "<ul>";
+						$(".overflow-container h3").before(errors_div);
+						errors_div.className = "error";
+						errors.forEach(showErrors);
+						errors_div.innerHTML = txt;
+						
+						function showErrors(value, index, array) {
+							txt = txt + "<li>" + value + "</li>";
+						}
+						
+						errors_div.innerHTML = txt + "</ul>";
+						$(errors_div).fadeIn(300);
+						errors = [];
+						errors_div.focus();
+						$("#error-list").fadeOut(2500);
+						return false;
+					}
+					
+					$("#error-list").hide();
+					return true;
+				}
+				</script>
+		
+		</div>
+				
 		<!--Added-->
 		
 		<%} %>

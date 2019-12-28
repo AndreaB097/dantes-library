@@ -39,7 +39,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return books;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database8: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		return null;
 	}
@@ -73,7 +73,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return book;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database7: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		
 		return null;
@@ -100,7 +100,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return genres;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database6: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		
 		return null;	
@@ -129,7 +129,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return authors;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database5: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		
 		return null;	
@@ -175,7 +175,7 @@ public ArrayList<BooksBean> getAllBooks() {
 
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database4: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		
 		return null;
@@ -192,7 +192,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database3: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		return result;
 	}
@@ -251,12 +251,11 @@ public ArrayList<BooksBean> getAllBooks() {
 				result = ps.executeUpdate();
 				ps.close();
 			}
-
 			conn.close();
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database2: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		return result;
 	}
@@ -265,38 +264,41 @@ public ArrayList<BooksBean> getAllBooks() {
 		int result = 0;	
 		try {
 			Connection conn = DBConnection.getConnection();
-			String query = "INSERT INTO books(title, description, quantity, "
-					+ "publisher) VALUES ('"
-					+ book.getTitle().replace("'", "''") + "', '" + book.getDescription().replace("'", "''")
-					+ "', \"" + book.getQuantity() + "\", "
-					+ book.getPublisher().replace("'", "''") + ")";
-			PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			result = ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			rs.next();
-			int book_id = rs.getInt(1);
-			
-			ps.close();
-
-			if(System.getProperty("file.separator") == "\\") {
-				query = "UPDATE books "
-					+ "SET cover='" + book.getCover().replace("\\", "/") + "'"
-					+ " WHERE book_id = " + Integer.toString(book_id);
+			String query = "INSERT INTO books(title, description, quantity, publisher, cover) VALUES (?, ?, ?, ?, ?)";
+					PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+					ps.setString(1, book.getTitle());
+					ps.setString(2, book.getDescription());
+					ps.setInt(3, book.getQuantity());
+					ps.setString(4, book.getPublisher());
+					ps.setString(5, book.getCover());
+		    result = ps.executeUpdate();
+		    ResultSet rs = ps.getGeneratedKeys();
+		    rs.first();
+		    int book_id = rs.getInt(1);
+			ArrayList<String> genres = book.getGenres();
+				for(int i=0; i< genres.size();i++) {
+				query = "INSERT INTO books_genres(book_id, genre_name) VALUES ("+book_id+", '"+ genres.get(i)+ "')";
+				ps = conn.prepareStatement(query);
+				result = ps.executeUpdate();
 			}
-			else {
-				query = "UPDATE books "
-						+ "SET link='" + book.getCover() + "'"
-						+ " WHERE book_id = " + Integer.toString(book_id);
 				
-			}
-			ps = conn.prepareStatement(query);
-			result = ps.executeUpdate();
-			ps.close();
-			conn.close();
-			return result;
+			ArrayList<String> authors = book.getAuthors();
+			for(int i=0; i< authors.size();i++) {
+				query = "INSERT INTO authors(name) VALUES ('"+ authors.get(i)+ "')";
+				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+				result = ps.executeUpdate();
+				rs = ps.getGeneratedKeys();
+				rs.first();
+				int author_id = rs.getInt(1);
+				query = "INSERT INTO books_authors(book_id, author_id) VALUES ("+book_id+", '"+ author_id+"')";
+				ps = conn.prepareStatement(query);
+				result = ps.executeUpdate();
+		   }
+		  conn.close();
+		  return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database1: " + e.getMessage());
+			System.out.println("Errore Database: " + e.getMessage());
 		}
 		return result;
 	}
