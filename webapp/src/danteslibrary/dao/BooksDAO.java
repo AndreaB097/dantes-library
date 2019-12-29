@@ -39,7 +39,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return books;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getAllBooks: " + e.getMessage());
 		}
 		return null;
 	}
@@ -73,7 +73,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return book;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo findBookById: " + e.getMessage());
 		}
 		
 		return null;
@@ -100,13 +100,11 @@ public ArrayList<BooksBean> getAllBooks() {
 			return genres;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo retrieveBookGenres: " + e.getMessage());
 		}
 		
 		return null;	
 	}
-	
-	
 	
 	public ArrayList<String> retrieveBookAuthors(int book_id) {
 		
@@ -129,10 +127,34 @@ public ArrayList<BooksBean> getAllBooks() {
 			return authors;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo retrieveBookAuthors: " + e.getMessage());
 		}
 		
 		return null;	
+	}
+	
+	public ArrayList<String> retrieveAllGenres() {
+		
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres;");
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+				return null;
+			
+			ArrayList<String> genres = new ArrayList<String>();
+			
+			while(result.next()) {
+				genres.add(result.getString("genre_name"));
+			}
+
+			conn.close();
+			return genres;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo retrieveAllGenres: " + e.getMessage());
+			return null;	
+		}
 	}
 	
 	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) {
@@ -175,7 +197,7 @@ public ArrayList<BooksBean> getAllBooks() {
 
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getBooksByFilter: " + e.getMessage());
 		}
 		
 		return null;
@@ -192,7 +214,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo removeBook: " + e.getMessage());
 		}
 		return result;
 	}
@@ -255,7 +277,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo updateBook: " + e.getMessage());
 		}
 		return result;
 	}
@@ -265,41 +287,75 @@ public ArrayList<BooksBean> getAllBooks() {
 		try {
 			Connection conn = DBConnection.getConnection();
 			String query = "INSERT INTO books(title, description, quantity, publisher, cover) VALUES (?, ?, ?, ?, ?)";
-					PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-					ps.setString(1, book.getTitle());
-					ps.setString(2, book.getDescription());
-					ps.setInt(3, book.getQuantity());
-					ps.setString(4, book.getPublisher());
-					ps.setString(5, book.getCover());
+			PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, book.getTitle());
+			ps.setString(2, book.getDescription());
+			ps.setInt(3, book.getQuantity());
+			ps.setString(4, book.getPublisher());
+			String link;
+			if(System.getProperty("file.separator").equals("\\")) {
+				link = book.getCover().replace("\\", "/");
+			}
+			else {
+				link = book.getCover();
+			}
+			ps.setString(5, link);
 		    result = ps.executeUpdate();
 		    ResultSet rs = ps.getGeneratedKeys();
 		    rs.first();
 		    int book_id = rs.getInt(1);
-			ArrayList<String> genres = book.getGenres();
-				for(int i=0; i< genres.size();i++) {
-				query = "INSERT INTO books_genres(book_id, genre_name) VALUES ("+book_id+", '"+ genres.get(i)+ "')";
+			
+		    ArrayList<String> genres = book.getGenres();
+			for(int i = 0; i < genres.size(); i++) {
+				query = "INSERT INTO books_genres(book_id, genre_name) VALUES (?, ?)";
 				ps = conn.prepareStatement(query);
+				ps.setInt(1, book_id);
+				ps.setString(2, genres.get(i));
 				result = ps.executeUpdate();
 			}
 				
 			ArrayList<String> authors = book.getAuthors();
-			for(int i=0; i< authors.size();i++) {
-				query = "INSERT INTO authors(name) VALUES ('"+ authors.get(i)+ "')";
+			for(int i = 0; i < authors.size(); i++) {
+				query = "INSERT INTO authors(name) VALUES (?)";
 				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, authors.get(i));
 				result = ps.executeUpdate();
 				rs = ps.getGeneratedKeys();
 				rs.first();
 				int author_id = rs.getInt(1);
-				query = "INSERT INTO books_authors(book_id, author_id) VALUES ("+book_id+", '"+ author_id+"')";
+				query = "INSERT INTO books_authors(book_id, author_id) VALUES (?, ?)";
 				ps = conn.prepareStatement(query);
+				ps.setInt(1, book_id);
+				ps.setInt(2, author_id);
 				result = ps.executeUpdate();
 		   }
 		  conn.close();
 		  return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo newBook: " + e.getMessage());
+			return result;
 		}
-		return result;
 	}
+	
+	public String getBookCoverById(int book_id) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT books.cover FROM books "
+					+ "WHERE books.book_id = ?");
+			ps.setInt(1, book_id);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+				return null;
+			result.first();
+			String cover = result.getString("cover");
+			conn.close();
+			return cover;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo retrieveBookGenres: " + e.getMessage());
+			return null;
+		}	
+	}
+	
 }

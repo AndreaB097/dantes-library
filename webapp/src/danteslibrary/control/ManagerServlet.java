@@ -5,8 +5,10 @@ import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-
+import java.util.Random;
 
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
@@ -14,9 +16,8 @@ import danteslibrary.model.*;
 
 
 @WebServlet("/admin")
-//@MultipartConfig /*Necessario perché nella pagina admin.jsp abbiamo una form
+@MultipartConfig /*Necessario perché nella pagina admin.jsp abbiamo una form
 //con enctype="multipart/form-data"*/
-
 public class ManagerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -63,7 +64,7 @@ public class ManagerServlet extends HttpServlet {
 			else if(request.getParameter("remove_user") != null) {
 				UsersDAO dao = new UsersDAO();
 				dao.removeUser(request.getParameter("remove_user"));
-				request.setAttribute("info", request.getParameter("remove_user"));
+				request.setAttribute("info_user", "L'utente " + request.getParameter("remove_user") + " è stato rimosso.");
 			}
 		
 			/* -- Sezione Libro -- */	
@@ -86,60 +87,84 @@ public class ManagerServlet extends HttpServlet {
 						request.setAttribute("books", books);
 					}
 				}
-				
+				else if(request.getParameter("edit_book") != null) {
+					BooksDAO dao = new BooksDAO();
+					BooksBean book = dao.findBookById(request.getParameter("edit_book"));
+					ArrayList<String> genres = dao.retrieveAllGenres();
+					request.setAttribute("edit_book", book);
+					request.setAttribute("all_genres", genres);
+					request.getRequestDispatcher("admin.jsp?books").forward(request, response);
+					return;
+				}
 				else if((request.getParameter("save_book") != null && request.getParameter("save_book") != "")
 						||(request.getParameter("new_book") != null)) {
 					BooksDAO dao = new BooksDAO();
 					/*Prelevo tutti i parametri che sono stati passati*/
-					//Part filePart = request.getPart("file"); /*Serve per prelevare dal campo <input type="file">*/
-						/*if(filePart.getSize() != 0) {
-						InputStream input = filePart.getInputStream(); 
+					Part filePart = request.getPart("file"); /*Serve per prelevare dal campo <input type="file">*/
+					String link;
+					if(request.getParameter("save_book") != null)
+						link = dao.getBookCoverById(Integer.parseInt(request.getParameter("save_book")));
+					else
+						link = null;
+					
+					/*Salvo la nuova immagine SOLO se l'admin ha cambiata, quindi
+					 * nel campo input ci sarà un'immagine con dimensione diversa da 0 byte */	
+					if(filePart.getSize() != 0) {
+						InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
 						String absolute_path = getServletContext().getRealPath("");
-						String path = "../default/";
-
-						String randomFileName = "book-" + new Random().nextInt(100000) + ".jpg";
+						String path = "./images/covers/";
+						File directory = new File(absolute_path + path);
+						if(!directory.exists()) {
+							directory.mkdirs();
+						}
+						/*Viene creato un nome pseudocasuale per l'immagine*/
+						String randomFileName = "book-" + new Random().nextInt(100000) + ".png";
 						File file = new File(absolute_path + path + randomFileName);
-
+						/*L'immagine viene copiata nel percorso sopra specificato e se esiste un file con lo stesso
+						 * nome, viene sovrascritto.
+						 * L'immagine precedente invece, viene cancellata.*/
 						if(request.getParameter("save_book") != null) {
-							 String oldFileName = book.getCover();
+							String oldFileName = dao.getBookCoverById(Integer.parseInt(request.getParameter("save_book")));
 							Files.deleteIfExists(new File(absolute_path + oldFileName).toPath());
 						}
 						Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 						link = path + randomFileName;
-					}*/
+					}
 					try {
-						//int book_id = Integer.parseInt(request.getParameter("book_id"));
 						String title = request.getParameter("title");
 						int quantity = Integer.parseInt(request.getParameter("quantity"));
 						String publisher = request.getParameter("publisher");
 						String description = request.getParameter("description");
-						ArrayList<String> authors = new ArrayList<String>(); 
+						ArrayList<String> authors = new ArrayList<String>();
 						authors.add(request.getParameter("authors"));
 						ArrayList<String> genres = new ArrayList<String>(); 
 						genres.add(request.getParameter("genres"));
 						BooksBean book = new BooksBean();
-						/*Costruisco il libro modificato*/
+						/*Costruisco il libro (se lo sto modificando, allora mi serve l'id
+						 * del libro che sto modificando, altrimenti vuol dire che lo sto
+						 * aggiungendo, quindi l'id verrà auto generato dal db)*/
 						if(request.getParameter("save_book") != null) {
-							int book_id = Integer.parseInt(request.getParameter("book_id"));
-							book.setBook_id(book_id);
-							}
+							book.setBook_id(Integer.parseInt(request.getParameter("book_id")));
+						}
 						book.setTitle(title.toString());
 						book.setDescription(description);
 						book.setPublisher(publisher);
 						book.setQuantity(quantity);
 						book.setAuthors(authors);
 						book.setGenres(genres);
-					//	if(link == null) {
-					//		link = "./images/logo.jpg"; /*Non ci sono immagini per il libro nel DB*/
-					//	}
-						book.setCover("./images/logo.jpg");
-						if(request.getParameter("save_book") != null)
+						if(link == null) {
+							link = "./images/no_image.png"; /*Non ci sono immagini del libro nel db*/
+						}
+						book.setCover(link);
+						if(request.getParameter("save_book") != null) {
 							/*Aggiorno il libro nel DB*/
 							dao.updateBook(book);
-						else
-
+							request.setAttribute("info_book", "Il libro " + book.getTitle() + " è stato aggiornato.");
+						}
+						else {
 							dao.newBook(book);
-
+							request.setAttribute("info_book", "Il libro " + book.getTitle() + " è stato aggiunto.");
+						}
 					}
 					catch(Exception e) {
 						request.setAttribute("error", "Errore, c'è qualche campo vuoto.");
@@ -156,7 +181,7 @@ public class ManagerServlet extends HttpServlet {
 				else if(request.getParameter("remove_book") != null) {
 					BooksDAO dao = new BooksDAO();
 					dao.removeBook(request.getParameter("remove_book"));
-					request.setAttribute("info", request.getParameter("remove_book"));
+					request.setAttribute("info_book", "Il libro " + request.getParameter("remove_book") + " è stato rimosso.");
 				}
 				
 				
@@ -191,7 +216,8 @@ public class ManagerServlet extends HttpServlet {
 				else if(request.getParameter("remove_card") != null) {
 					CardsDAO dao = new CardsDAO();
 					dao.removeCard(request.getParameter("remove_card"));
-					request.setAttribute("info", request.getParameter("remove_card"));
+					request.setAttribute("info_card", "La tessera con codice: " 
+					+ request.getParameter("remove_card") + " è stata rimossa.");
 				}
 			
 				/* -- Sezione Prenotazione -- */	
@@ -209,7 +235,7 @@ public class ManagerServlet extends HttpServlet {
 					 *  */
 					int filter = Integer.parseInt(request.getParameter("filter"));
 					if(filter < 0 || filter > 7) {
-						request.setAttribute("info", "Filtro non valido.");
+						request.setAttribute("error", "Filtro non valido.");
 						request.getRequestDispatcher("admin.jsp").forward(request, response);
 						return;
 					} 
@@ -227,7 +253,8 @@ public class ManagerServlet extends HttpServlet {
 				else if(request.getParameter("remove_booking") != null) {
 					BookingsDAO dao = new BookingsDAO();
 					dao.removeBooking(request.getParameter("remove_booking"));
-					request.setAttribute("info", request.getParameter("remove_booking"));
+					request.setAttribute("info_booking", "La prenotazione con codice: "
+					+ request.getParameter("remove_booking") + " è stata rimossa.");
 				}	
 				
 				/*--Sezione Gestori--*/
@@ -240,7 +267,7 @@ public class ManagerServlet extends HttpServlet {
 					 * - 3: Ruolo */
 					int filter = Integer.parseInt(request.getParameter("filter"));
 					if(filter < 0 || filter > 3) {
-						request.setAttribute("info", "Filtro non valido.");
+						request.setAttribute("error", "Filtro non valido.");
 						request.getRequestDispatcher("admin.jsp").forward(request, response);
 						return;
 					} 
@@ -259,7 +286,8 @@ public class ManagerServlet extends HttpServlet {
 				else if(request.getParameter("remove_manager") != null) {
 					ManagersDAO dao = new ManagersDAO();
 					dao.removeManager(request.getParameter("remove_manager"));
-					request.setAttribute("info", request.getParameter("remove_manager"));
+					request.setAttribute("info_manager", "Il Gestore:  "
+					+ request.getParameter("remove_manager") + " è stato rimosso.");
 				}
 				
 				

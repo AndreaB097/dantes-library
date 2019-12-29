@@ -97,14 +97,16 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				    $('.dropdownFilters').selectmenu();
 				});
 				</script>
-				
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?all_users'">Mostra tutti</button>
-			<% if(request.getAttribute("info") != null) { %>
-				<div class="info">L'utente <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
+			
+			<% if(request.getAttribute("info_user") != null) { %>
+				<div class="info"><%=request.getAttribute("info_user") %></div>
 			<% } %>
+			
+			<%if(request.getAttribute("users") != null) { %>	
+			<div class="overflow-container">
 			<table>
-			<%if(request.getAttribute("users") != null) { %>		
 					<tr>
 						<th>Email</th>
 						<th>Nome</th>
@@ -128,10 +130,11 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							</form>
 						</td>
 					</tr>
-			<%  } 
-			} %>
+			<%  } %>
 			</table>
-		</div> <!-- fine sezione Utenti -->
+			</div> 
+		 <%} %>
+		</div> <!-- fine section-container sezione Utenti -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
@@ -151,53 +154,53 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<input class="search-field" type="text" name="keyword_book" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
 					<button class="search-button" type="submit" formaction="admin?books"><i class="fas fa-search"></i></button>
 				</div>
-				
 			</form>
-		
-			<button id="show-all-btn" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
-			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">Il libro <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
-			<%} %>
+			<button id="btn-all-books" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
 			
-			<!--Added-->
+			<%if(request.getAttribute("info_book") != null) { %>
+				<div class="info"><%=request.getAttribute("info_book") %></div>
+			<%} %>
+
 			<button id="btn-book">Aggiungi Libro</button>     
 			<button id="btn-genre">Aggiungi Genere</button>
 			<button id="btn-delgenre">Cancella Genere</button>
-			<!--Added-->
-			
-			<!--Added-->
+
 			<script>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
 			});
+			
 			$(document).ready(function() {
 				$("#new-book-form").hide();
-				$("#btn-book, #btn-genre").click(function() {
+				$("#update-book-form").hide();
+				$("#btn-book").click(function() {
 					$("#new-book-form").slideDown();
 					$("#update-book-form").hide();
 					$("#all-books-div").hide();
 				});
 				$("#btn-all-books").click(function() {
 					$("#all-books-div").slideDown();
-					$("#new-books-form").hide();
-					$("#update-books-form").hide();
+					$("#new-book-form").hide();
+					$("#update-book-form").hide();
 				});
 				<%if(request.getAttribute("error") != null) { %>
 					$(".overflow-container").slideDown();
 				<% } %>
 			});	
 			</script>
-			<!--Added-->
 			
-			<table>
-			<%if(request.getAttribute("books") != null) { %>		
+			<%if(request.getAttribute("books") != null) { %>
+			<div id="all-books-div" class="overflow-container">
+			<table>	
 					<tr>
 						<th>Id</th>
 						<th>Titolo</th>
 						<th>Autore</th>
 						<th>Casa Editrice</th>
 						<th>Genere</th>
-						<th>Quantita'</th>
+						<th>Quantità</th>
+						<th></th>
+						<th></th>
 					</tr>
 			<%	@SuppressWarnings("unchecked")
 				ArrayList<BooksBean> books = (ArrayList<BooksBean>) request.getAttribute("books");
@@ -205,16 +208,22 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<tr>
 						<td><%=book.getBook_id() %></td>
 						<td><%=book.getTitle() %></td>
-						<td> <% for(String s : book.getAuthors()) { %>
-							                <%=s%>
-							         <% }%>
+						<td><% for(String s : book.getAuthors()) { %>
+							     <%=s%>
+							<% }%>
+						</td>
+						<td><% for(String s : book.getGenres()) { %>
+							     <%=s%>
+							<% }%>
 						</td>
 						<td><%=book.getPublisher() %></td>
-												<td> <% for(String s : book.getGenres()) { %>
-							                <%=s%>
-							         <% }%>
-						</td>
 						<td><%=book.getQuantity() %></td>
+						<td>
+							<form action="admin?books" method="post">
+								<input type="hidden" name="edit_book" value="<%=book.getBook_id()%>">
+								<button id="btn-edit" type="submit"><i style="color: #404040;" class="fas fa-pencil-alt fa-lg"></i></button>
+							</form>
+						</td>
 						<td>
 							<form action="admin?books" method="post">
 								<input type="hidden" name="remove_book" value="<%=book.getBook_id()%>">
@@ -222,95 +231,126 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							</form>
 						</td>
 					</tr>
-			<%  } 
-			} %>
+			<%  } %>
 			</table>
-		
-			
-			<!--Added-->
-			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()">
-			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
-			<div style="float:left" id="image-preview">
-				<img src="images/no_image.jpg" alt="Nessun immagine">
 			</div>
-					<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
-					<input id="image" type="file" name="file" accept=".jpg, .jpeg">
-					<label for="title">Titolo</label>
-					<input id="title" name="title" type="text">
-					<label for="authors">Autori</label>
-					<input id="authors" name="authors" type="text">
-					<label for="publisher">Casa editrice</label>
-					<input id="publisher" name="publisher" type="text">
-					<label for="genres">Genere</label>
-					<input id="genres" name="genres" type="text">
-					<label for="quantity">Quantità</label>
-					<input id="quantity" name="quantity" type="text">
-					<label for="description">Descrizione</label>
-					<textarea id="description" name="description" rows="6" cols="60" style="resize: none;"></textarea>
-					<script>
-					$("#btn-book").click(function() {
-						$("#new-book-form h3").text("Inserimento Libro");
+			<%}
+			else if(request.getAttribute("edit_book") != null) {
+				BooksBean book = (BooksBean) request.getAttribute("edit_book"); %>
+			<script>
+			$(document).ready(function() {
+				$("#update-book-form").slideDown();
+				$("#new-book-form").hide();
+				$("#all-books-div").hide();
+			});
+			</script>
+			<form id="update-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
+				<div style="margin-bottom: 20px;" id="error-list" tabindex="-1"></div>
+				<h3>Modifica Libro</h3>
+				<div style="float:left" id="image-preview">
+					<img src="<%=book.getCover() %>" alt="Nessun immagine">
+				</div>
+				
+				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
+				<input id="image" type="file" name="file" accept=".jpg, .jpeg, .png">
+				<label for="title">Titolo</label>
+				<input id="title" name="title" type="text" value="<%=book.getTitle() %>">
+				<label for="description">Descrizione</label>
+				<textarea id="description" name="description" rows="6" cols="60" value="<%=book.getDescription() %>"></textarea>
+				<label for="authors">Autori</label>
+				<input id="authors" name="authors" type="text" value="<%=book.getAuthors() %>">
+				<label for="publisher">Casa editrice</label>
+				<input id="publisher" name="publisher" type="text" value="<%=book.getPublisher() %>">
+				<label for="genres">Genere</label>
+				<input id="genres" name="genres" type="text" value="<%=book.getGenres() %>">
+				<label for="quantity">Quantità</label>
+				<input id="quantity" name="quantity" type="text" value="<%=book.getQuantity() %>">
+				<button type="submit" class="save" formaction="admin?books&save_book=<%=book.getBook_id()%>"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+				<script>
+					$(".cancel").click(function() {
+						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
 					});
-					</script>
-					<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
-					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
-					<script>
-						$(".cancel").click(function() {
-							$("#image-preview").html('<img src="images/no_image.jpg" alt="Nessun immagine">');
-						});
-					</script>
-		</form>
+				</script>
+			</form>
+			<%} %>
+			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
+				<div style="margin-bottom: 20px;" id="error-list" tabindex="-1"></div>
+				<h3>Inserimento Libro</h3>
+				<div style="float:left" id="image-preview">
+					<img src="images/no_image.png" alt="Nessun immagine">
+				</div>
+				
+				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
+				<input id="image" type="file" name="file" accept=".jpg, .jpeg, .png">
+				<label for="title">Titolo</label>
+				<input id="title" name="title" type="text">
+				<label for="description">Descrizione</label>
+				<textarea id="description" name="description" rows="6" cols="60"></textarea>
+				<label for="authors">Autori</label>
+				<input id="authors" name="authors" type="text">
+				<label for="publisher">Casa editrice</label>
+				<input id="publisher" name="publisher" type="text">
+				<label for="genres">Genere</label>
+				<input id="genres" name="genres" type="text">
+				<label for="quantity">Quantità</label>
+				<input id="quantity" name="quantity" type="text">
+				<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+				<script>
+					$(".cancel").click(function() {
+						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
+					});
+				</script>
+			</form>
 		
 		<script>
-				$("#error-list").hide();
-				var errors = [];
-				function validateBook() {
-					var title = document.getElementById("title").value;
-					var description = document.getElementById("description").value;
-					var authors = document.getElementById("authors").value;
-					var publisher = document.getElementById("publisher").value;
-					var quantity = document.getElementById("quantity").value;
-					var genres = document.getElementById("genres").value;
-						
-					if(!title || !description || !authors || !publisher || !quantity || !genres) {
-						errors.push("Non tutti i campi sono stati compilati.");
-					}
+		$("#error-list").hide();
+		var errors = [];
+		function validateBook() {
+			var title = document.getElementById("title").value;
+			var description = document.getElementById("description").value;
+			var authors = document.getElementById("authors").value;
+			var publisher = document.getElementById("publisher").value;
+			var quantity = document.getElementById("quantity").value;
+			var genres = document.getElementById("genres").value;
 				
-					if(errors.length != 0) {
-						if(!document.getElementById("error-list")) {
-							var errors_div = document.createElement("div");
-							errors_div.setAttribute("id", "error-list");
-						}
-						else {
-							var errors_div = document.getElementById("error-list");
-						}
-						var txt = "<ul>";
-						$(".overflow-container h3").before(errors_div);
-						errors_div.className = "error";
-						errors.forEach(showErrors);
-						errors_div.innerHTML = txt;
-						
-						function showErrors(value, index, array) {
-							txt = txt + "<li>" + value + "</li>";
-						}
-						
-						errors_div.innerHTML = txt + "</ul>";
-						$(errors_div).fadeIn(300);
-						errors = [];
-						errors_div.focus();
-						$("#error-list").fadeOut(2500);
-						return false;
-					}
-					
-					$("#error-list").hide();
-					return true;
+			if(!title || !description || !authors || !publisher || !quantity || !genres) {
+				errors.push("Non tutti i campi sono stati compilati.");
+			}
+		
+			if(errors.length != 0) {
+				if(!document.getElementById("error-list")) {
+					var errors_div = document.createElement("div");
+					errors_div.setAttribute("id", "error-list");
 				}
-				</script>
-		
-		</div>
+				else {
+					var errors_div = document.getElementById("error-list");
+				}
+				var txt = "<ul>";
+				$(".overflow-container h3").before(errors_div);
+				errors_div.className = "error";
+				errors.forEach(showErrors);
+				errors_div.innerHTML = txt;
 				
-		<!--Added-->
+				function showErrors(value, index, array) {
+					txt = txt + "<li>" + value + "</li>";
+				}
+				
+				errors_div.innerHTML = txt + "</ul>";
+				$(errors_div).fadeIn(300);
+				errors = [];
+				errors_div.focus();
+				$("#error-list").fadeOut(2500);
+				return false;
+			}
+			
+			$("#error-list").hide();
+			return true;
+		}
+		</script>
 		
+		</div> <!-- fine section-container sezione Libri -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
@@ -332,16 +372,16 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<input class="search-field" type="text" name="keyword_card" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
 					<button class="search-button" type="submit" formaction="admin?cards"><i class="fas fa-search"></i></button>
 				</div>
-				
 			</form>
-		
 			<button id="show-all-btn" onClick="window.location = 'admin?cards&all_cards'">Mostra tutti</button>
-			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">La tessera <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
+			
+			<%if(request.getAttribute("info_card") != null) { %>
+				<div class="info"><%=request.getAttribute("info_card") %></div>
 			<%} %>
 			
-			<table>
-			<%if(request.getAttribute("cards") != null) { %>		
+			<%if(request.getAttribute("cards") != null) { %>
+			<div class="overflow-container">
+			<table>		
 					<tr>
 						<th>Nome</th>
 						<th>Cognome</th>
@@ -349,6 +389,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<th>Codice fiscale</th>
 						<th>Codice tessera</th>
 						<th>Associata</th>
+						<th></th>
 					</tr>
 			<%	@SuppressWarnings("unchecked")
 				ArrayList<CardsBean> cards = (ArrayList<CardsBean>) request.getAttribute("cards");
@@ -373,10 +414,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							</form>
 						</td>
 					</tr>
-			<%  } 
-			} %>
+			<%  } %>
 			</table>
-		</div>
+			</div>
+		   <%} %>
+			
+		</div> <!-- fine section-container sezione Tessere -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
@@ -400,12 +443,11 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<input class="search-field" type="text" name="keyword_booking" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
 					<button class="search-button" type="submit" formaction="admin?bookings"><i class="fas fa-search"></i></button>
 				</div>
-				
 			</form>
-		
 			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
-			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">La prenotazione <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
+			
+			<%if(request.getAttribute("info_booking") != null) { %>
+				<div class="info"><%=request.getAttribute("info_booking") %></div>
 			<%} %>
 			
 			<script>
@@ -414,8 +456,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			});
 			</script>
 			
-			<table>
-			<%if(request.getAttribute("bookings") != null) { %>		
+			<%if(request.getAttribute("bookings") != null) { %>
+			<div class="overflow-container">
+			<table>		
 					<tr>
 						<th>Codice prenotazione</th>
 						<th>Codice Libro</th>
@@ -443,10 +486,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							</form>
 						</td>
 					</tr>
-			<%  } 
-			} %>
-			</table>
-		</div>
+			<%  } %>
+			 </table>
+			</div>
+			<%} %>
+			
+		</div> <!-- fine section-container sezione Prenotazioni -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Biblioteca")) {%>
@@ -466,12 +511,11 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<input class="search-field" type="text" name="keyword_manager" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
 					<button class="search-button" type="submit" formaction="admin?managers"><i class="fas fa-search"></i></button>
 				</div>
-				
 			</form>
-		
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
-			<%if(request.getAttribute("info") != null) { %>
-				<div class="info">Il gestore <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
+			
+			<%if(request.getAttribute("info_manager") != null) { %>
+				<div class="info"><%=request.getAttribute("info_manager") %></div>
 			<%} %>
 			
 			<script>
@@ -479,9 +523,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			    $('.dropdownFilters').selectmenu();
 			});
 			</script>
-			
-			<table>
-			<%if(request.getAttribute("managers") != null) { %>		
+
+			<%if(request.getAttribute("managers") != null) { %>
+			<div class="overflow-container">
+			<table>	
 					<tr>
 						<th>Email</th>
 						<th>Nome</th>
@@ -510,10 +555,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							</form>
 						</td>
 					</tr>
-			<%  } 
-			} %>
+			<%  } %>
 			</table>
-		</div>
+			</div>
+			<%} %>
+			
+		</div> <!-- fine section-container sezione Prenotazioni -->
 		
 		<!-- Sezione Gestore biblioteca -->
 		<div class="section-container">
@@ -564,9 +611,38 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$(".section-container").eq($(this).index()).show();
 				}
 			});
-			
+	</script>
+		
+		<script>
+		var file = document.getElementById("image");
+		file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
+		function validateImage() {
+			if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
+				return false;
+			}
+			else if(file.files[0].size <= 0 || file.files[0].size > 1048576 /*1MB*/) {
+				return false;
+			}
+			return true;
+		}
+		$("#image").change(function() {
+			if(!validateImage())
+				return false;
+			var img = new Image();
+			var canvas = document.createElement("canvas");
+			canvas.width = 1000;
+			canvas.height = 1000;
+			img.onload = function() {
+				var ctx = canvas.getContext("2d");
+				ctx.drawImage(img, 0, 0, 1000, 1000);
+			};
+			img.src = URL.createObjectURL(file.files[0]);
+			$("#image-preview").html(canvas);
+			return true;
+		});
 		</script>
-	</div>
+		
+	</div> <!-- Chiusura del div "container" in cima -->
 <% } /*Chiusura dell'else in cima (quello che fa iniziare il pannello di controllo)*/%>
 	
 <%@include file="./jsp/layout/footer.jsp" %>
