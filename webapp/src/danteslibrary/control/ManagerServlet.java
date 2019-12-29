@@ -290,6 +290,40 @@ public class ManagerServlet extends HttpServlet {
 						request.setAttribute("managers", managers);
 					}
 				}
+				
+				else if(request.getParameter("new_manager") != null) {
+					ManagersDAO dao = new ManagersDAO();
+					ManagersBean manager = new ManagersBean();
+					String manager_email = request.getParameter("email");
+					String manager_password = request.getParameter("password");
+					String name = request.getParameter("name");
+					String surname = request.getParameter("surname");
+					String address = request.getParameter("address");
+					String phone = request.getParameter("phone");
+					ArrayList<String> roles = new ArrayList<String>();
+					if (request.getParameter("users_manager") != null)
+						roles.add("Gestore Utenti");
+					if (request.getParameter("books_manager") != null)
+						roles.add("Gestore Libri");
+					if (request.getParameter("cards_manager") != null)
+						roles.add("Gestore Tessere");
+					if (request.getParameter("bookings_manager") != null)
+						roles.add("Gestore Prenotazioni");
+					if (request.getParameter("library_manager") != null)
+						roles.add("Gestore Biblioteca");
+
+					manager.setEmail(email);
+					manager.setPassword(password);
+					manager.setName(name);
+					manager.setSurname(surname);
+					manager.setPhone(phone);
+					manager.setAddress(address);
+					manager.setRoles(roles);
+
+					dao.newManager(manager);
+					
+					}
+			
 				/* - Mostra tutti i gestori presenti nel database*/
 				else if(request.getParameter("all_managers") != null) {
 					ManagersDAO dao = new ManagersDAO();

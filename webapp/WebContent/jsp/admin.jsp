@@ -421,7 +421,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		<script>
 				$("#error-list").hide();
 				var errors = [];
-				function validateBook() {
+				function validateBooking() {
 					var codice_fiscale = document.getElementById("codice_fiscale").value;
 					var card_id = document.getElementById("card_id").value;
 
@@ -546,7 +546,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			} %>
 			</table>
 			
-			
 			<form id="new-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
 			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
 
@@ -581,12 +580,14 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		<script>
 				$("#error-list").hide();
 				var errors = [];
-				function validateBook() {
+				function validateBooking() {
 					var codice_fiscale = document.getElementById("codice_fiscale").value;
 					var card_id = document.getElementById("card_id").value;
-
-						
-					if(!codice_fiscale) {
+					var book_id = document.getElementById("book_id").value;
+					var start_date = document.getElementById("start_date").value;
+					var end_date = document.getElementById("end_date").value;
+					
+					if(!codice_fiscale || !card_id || !book_id || !start_date || !end_date) {
 						errors.push("Non tutti i campi sono stati compilati.");
 					}
 				
@@ -646,6 +647,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</form>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
+			<button id="btn-manager">Aggiungi Gestore</button> 
 			<%if(request.getAttribute("info") != null) { %>
 				<div class="info">Il gestore <%=request.getAttribute("info") %> è stato rimosso con successo.</div>
 			<%} %>
@@ -654,6 +656,20 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
 			});
+			$(document).ready(function() {
+				$("#new-manager-form").hide();
+				$("#btn-manager").click(function() {
+					$("#new-manager-form").slideDown();
+					$("#all-managers-div").hide();
+				});
+				$("#btn-all-managers").click(function() {
+					$("#all-managers-div").slideDown();
+					$("#new-manager-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
 			</script>
 			
 			<table>
@@ -689,6 +705,102 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } 
 			} %>
 			</table>
+			
+			<form id="new-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
+			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
+
+					<label for="email">Email</label>
+					<input id="email" name="email" type="text">
+					
+					<label for="password">Password</label>
+					<input id="password" name="password" type="password">
+					
+					<label for="repeat_password">Ripeti Password</label>
+					<input id="repeat_password" name="repeat_password" type="password">
+					
+					<label for="name">Nome</label>
+					<input type="name" name="name"  type="text"> 
+					
+					<label for="surname">Cognome</label>
+					<input id="surname" name="surname"  type="text"> 
+					
+					<label for="address">Indirizzo</label>
+					<input id="address" name="address"  type="text"> 
+					
+					<label for="phone">Telefono</label>
+					<input id="phone" name="phone"  type="text"> 
+					
+					<label for="state">Ruolo</label>
+						<br>Gestore Utenti<input type="checkbox" name="users_manager" value="Gestore Utenti"><br>
+						Gestore Libri<input type="checkbox" name="books_manager" value="Gestore Libri"><br>
+						Gestore Tessere<input type="checkbox" name="cards_manager" value="Gestore Tessere"><br>
+						Gestore Prenotazioni<input type="checkbox" name="bookings_manager" value="Gestore Prenotazioni"><br>
+						Gestore Biblioteca<input type="checkbox" name="library_manager" value="Gestore Biblioteca"><br>
+
+
+					<script>
+					$("#btn-booking").click(function() {
+						$("#new-booking-form h3").text("Inserimento Prenotazione");
+					});
+					</script>
+					<button type="submit" class="save" formaction="admin?managers&new_manager"><i class="fas fa-plus fa-lg"></i> Aggiungi Gestore</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+		</form>
+		
+		<script>
+				$("#error-list").hide();
+				var errors = [];
+				function validateManager() {
+					var email = document.getElementById("email").value;
+					var name = document.getElementById("name").value;
+					var surname = document.getElementById("surname").value;
+					var password = document.getElementById("password").value;
+					var repeat_password = document.getElementById("repeat_password").value;
+					var address = document.getElementById("address").value;
+					var phone = document.getElementById("phone").value;
+					
+					//fare controllo anche sui checkbox
+					
+					if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
+						errors.push("Non tutti i campi sono stati compilati.");
+					}
+					
+					if(password != repeat_password){
+						errors.push("Le password non corrispondono");
+					}
+
+				
+					if(errors.length != 0) {
+						if(!document.getElementById("error-list")) {
+							var errors_div = document.createElement("div");
+							errors_div.setAttribute("id", "error-list");
+						}
+						else {
+							var errors_div = document.getElementById("error-list");
+						}
+						var txt = "<ul>";
+						$(".overflow-container h3").before(errors_div);
+						errors_div.className = "error";
+						errors.forEach(showErrors);
+						errors_div.innerHTML = txt;
+						
+						function showErrors(value, index, array) {
+							txt = txt + "<li>" + value + "</li>";
+						}
+						
+						errors_div.innerHTML = txt + "</ul>";
+						$(errors_div).fadeIn(300);
+						errors = [];
+						errors_div.focus();
+						$("#error-list").fadeOut(2500);
+						return false;
+					}
+					
+					$("#error-list").hide();
+					return true;
+				}
+				</script>
+		
 		</div>
 		
 		<!-- Sezione Gestore biblioteca -->
