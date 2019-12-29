@@ -210,9 +210,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							         <% }%>
 						</td>
 						<td><%=book.getPublisher() %></td>
-												<td> <% for(String s : book.getGenres()) { %>
-							                <%=s%>
-							         <% }%>
+						<td> <% for(String s : book.getGenres()) { %>
+							       <%=s%>
+						     <% }%>
 						</td>
 						<td><%=book.getQuantity() %></td>
 						<td>
@@ -336,10 +336,11 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</form>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?cards&all_cards'">Mostra tutti</button>
+			<button id="btn-card">Aggiungi Tessera</button> 
 			<%if(request.getAttribute("info") != null) { %>
 				<div class="info">La tessera <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
 			<%} %>
-			<button id="btn-card">Aggiungi Tessera</button> 
+
 			
 			<script>
 			$(document).ready(function() {
@@ -459,8 +460,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					return true;
 				}
 				</script>
-		
-		
 		</div>
 		<%} %>
 		
@@ -489,6 +488,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</form>
 		
 			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
+			<button id="btn-booking">Aggiungi Prenotazione</button> 
 			<%if(request.getAttribute("info") != null) { %>
 				<div class="info">La prenotazione <%=request.getAttribute("info") %> è stato rimossa con successo.</div>
 			<%} %>
@@ -497,6 +497,20 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
 			});
+			$(document).ready(function() {
+				$("#new-booking-form").hide();
+				$("#btn-booking").click(function() {
+					$("#new-booking-form").slideDown();
+					$("#all-bookings-div").hide();
+				});
+				$("#btn-all-bookings").click(function() {
+					$("#all-bookings-div").slideDown();
+					$("#new-booking-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
 			</script>
 			
 			<table>
@@ -531,6 +545,83 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } 
 			} %>
 			</table>
+			
+			
+			<form id="new-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
+			<h3></h3> <!-- Riempimento dinamico con jQuery, vedi sotto -->
+
+					<label for="email">Email(facoltativo)</label>
+					<input id="email" name="email" type="text">
+					<label for="codice_fiscale">Codice fiscale</label>
+					<input id="codice_fiscale" name="codice_fiscale" type="text">
+					<label for="card_id">Codice Tessera</label>
+					<input type="card_id" name="card_id"  type="text"> 
+					<label for="book_id">Codice Libro</label>
+					<input type="book_id" name="book_id"  type="text"> 
+					<label for="start_date">Data inizio</label>
+					<input type="start_date" name="start_date"  type="text"> 
+					<label for="end_date">Data fine</label>
+					<input type="end_date" name="end_date"  type="text"> 
+					<label for="state">Stato prenotazione</label>
+					<select class="dropdownFilters" name="state">
+  						<option value="Non ancora ritirato">Non ancora ritirato</option>
+  						<option value="Ritirato">Ritirato</option>
+  						<option value="Riconsegnato">Riconsegnato</option>
+  						<option value="Annullata">Annullata</option>
+					</select>
+					<script>
+					$("#btn-booking").click(function() {
+						$("#new-booking-form h3").text("Inserimento Prenotazione");
+					});
+					</script>
+					<button type="submit" class="save" formaction="admin?bookings&new_booking"><i class="fas fa-plus fa-lg"></i> Aggiungi Prenotazione</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+		</form>
+		
+		<script>
+				$("#error-list").hide();
+				var errors = [];
+				function validateBook() {
+					var codice_fiscale = document.getElementById("codice_fiscale").value;
+					var card_id = document.getElementById("card_id").value;
+
+						
+					if(!codice_fiscale) {
+						errors.push("Non tutti i campi sono stati compilati.");
+					}
+				
+					if(errors.length != 0) {
+						if(!document.getElementById("error-list")) {
+							var errors_div = document.createElement("div");
+							errors_div.setAttribute("id", "error-list");
+						}
+						else {
+							var errors_div = document.getElementById("error-list");
+						}
+						var txt = "<ul>";
+						$(".overflow-container h3").before(errors_div);
+						errors_div.className = "error";
+						errors.forEach(showErrors);
+						errors_div.innerHTML = txt;
+						
+						function showErrors(value, index, array) {
+							txt = txt + "<li>" + value + "</li>";
+						}
+						
+						errors_div.innerHTML = txt + "</ul>";
+						$(errors_div).fadeIn(300);
+						errors = [];
+						errors_div.focus();
+						$("#error-list").fadeOut(2500);
+						return false;
+					}
+					
+					$("#error-list").hide();
+					return true;
+				}
+				</script>
+			
+			
 		</div>
 		<%} %>
 		

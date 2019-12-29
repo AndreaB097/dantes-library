@@ -3,14 +3,11 @@ package danteslibrary.control;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
-
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-
-
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
-
 
 
 @WebServlet("/admin")
@@ -189,7 +186,6 @@ public class ManagerServlet extends HttpServlet {
 					String codice_fiscale = request.getParameter("codice_fiscale");
 					boolean associated= false;
 					associated = request.getParameter( "associated" ) != null;
-					
 					if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
 						try {
 								int card_id = Integer.parseInt(request.getParameter("card_id"));
@@ -244,6 +240,25 @@ public class ManagerServlet extends HttpServlet {
 						request.setAttribute("bookings", bookings);
 					}
 				}
+				
+				else if(request.getParameter("new_booking") != null) {
+					BookingsDAO dao = new BookingsDAO();
+					String codice_fiscale = request.getParameter("codice_fiscale");
+					int book_id = Integer.parseInt(request.getParameter("book_id"));
+					int card_id = Integer.parseInt(request.getParameter("card_id"));
+					String start_date = request.getParameter("start_date");
+					String end_date = request.getParameter("end_date");
+					String state = request.getParameter("state");
+					String email_booking;
+					if((request.getParameter("email")!=null) && !(request.getParameter("email").equals(""))) {
+								email_booking = request.getParameter("email");
+						}
+					else {
+						email_booking = null;
+						}
+					dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
+				}
+				
 				else if(request.getParameter("all_bookings") != null) {
 					BookingsDAO dao = new BookingsDAO();
 					ArrayList<BookingsBean> bookings = dao.getAllBookings();
