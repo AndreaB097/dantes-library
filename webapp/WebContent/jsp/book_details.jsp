@@ -15,7 +15,11 @@ java.time.format.*, java.util.Locale"%>
 	
 <div class="container">
 	<div class="book-container">
-	<%BooksBean book = (BooksBean) request.getAttribute("book"); %>
+	<%if(request.getAttribute("book") == null) {
+		response.sendError(404);
+		return;
+	}
+	BooksBean book = (BooksBean) request.getAttribute("book"); %>
 		<div class="cover">
 			<img src="<%=book.getCover() %>" alt="Impossibile caricare l'immagine">
 		</div>

@@ -87,6 +87,9 @@
 		<a href="./login.jsp"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Accedi</a>
 	<%} %>
 	<a href="./contacts.jsp"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
+	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
+		<a href="./logout.jsp"><i class="fas fa-sign-out-alt fa-lg"></i>&nbsp;&nbsp;&nbsp;Logout</a>
+	<%}%>
 	<form id="search-responsive" action="./search">
 		<p>Ricerca per  <select id="search-filters-responsive" class="dropdownFilters" name="filter">
 			<option value="0">Titolo</option>

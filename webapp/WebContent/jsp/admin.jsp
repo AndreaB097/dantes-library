@@ -39,45 +39,45 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		<!-- Menu laterale -->
 		<div class="sidebar">
 			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
-				<section class="active"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Utenti</section>
+				<section id="sidebar-users" class="active"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Utenti</section>
 			<%}
 			if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-book fa-lg"></i>&nbsp;&nbsp;&nbsp;&nbsp;Libri</section>
+				<section id="sidebar-books"><i class="fas fa-book fa-lg"></i>&nbsp;&nbsp;&nbsp;&nbsp;Libri</section>
 			<%}
 			if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-id-card fa-lg"></i>&nbsp;&nbsp;Tessere</section>
+				<section id="sidebar-cards"><i class="fas fa-id-card fa-lg"></i>&nbsp;&nbsp;Tessere</section>
 			<%}
 			if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-address-book fa-lg"></i>&nbsp;&nbsp;&nbsp;Prenotazioni</section>
+				<section id="sidebar-bookings"><i class="fas fa-address-book fa-lg"></i>&nbsp;&nbsp;&nbsp;Prenotazioni</section>
 			<%}
 			if(roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-users-cog fa-lg"></i>&nbsp;&nbsp;Gestori</section>
-				<section><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;Gestore biblioteca</section>
+				<section id="sidebar-managers"><i class="fas fa-users-cog fa-lg"></i>&nbsp;&nbsp;Gestori</section>
+				<section id="sidebar-library"><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;Gestore biblioteca</section>
 			<%} %>
 		</div>
 		
 		<div class="sidebar-responsive">
 			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
-				<section class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Utenti<p></section>
+				<section id="sidebar-users" class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Utenti<p></section>
 			<%}
 			if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-book fa-lg"></i><br><p>Libri</p></section>
+				<section id="sidebar-books"><i class="fas fa-book fa-lg"></i><br><p>Libri</p></section>
 			<%}
 			if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-id-card fa-lg"></i><br><p>Tessere</p></section>
+				<section id="sidebar-cards"><i class="fas fa-id-card fa-lg"></i><br><p>Tessere</p></section>
 			<%}
 			if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-address-book fa-lg"></i><br><p>Prenotazioni</p></section>
+				<section id="sidebar-bookings"><i class="fas fa-address-book fa-lg"></i><br><p>Prenotazioni</p></section>
 			<%}
 			if(roles.contains("Gestore Biblioteca")) {%>
-				<section><i class="fas fa-users-cog fa-lg"></i><br><p>Gestori</p></section>
-				<section><i class="fas fa-user-shield fa-lg"></i><br>Gestore biblioteca</section>
+				<section id="sidebar-managers"><i class="fas fa-users-cog fa-lg"></i><br><p>Gestori</p></section>
+				<section id="sidebar-library"><i class="fas fa-user-shield fa-lg"></i><br>Gestore biblioteca</section>
 			<%} %>
 		</div>
 		
 		<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
 		<!-- Sezione Utenti -->
-		<div class="section-container">
+		<div id="users-section" class="section-container">
 			<h2>Sezione Account Utenti</h2>
 			<form method="post">	
 				<p>Ricerca per: 
@@ -139,7 +139,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 		<%if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
 		<!--  Sezione Libri -->
-		<div class="section-container">
+		<div id="books-section" class="section-container">
 			<h2>Sezione Libri</h2>
 			<form method="post">
 				<p>Ricerca per: 
@@ -156,17 +156,17 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</div>
 			</form>
 			<button id="btn-all-books" onClick="window.location = 'admin?books&all_books'">Mostra tutti</button>
-			
+
+			<button id="btn-book">Aggiungi Libro</button>     
+			<button id="btn-genre">Aggiungi Genere</button>
+			<button id="btn-delgenre">Cancella Genere</button>
+
 			<%if(request.getAttribute("info_book") != null) { %>
 				<div class="info"><%=request.getAttribute("info_book") %></div>
 			<%}
 			  else if(request.getAttribute("error") != null) { %>
 			  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
-
-			<button id="btn-book">Aggiungi Libro</button>     
-			<button id="btn-genre">Aggiungi Genere</button>
-			<button id="btn-delgenre">Cancella Genere</button>
 
 			<script>
 			$(document).ready(function() {
@@ -186,9 +186,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$("#new-book-form").hide();
 					$("#update-book-form").hide();
 				});
-				<%if(request.getAttribute("error") != null) { %>
-					$(".overflow-container").slideDown();
-				<% } %>
 			});	
 			</script>
 			
@@ -265,7 +262,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			});
 			</script>
 			<form id="update-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
-				<div style="margin-bottom: 20px;" id="error-list" tabindex="-1"></div>
 				<h3>Modifica Libro</h3>
 				<div style="float:left" id="image-preview">
 					<img src="<%=book.getCover() %>" alt="Nessun immagine">
@@ -339,7 +335,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%} %>
 
 			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
-				<div style="margin-bottom: 20px;" id="error-list" tabindex="-1"></div>
 				<h3>Inserimento Libro</h3>
 				<div style="float:left" id="image-preview">
 					<img src="images/no_image.png" alt="Nessun immagine">
@@ -395,8 +390,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 				<script>
 					$(".save").click(function() {
-						$('#authors').val($('#update-authors-select').val());
-						$('#genres').val($('#update-genres-select').val());
+						$('#authors').val($('#authors-select').val());
+						$('#genres').val($('#genres-select').val());
 					});
 					$(".cancel").click(function() {
 						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
@@ -423,12 +418,13 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				if(!document.getElementById("error-list")) {
 					var errors_div = document.createElement("div");
 					errors_div.setAttribute("id", "error-list");
+					errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
 				}
 				else {
 					var errors_div = document.getElementById("error-list");
 				}
 				var txt = "<ul>";
-				$(".overflow-container h3").before(errors_div);
+				$("#books-section h3").before(errors_div);
 				errors_div.className = "error";
 				errors.forEach(showErrors);
 				errors_div.innerHTML = txt;
@@ -442,6 +438,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				errors = [];
 				errors_div.focus();
 				$("#error-list").fadeOut(2500);
+				console.log(errors);
 				return false;
 			}
 			
@@ -450,12 +447,42 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		}
 		</script>
 		
+		<script>
+		/*Script per il caricamento delle immagini e preview*/
+		var file = document.getElementById("image");
+		file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
+		function validateImage() {
+			if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
+				return false;
+			}
+			else if(file.files[0].size <= 0 || file.files[0].size > 1048576 /*1MB*/) {
+				return false;
+			}
+			return true;
+		}
+		$("#image").change(function() {
+			if(!validateImage())
+				return false;
+			var img = new Image();
+			var canvas = document.createElement("canvas");
+			canvas.width = 1000;
+			canvas.height = 1000;
+			img.onload = function() {
+				var ctx = canvas.getContext("2d");
+				ctx.drawImage(img, 0, 0, 1000, 1000);
+			};
+			img.src = URL.createObjectURL(file.files[0]);
+			$("#image-preview").html(canvas);
+			return true;
+		});
+		</script>
+		
 		</div> <!-- fine section-container sezione Libri -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>
 		<!-- Tessera -->
-		<div class="section-container">
+		<div id="cards-section" class="section-container">
 			<h2>Sezione Tessere</h2>
 			<form method="post">
 				<p>Ricerca per: 
@@ -474,7 +501,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</div>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?cards&all_cards'">Mostra tutti</button>
-      <button id="btn-card">Aggiungi Tessera</button> 
+      		<button id="btn-card">Aggiungi Tessera</button> 
 			
 			<%if(request.getAttribute("info_card") != null) { %>
 				<div class="info"><%=request.getAttribute("info_card") %></div>
@@ -546,60 +573,61 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<input id="codice_fiscale" name="codice_fiscale" type="text">
 					<label for="card_id">Codice tessera (facoltativo)</label>
 					<input id="card_id" name="card_id" type="text">
-					<label for="associated">Associata:</label>
-					<input type="checkbox" name="associated" value="associated"> 
+					<label for="associated" style="display: inline;">Associata:</label>
+					<input id="associated" type="checkbox" name="associated" value="associated"><br/><br/>
 					<button type="submit" class="save" formaction="admin?cards&new_card"><i class="fas fa-plus fa-lg"></i> Aggiungi Tessera</button>
 					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 		</form>
 		
 		<script>
-				$("#error-list").hide();
-				var errors = [];
-				function validateCard() {
-					var codice_fiscale = document.getElementById("codice_fiscale").value;
-					var card_id = document.getElementById("card_id").value;
+			$("#error-list").hide();
+			var errors = [];
+			function validateCard() {
+				var codice_fiscale = document.getElementById("codice_fiscale").value;
+				var card_id = document.getElementById("card_id").value;
 
-						
-					if(!codice_fiscale) {
-						errors.push("Non tutti i campi sono stati compilati.");
+					
+				if(!codice_fiscale) {
+					errors.push("Non tutti i campi sono stati compilati.");
+				}
+			
+				if(errors.length != 0) {
+					if(!document.getElementById("error-list")) {
+						var errors_div = document.createElement("div");
+						errors_div.setAttribute("id", "error-list");
+						errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
 					}
-				
-					if(errors.length != 0) {
-						if(!document.getElementById("error-list")) {
-							var errors_div = document.createElement("div");
-							errors_div.setAttribute("id", "error-list");
-						}
-						else {
-							var errors_div = document.getElementById("error-list");
-						}
-						var txt = "<ul>";
-						$(".overflow-container h3").before(errors_div);
-						errors_div.className = "error";
-						errors.forEach(showErrors);
-						errors_div.innerHTML = txt;
-						
-						function showErrors(value, index, array) {
-							txt = txt + "<li>" + value + "</li>";
-						}
-						
-						errors_div.innerHTML = txt + "</ul>";
-						$(errors_div).fadeIn(300);
-						errors = [];
-						errors_div.focus();
-						$("#error-list").fadeOut(2500);
-						return false;
+					else {
+						var errors_div = document.getElementById("error-list");
+					}
+					var txt = "<ul>";
+					$("#cards-section h3").before(errors_div);
+					errors_div.className = "error";
+					errors.forEach(showErrors);
+					errors_div.innerHTML = txt;
+					
+					function showErrors(value, index, array) {
+						txt = txt + "<li>" + value + "</li>";
 					}
 					
-					$("#error-list").hide();
-					return true;
+					errors_div.innerHTML = txt + "</ul>";
+					$(errors_div).fadeIn(300);
+					errors = [];
+					errors_div.focus();
+					$("#error-list").fadeOut(2500);
+					return false;
 				}
+				
+				$("#error-list").hide();
+				return true;
+			}
 		</script>
 		</div> <!-- fine section-container sezione Tessere -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Prenotazioni") || roles.contains("Gestore Biblioteca")) {%>
 		<!-- Sezione Prenotazioni -->
-		<div class="section-container">
+		<div id="bookings-section" class="section-container">
 			<h2>Sezione Prenotazioni</h2>
 			<form method="post">
 				<p>Ricerca per: 
@@ -640,9 +668,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$("#all-bookings-div").slideDown();
 					$("#new-booking-form").hide();
 				});
-				<%if(request.getAttribute("error") != null) { %>
-					$(".overflow-container").slideDown();
-				<% } %>
 			});	
 			</script>
 			
@@ -683,72 +708,78 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			
 			<form id="new-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
 			<h3>Inserimento Prenotazione</h3>
-					<label for="email">Email(facoltativo)</label>
-					<input id="email" name="email" type="text">
-					<label for="codice_fiscale">Codice fiscale</label>
-					<input id="codice_fiscale" name="codice_fiscale" type="text">
-					<label for="card_id">Codice Tessera</label>
-					<input type="card_id" name="card_id"  type="text"> 
-					<label for="book_id">Codice Libro</label>
-					<input type="book_id" name="book_id"  type="text"> 
-					<label for="start_date">Data inizio</label>
-					<input type="start_date" name="start_date"  type="text"> 
-					<label for="end_date">Data fine</label>
-					<input type="end_date" name="end_date"  type="text"> 
-					<label for="state">Stato prenotazione</label>
-					<select class="dropdownFilters" name="state">
-  						<option value="Non ancora ritirato">Non ancora ritirato</option>
-  						<option value="Ritirato">Ritirato</option>
-  						<option value="Riconsegnato">Riconsegnato</option>
-  						<option value="Annullata">Annullata</option>
-					</select>
-					<button type="submit" class="save" formaction="admin?bookings&new_booking"><i class="fas fa-plus fa-lg"></i> Aggiungi Prenotazione</button>
-					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+				<label for="email">Email(facoltativo)</label>
+				<input id="email" name="email" type="text">
+				<label for="codice_fiscale">Codice fiscale</label>
+				<input id="codice_fiscale" name="codice_fiscale" type="text">
+				<label for="card_id">Codice Tessera</label>
+				<input id="card_id" name="card_id"  type="text"> 
+				<label for="book_id">Codice Libro</label>
+				<input id="book_id" name="book_id"  type="text"> 
+				<label for="start_date">Data inizio</label>
+				<input id="start_date" name="start_date"  type="text"> 
+				<label for="end_date">Data fine</label>
+				<input id="end_date" name="end_date"  type="text"> 
+				<label for="state">Stato prenotazione</label>
+				<select id="state" name="state">
+					<option value="Non ancora ritirato">Non ancora ritirato</option>
+					<option value="Ritirato">Ritirato</option>
+					<option value="Riconsegnato">Riconsegnato</option>
+					<option value="Annullata">Annullata</option>
+				</select>
+				<script>
+				$(document).ready(function() {
+				    $('#state').selectmenu();
+				});
+				</script>
+				<button type="submit" class="save" formaction="admin?bookings&new_booking"><i class="fas fa-plus fa-lg"></i> Aggiungi Prenotazione</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 		</form>
 		
 		<script>
-				$("#error-list").hide();
-				var errors = [];
-			  function validateBooking() {
-					var codice_fiscale = document.getElementById("codice_fiscale").value;
-					var card_id = document.getElementById("card_id").value;
-					var book_id = document.getElementById("book_id").value;
-					var start_date = document.getElementById("start_date").value;
-					var end_date = document.getElementById("end_date").value;
-					
-					if(!codice_fiscale || !card_id || !book_id || !start_date || !end_date) {
-						errors.push("Non tutti i campi sono stati compilati.");
-					}
-				
-					if(errors.length != 0) {
-						if(!document.getElementById("error-list")) {
-							var errors_div = document.createElement("div");
-							errors_div.setAttribute("id", "error-list");
-						}
-						else {
-							var errors_div = document.getElementById("error-list");
-						}
-						var txt = "<ul>";
-						$(".overflow-container h3").before(errors_div);
-						errors_div.className = "error";
-						errors.forEach(showErrors);
-						errors_div.innerHTML = txt;
-						
-						function showErrors(value, index, array) {
-							txt = txt + "<li>" + value + "</li>";
-						}
-						
-						errors_div.innerHTML = txt + "</ul>";
-						$(errors_div).fadeIn(300);
-						errors = [];
-						errors_div.focus();
-						$("#error-list").fadeOut(2500);
-						return false;
-					}
-					
-					$("#error-list").hide();
-					return true;
+		$("#error-list").hide();
+		var errors = [];
+	  	function validateBooking() {
+			var codice_fiscale = document.getElementById("codice_fiscale").value;
+			var card_id = document.getElementById("card_id").value;
+			var book_id = document.getElementById("book_id").value;
+			var start_date = document.getElementById("start_date").value;
+			var end_date = document.getElementById("end_date").value;
+			
+			if(!codice_fiscale || !card_id || !book_id || !start_date || !end_date) {
+				errors.push("Non tutti i campi sono stati compilati.");
+			}
+		
+			if(errors.length != 0) {
+				if(!document.getElementById("error-list")) {
+					var errors_div = document.createElement("div");
+					errors_div.setAttribute("id", "error-list");
+					errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
 				}
+				else {
+					var errors_div = document.getElementById("error-list");
+				}
+				var txt = "<ul>";
+				$("#bookings-section h3").before(errors_div);
+				errors_div.className = "error";
+				errors.forEach(showErrors);
+				errors_div.innerHTML = txt;
+				
+				function showErrors(value, index, array) {
+					txt = txt + "<li>" + value + "</li>";
+				}
+				
+				errors_div.innerHTML = txt + "</ul>";
+				$(errors_div).fadeIn(300);
+				errors = [];
+				errors_div.focus();
+				$("#error-list").fadeOut(2500);
+				return false;
+			}
+			
+			$("#error-list").hide();
+			return true;
+		}
 		</script>
 
 		</div> <!-- fine section-container sezione Prenotazioni -->
@@ -756,7 +787,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		
 		<%if(roles.contains("Gestore Biblioteca")) {%>
 		<!-- Sezione Gestori -->
-		<div class="section-container">
+		<div id="managers-section" class="section-container">
 			<h2>Sezione Gestori</h2>
 			<form method="post">
 				<p>Ricerca per: 
@@ -793,9 +824,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$("#all-managers-div").slideDown();
 					$("#new-manager-form").hide();
 				});
-				<%if(request.getAttribute("error") != null) { %>
-					$(".overflow-container").slideDown();
-				<% } %>
 			});	
 			</script>
 
@@ -819,9 +847,17 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td><%=manager.getSurname() %></td>
 						<td><%=manager.getAddress() %></td>
 						<td><%=manager.getPhone() %></td>
-						<td> <% for(String s : 	manager.getRoles()) { %>
-				               <%=s%>
-				         	<% }%>
+						<td>
+						<%ArrayList<String> manager_roles = manager.getRoles();
+						if(manager_roles != null && !manager_roles.isEmpty())
+							for(int i = 0; i < manager_roles.size(); i++) {
+								if((i+1) < manager_roles.size()) { %>
+									<%=manager_roles.get(i) + ", " %>	
+								<%} 
+								else { %>
+									<%=manager_roles.get(i) %>
+								<%} %>
+							<%} %>
 						</td>
 						<td>
 							<form action="admin?managers" method="post">
@@ -838,35 +874,30 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<form id="new-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
 			<h3>Inserimento Gestore</h3>
 
-					<label for="email">Email</label>
-					<input id="email" name="email" type="text">
-					
-					<label for="password">Password</label>
-					<input id="password" name="password" type="password">
-					
-					<label for="repeat_password">Ripeti Password</label>
-					<input id="repeat_password" name="repeat_password" type="password">
-					
-					<label for="name">Nome</label>
-					<input type="name" name="name"  type="text"> 
-					
-					<label for="surname">Cognome</label>
-					<input id="surname" name="surname"  type="text"> 
-					
-					<label for="address">Indirizzo</label>
-					<input id="address" name="address"  type="text"> 
-					
-					<label for="phone">Telefono</label>
-					<input id="phone" name="phone"  type="text"> 
-					
-					<label for="state">Ruolo</label>
-						<br>Gestore Utenti<input type="checkbox" name="users_manager" value="Gestore Utenti"><br>
-						Gestore Libri<input type="checkbox" name="books_manager" value="Gestore Libri"><br>
-						Gestore Tessere<input type="checkbox" name="cards_manager" value="Gestore Tessere"><br>
-						Gestore Prenotazioni<input type="checkbox" name="bookings_manager" value="Gestore Prenotazioni"><br>
-						Gestore Biblioteca<input type="checkbox" name="library_manager" value="Gestore Biblioteca"><br>
-					<button type="submit" class="save" formaction="admin?managers&new_manager"><i class="fas fa-plus fa-lg"></i> Aggiungi Gestore</button>
-					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+				<label for="email">Email</label>
+				<input id="email" name="email" type="text">
+				<label for="password">Password</label>
+				<input id="password" name="password" type="password">
+				<label for="repeat_password">Ripeti Password</label>
+				<input id="repeat_password" name="repeat_password" type="password">
+				<label for="name">Nome</label>
+				<input id="name" name="name"  type="text"> 
+				<label for="surname">Cognome</label>
+				<input id="surname" name="surname"  type="text"> 
+				<label for="address">Indirizzo</label>
+				<input id="address" name="address"  type="text"> 
+				<label for="phone">Telefono</label>
+				<input id="phone" name="phone"  type="text"> 
+				
+				<label>Ruolo</label>
+				<br/>
+					<input type="checkbox" name="users_manager" value="Gestore Utenti">  Gestore Utenti<br>
+					<input type="checkbox" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
+					<input type="checkbox" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
+					<input type="checkbox" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
+					<input type="checkbox" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
+				<button type="submit" class="save" formaction="admin?managers&new_manager"><i class="fas fa-plus fa-lg"></i>  Aggiungi Gestore</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 		</form>
 		
 		<script>
@@ -881,7 +912,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
         var address = document.getElementById("address").value;
         var phone = document.getElementById("phone").value;
 
-        //fare controllo anche sui checkbox
+        //TODO fare controllo anche sui checkbox
 
         if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
           errors.push("Non tutti i campi sono stati compilati.");
@@ -896,12 +927,13 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
           if(!document.getElementById("error-list")) {
             var errors_div = document.createElement("div");
             errors_div.setAttribute("id", "error-list");
+            errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
           }
           else {
             var errors_div = document.getElementById("error-list");
           }
           var txt = "<ul>";
-          $(".overflow-container h3").before(errors_div);
+          $("#managers-section h3").before(errors_div);
           errors_div.className = "error";
           errors.forEach(showErrors);
           errors_div.innerHTML = txt;
@@ -926,7 +958,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
     </div> <!-- fine section-container sezione Gestori -->
 		
 		<!-- Sezione Gestore biblioteca -->
-		<div class="section-container">
+		<div id="library-section" class="section-container">
 			<h2>Sezione Gestore biblioteca</h2>
 		</div>
 	<%} %>
@@ -937,29 +969,29 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		$(".section-container").hide();
 		$(".sidebar section, .sidebar-responsive section").removeClass("active");
 		<%if(request.getParameter("account") != null) {%>
-			$(".section-container").eq(0).show();
-			$(".sidebar section").eq(0).addClass("active");
-			$(".sidebar-responsive section").eq(0).addClass("active");
+			$("#users-section").show();
+			$("#sidebar-users").addClass("active");
+			$(".sidebar-responsive #sidebar-users").addClass("active");
 		<% } else if(request.getParameter("books") != null) {%>
-			$(".section-container").eq(1).show();
-			$(".sidebar section").eq(1).addClass("active");
-			$(".sidebar-responsive section").eq(1).addClass("active");
+			$("#books-section").show();
+			$(".sidebar #sidebar-books").addClass("active");
+			$(".sidebar-responsive #sidebar-books").addClass("active");
 		<%} else if(request.getParameter("cards") != null) { %>
-			$(".section-container").eq(2).show();
-			$(".sidebar section").eq(2).addClass("active");
-			$(".sidebar-responsive section").eq(2).addClass("active");
+			$("#cards-section").show();
+			$(".sidebar #sidebar-cards").addClass("active");
+			$(".sidebar-responsive #sidebar-cards").addClass("active");
 		<%} else if(request.getParameter("bookings") != null) { %>
-			$(".section-container").eq(3).show();
-			$(".sidebar section").eq(3).addClass("active");
-			$(".sidebar-responsive section").eq(3).addClass("active");
+			$("#bookings-section").show();
+			$(".sidebar #sidebar-bookings").addClass("active");
+			$(".sidebar-responsive #sidebar-bookings").addClass("active");
 			<%} else if(request.getParameter("managers") != null) { %>
-			$(".section-container").eq(4).show();
-			$(".sidebar section").eq(4).addClass("active");
-			$(".sidebar-responsive section").eq(4).addClass("active");
+			$("#managers-section").show();
+			$(".sidebar #sidebar-managers").addClass("active");
+			$(".sidebar-responsive #managers-section").addClass("active");
 			<%} else if(request.getParameter("library_manager") != null) { %>
-			$(".section-container").eq(5).show();
-			$(".sidebar section").eq(5).addClass("active");
-			$(".sidebar-responsive section").eq(5).addClass("active"); 
+			$("#library-section").show();
+			$(".sidebar #sidebar-library").addClass("active");
+			$(".sidebar-responsive #sidebar-library").addClass("active"); 
 		<%} else {%>
 			$(".section-container").eq(0).show();
 			$(".sidebar section").eq(0).addClass("active");
@@ -975,35 +1007,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				}
 			});
 	</script>
-		
-		<script>
-		var file = document.getElementById("image");
-		file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
-		function validateImage() {
-			if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
-				return false;
-			}
-			else if(file.files[0].size <= 0 || file.files[0].size > 1048576 /*1MB*/) {
-				return false;
-			}
-			return true;
-		}
-		$("#image").change(function() {
-			if(!validateImage())
-				return false;
-			var img = new Image();
-			var canvas = document.createElement("canvas");
-			canvas.width = 1000;
-			canvas.height = 1000;
-			img.onload = function() {
-				var ctx = canvas.getContext("2d");
-				ctx.drawImage(img, 0, 0, 1000, 1000);
-			};
-			img.src = URL.createObjectURL(file.files[0]);
-			$("#image-preview").html(canvas);
-			return true;
-		});
-		</script>
 		
 	</div> <!-- Chiusura del div "container" in cima -->
 <% } /*Chiusura dell'else in cima (quello che fa iniziare il pannello di controllo)*/%>

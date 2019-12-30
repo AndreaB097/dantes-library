@@ -637,6 +637,11 @@ div.dropdown-content table tr:nth-child(even) {
 .section-container textarea:focus {
 	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
 }
+div.section-container input[type='checkbox'] {
+	display: inline;
+	margin: 0px 0 20px 5px;
+	width: auto;
+}
 .section-container textarea {
 	width: 50%;
 	border: 1px solid #d9d9d9;
@@ -720,27 +725,25 @@ div.dropdown-content table tr:nth-child(even) {
 }
 .section-container button.cancel {
 	width: 150px;
-	margin-left: 50px;
-	margin-bottom: 10px;
+	height: 50px;
+	margin: 5px 0 10px 70px;
 	background-color: rgba(255, 229, 229, 0.4);
 	color: #721c24;
 	padding: 10px;
 	border: none;
 	border-radius: 4px;
-	text-align: center;
-	display: inline-block;
+	vertical-align: middle;
 }
 .section-container button.save {
 	width: 150px;
-	margin-bottom: 10px;
-	margin-left: 3px;
+	height: 50px;
+	margin: 5px 0 10px 3px;
 	background-color: rgba(180, 228, 227, 0.4);
 	color: #2b7a78;
 	padding: 10px;
 	border: none;
 	border-radius: 4px;
-	text-align: center;
-	display: inline-block;
+	vertical-align: middle;
 }
 .section-container button.cancel:hover {
 	background-color: rgba(255, 229, 229, 1);
@@ -770,6 +773,10 @@ div.dropdown-content table tr:nth-child(even) {
 .section-container #btn-delgenre {
 	width: 140px;
 	margin: 10px 0;
+}
+.section-container #state-button {
+	display: block;
+	margin-bottom: 20px;
 }
 
 /********************
@@ -884,6 +891,9 @@ div.dropdown-content table tr:nth-child(even) {
 	div.section-container .overflow-container table {
 		width: 100%;
 	}
+	div.section-container .select2-container {
+		width: 100% !important;
+	}
 	div.section-container #search-bar .search-field {
 		width: 85%;
 		font-size: 12px;
@@ -919,16 +929,20 @@ div.dropdown-content table tr:nth-child(even) {
 		width: auto;
 	}
 	.section-container button.save {
-		margin: 0;
-		height: 50px;
+		margin: 5px;
+		padding: 3px;
+		height: 40px;
+		font-size: 12px;
 		vertical-align: middle;
-		width: 26%;
+		width: 30%;
 	}
 	.section-container button.cancel {
-		margin: 0;
-		height: 50px;
+		margin: 5px;
+		padding: 3px;
+		height: 40px;
+		font-size: 12px;
 		vertical-align: middle;
-		width: 26%;
+		width: 30%;
 		float: right;
 	}
 	.section-container button#btn-book,
@@ -939,5 +953,10 @@ div.dropdown-content table tr:nth-child(even) {
 		vertical-align: middle;
 		height: 50px;
 		width: 23%;
+	}
+	.section-container #state-button {
+		display: block;
+		margin-bottom: 20px;
+		width: 100%;
 	}
 }

@@ -9,8 +9,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Random;
 
-import java.time.LocalDate;
-
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
 
@@ -25,14 +23,15 @@ public class ManagerServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		
 		HttpSession session = request.getSession();
 		
-		/*[ FUNZIONALITÀ AMMINISTRATORE ]
-		 * disponibili solo se è autenticato (admin != null)*/
+		/*[ FUNZIONALITA' AMMINISTRATORE ]
+		 * disponibili solo se e' autenticato (admin != null)*/
 		if(session.getAttribute("admin") != null) {
 
 			/*--Sezione Utente--*/
@@ -181,7 +180,7 @@ public class ManagerServlet extends HttpServlet {
 					BooksBean book = new BooksBean();
 					/*Costruisco il libro (se lo sto modificando, allora mi serve l'id
 					 * del libro che sto modificando, altrimenti vuol dire che lo sto
-					 * aggiungendo, quindi l'id verrà auto generato dal db)*/
+					 * aggiungendo, quindi l'id verra'� auto generato dal db)*/
 					if(request.getParameter("save_book") != null) {
 						book.setBook_id(Integer.parseInt(request.getParameter("book_id")));
 					}
