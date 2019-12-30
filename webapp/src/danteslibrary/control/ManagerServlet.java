@@ -3,21 +3,21 @@ package danteslibrary.control;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Random;
-import org.json.*;
+
+import java.time.LocalDate;
 
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
 
-
+import org.json.*;
 
 @WebServlet("/admin")
-@MultipartConfig /*Necessario perchÈ nella pagina admin.jsp abbiamo una form
+@MultipartConfig /*Necessario perch√© nella pagina admin.jsp abbiamo una form
 //con enctype="multipart/form-data"*/
 public class ManagerServlet extends HttpServlet {
 
@@ -31,8 +31,8 @@ public class ManagerServlet extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		
-		/*[ FUNZIONALIT¿ AMMINISTRATORE ]
-		 * disponibili solo se Ë autenticato (admin != null)*/
+		/*[ FUNZIONALIT√Ä AMMINISTRATORE ]
+		 * disponibili solo se √® autenticato (admin != null)*/
 		if(session.getAttribute("admin") != null) {
 
 			/*--Sezione Utente--*/
@@ -65,7 +65,7 @@ public class ManagerServlet extends HttpServlet {
 			else if(request.getParameter("remove_user") != null) {
 				UsersDAO dao = new UsersDAO();
 				dao.removeUser(request.getParameter("remove_user"));
-				request.setAttribute("info_user", "L'utente " + request.getParameter("remove_user") + " Ë stato rimosso.");
+				request.setAttribute("info_user", "L'utente " + request.getParameter("remove_user") + " √® stato rimosso.");
 			}
 		
 			/* -- Sezione Libro -- */	
@@ -118,7 +118,7 @@ public class ManagerServlet extends HttpServlet {
 					link = null;
 				
 				/*Salvo la nuova immagine SOLO se l'admin ha cambiata, quindi
-				 * nel campo input ci sar‡ un'immagine con dimensione diversa da 0 byte */	
+				 * nel campo input ci sar√† un'immagine con dimensione diversa da 0 byte */	
 				if(filePart.getSize() != 0) {
 					InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
 					String absolute_path = getServletContext().getRealPath("");
@@ -181,7 +181,7 @@ public class ManagerServlet extends HttpServlet {
 					BooksBean book = new BooksBean();
 					/*Costruisco il libro (se lo sto modificando, allora mi serve l'id
 					 * del libro che sto modificando, altrimenti vuol dire che lo sto
-					 * aggiungendo, quindi l'id verr‡ auto generato dal db)*/
+					 * aggiungendo, quindi l'id verr√† auto generato dal db)*/
 					if(request.getParameter("save_book") != null) {
 						book.setBook_id(Integer.parseInt(request.getParameter("book_id")));
 					}
@@ -198,20 +198,20 @@ public class ManagerServlet extends HttpServlet {
 					if(request.getParameter("save_book") != null) {
 						/*Aggiorno il libro nel DB*/
 						if(dao.updateBook(book) != 0)
-							request.setAttribute("info_book", "Il libro " + book.getTitle() + " Ë stato aggiornato.");
+							request.setAttribute("info_book", "Il libro " + book.getTitle() + " √® stato aggiornato.");
 						else
-							request.setAttribute("error", "Si Ë verificato un errore.");
+							request.setAttribute("error", "Si √® verificato un errore.");
 					}
 					else {
 						if(dao.newBook(book) != 0)
-							request.setAttribute("info_book", "Il libro " + book.getTitle() + " Ë stato aggiunto.");
+							request.setAttribute("info_book", "Il libro " + book.getTitle() + " √® stato aggiunto.");
 						else
-							request.setAttribute("error", "Si Ë verificato un errore.");
+							request.setAttribute("error", "Si √® verificato un errore.");
 					}
 				}
 				catch(Exception e) {
-					request.setAttribute("error", "Errore, qualche campo Ë vuoto "
-							+ "oppure non Ë stato compilato.");
+					request.setAttribute("error", "Errore, qualche campo √® vuoto "
+							+ "oppure non √® stato compilato.");
 					return;
 				}
 				
@@ -224,7 +224,7 @@ public class ManagerServlet extends HttpServlet {
 			else if(request.getParameter("remove_book") != null) {
 				BooksDAO dao = new BooksDAO();
 				dao.removeBook(request.getParameter("remove_book"));
-				request.setAttribute("info_book", "Il libro " + request.getParameter("remove_book") + " Ë stato rimosso.");
+				request.setAttribute("info_book", "Il libro " + request.getParameter("remove_book") + " √® stato rimosso.");
 			}
 				
 			/* -- Sezione Tessera -- */	
@@ -245,10 +245,30 @@ public class ManagerServlet extends HttpServlet {
 				else {
 					CardsDAO dao_cards = new CardsDAO();
 					ArrayList<CardsBean> cards = dao_cards.getCardsByFilter(filter, keyword);
-					if(!cards.isEmpty())
+          if(!cards.isEmpty())
 						request.setAttribute("cards", cards);
 				}
 			}
+      else if(request.getParameter("new_card") != null) {
+        CardsDAO dao = new CardsDAO();
+        CardsBean card = new CardsBean();
+        String codice_fiscale = request.getParameter("codice_fiscale");
+        boolean associated= false;
+        associated = request.getParameter( "associated" ) != null;
+        if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
+          try {
+              int card_id = Integer.parseInt(request.getParameter("card_id"));
+              card.setCard_id(card_id);
+          }
+          catch(NumberFormatException  e) {
+            request.setAttribute("error", "Errore formato codice tessera.");
+            return;
+          }
+        }
+        card.setCodice_fiscale(codice_fiscale);
+        card.setAssociated(associated);
+        dao.newCardAdmin(card);
+      }
 			else if(request.getParameter("all_cards") != null) {
 				CardsDAO dao = new CardsDAO();
 				ArrayList<CardsBean> cards = dao.getAllCards();
@@ -259,34 +279,51 @@ public class ManagerServlet extends HttpServlet {
 				CardsDAO dao = new CardsDAO();
 				dao.removeCard(request.getParameter("remove_card"));
 				request.setAttribute("info_card", "La tessera con codice: " 
-				+ request.getParameter("remove_card") + " Ë stata rimossa.");
+				+ request.getParameter("remove_card") + " √® stata rimossa.");
 			}
 			
-			/* -- Sezione Prenotazione -- */	
-			if(request.getParameter("keyword_booking") != null && request.getParameter("keyword_booking") != "") {
-				String keyword = request.getParameter("keyword_booking");
-				/*filter puo' assumere 8 valori:
-				 * - 0: Codice prenotazione
-				 * - 1: Id Libro
-				 * - 2: Data inizio
-				 * - 3: Data fine
-				 * - 4: Stato
-				 * - 5: Email
-				 * - 6: Codice fiscale
-				 * - 7: Codice tessera
-				 *  */
-				int filter = Integer.parseInt(request.getParameter("filter"));
-				if(filter < 0 || filter > 7) {
-					request.setAttribute("error", "Filtro non valido.");
-					request.getRequestDispatcher("admin.jsp").forward(request, response);
-					return;
-				} 
-				else {
-					BookingsDAO dao_bookings = new BookingsDAO();
-					ArrayList<BookingsBean> bookings = dao_bookings.getBookingsByFilter(filter, keyword);
-					request.setAttribute("bookings", bookings);
-				}
-			}
+      /* -- Sezione Prenotazione -- */
+      if(request.getParameter("keyword_booking") != null && request.getParameter("keyword_booking") != "") {
+        String keyword = request.getParameter("keyword_booking");
+        /*filter puo' assumere 8 valori:
+         * - 0: Codice prenotazione
+         * - 1: Id Libro
+         * - 2: Data inizio
+         * - 3: Data fine
+         * - 4: Stato
+         * - 5: Email
+         * - 6: Codice fiscale
+         * - 7: Codice tessera
+         *  */
+        int filter = Integer.parseInt(request.getParameter("filter"));
+        if(filter < 0 || filter > 7) {
+          request.setAttribute("info", "Filtro non valido.");
+          request.getRequestDispatcher("admin.jsp").forward(request, response);
+          return;
+        } 
+        else {
+          BookingsDAO dao_bookings = new BookingsDAO();
+          ArrayList<BookingsBean> bookings = dao_bookings.getBookingsByFilter(filter, keyword);
+          request.setAttribute("bookings", bookings);
+        }
+      }
+      else if(request.getParameter("new_booking") != null) {
+        BookingsDAO dao = new BookingsDAO();
+        String codice_fiscale = request.getParameter("codice_fiscale");
+        int book_id = Integer.parseInt(request.getParameter("book_id"));
+        int card_id = Integer.parseInt(request.getParameter("card_id"));
+        String start_date = request.getParameter("start_date");
+        String end_date = request.getParameter("end_date");
+        String state = request.getParameter("state");
+        String email_booking;
+        if((request.getParameter("email")!=null) && !(request.getParameter("email").equals(""))) {
+              email_booking = request.getParameter("email");
+          }
+        else {
+          email_booking = null;
+          }
+        dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
+      }
 			else if(request.getParameter("all_bookings") != null) {
 				BookingsDAO dao = new BookingsDAO();
 				ArrayList<BookingsBean> bookings = dao.getAllBookings();
@@ -296,29 +333,60 @@ public class ManagerServlet extends HttpServlet {
 				BookingsDAO dao = new BookingsDAO();
 				dao.removeBooking(request.getParameter("remove_booking"));
 				request.setAttribute("info_booking", "La prenotazione con codice: "
-				+ request.getParameter("remove_booking") + " Ë stata rimossa.");
+				+ request.getParameter("remove_booking") + " √® stata rimossa.");
 			}	
 				
-			/*--Sezione Gestori--*/
-			if(request.getParameter("keyword_manager") != null && request.getParameter("keyword_manager") != "") {
-				String keyword = request.getParameter("keyword_manager");
-				/*filter puo' assumere 4 valori:
-				 * - 0: Email
-				 * - 1: Nome
-				 * - 2: Cognome
-				 * - 3: Ruolo */
-				int filter = Integer.parseInt(request.getParameter("filter"));
-				if(filter < 0 || filter > 3) {
-					request.setAttribute("error", "Filtro non valido.");
-					request.getRequestDispatcher("admin.jsp").forward(request, response);
-					return;
-				} 
-				else {
-					ManagersDAO dao = new ManagersDAO();
-					ArrayList<ManagersBean> managers = dao.getManagersByFilter(filter, keyword);
-					request.setAttribute("managers", managers);
-				}
-			}
+      /*--Sezione Gestori--*/
+      if(request.getParameter("keyword_manager") != null && request.getParameter("keyword_manager") != "") {
+        String keyword = request.getParameter("keyword_manager");
+        /*filter puo' assumere 4 valori:
+         * - 0: Email
+         * - 1: Nome
+         * - 2: Cognome
+         * - 3: Ruolo */
+        int filter = Integer.parseInt(request.getParameter("filter"));
+        if(filter < 0 || filter > 3) {
+          request.setAttribute("info", "Filtro non valido.");
+          request.getRequestDispatcher("admin.jsp").forward(request, response);
+          return;
+        } 
+        else {
+          ManagersDAO dao = new ManagersDAO();
+          ArrayList<ManagersBean> managers = dao.getManagersByFilter(filter, keyword);
+          request.setAttribute("managers", managers);
+        }
+      }
+      else if(request.getParameter("new_manager") != null) {
+        ManagersDAO dao = new ManagersDAO();
+        ManagersBean manager = new ManagersBean();
+        String manager_email = request.getParameter("email");
+        String manager_password = request.getParameter("password");
+        String name = request.getParameter("name");
+        String surname = request.getParameter("surname");
+        String address = request.getParameter("address");
+        String phone = request.getParameter("phone");
+        ArrayList<String> roles = new ArrayList<String>();
+        if (request.getParameter("users_manager") != null)
+          roles.add("Gestore Utenti");
+        if (request.getParameter("books_manager") != null)
+          roles.add("Gestore Libri");
+        if (request.getParameter("cards_manager") != null)
+          roles.add("Gestore Tessere");
+        if (request.getParameter("bookings_manager") != null)
+          roles.add("Gestore Prenotazioni");
+        if (request.getParameter("library_manager") != null)
+          roles.add("Gestore Biblioteca");
+
+        manager.setEmail(email);
+        manager.setPassword(password);
+        manager.setName(name);
+        manager.setSurname(surname);
+        manager.setPhone(phone);
+        manager.setAddress(address);
+        manager.setRoles(roles);
+
+        dao.newManager(manager);
+      }
 			/* - Mostra tutti i gestori presenti nel database*/
 			else if(request.getParameter("all_managers") != null) {
 				ManagersDAO dao = new ManagersDAO();
@@ -329,16 +397,13 @@ public class ManagerServlet extends HttpServlet {
 				ManagersDAO dao = new ManagersDAO();
 				dao.removeManager(request.getParameter("remove_manager"));
 				request.setAttribute("info_manager", "Il Gestore:  "
-				+ request.getParameter("remove_manager") + " Ë stato rimosso.");
+				+ request.getParameter("remove_manager") + " √® stato rimosso.");
 			}
-				
-				
+      
 			request.getRequestDispatcher("admin.jsp").forward(request, response);
 			return;
-			
-			
 		}
-		
+
 		if(email == null || password == null) {
 			response.sendRedirect("admin.jsp");
 			return;
@@ -363,7 +428,6 @@ public class ManagerServlet extends HttpServlet {
 		 * homepage*/
 		response.sendRedirect("admin.jsp");
 		return;
-		
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

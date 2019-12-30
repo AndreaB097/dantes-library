@@ -474,13 +474,34 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</div>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?cards&all_cards'">Mostra tutti</button>
+      <button id="btn-card">Aggiungi Tessera</button> 
 			
 			<%if(request.getAttribute("info_card") != null) { %>
 				<div class="info"><%=request.getAttribute("info_card") %></div>
 			<%} %>
+      
+      <script>
+			$(document).ready(function() {
+			    $('.dropdownFilters').selectmenu();
+			});
+			$(document).ready(function() {
+				$("#new-card-form").hide();
+				$("#btn-card").click(function() {
+					$("#new-card-form").slideDown();
+					$("#all-cards-div").hide();
+				});
+				$("#show-all-btn").click(function() {
+					$("#all-cards-div").slideDown();
+					$("#new-card-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
+			</script> 
 			
 			<%if(request.getAttribute("cards") != null) { %>
-			<div class="overflow-container">
+			<div id="all-cards-div" class="overflow-container">
 			<table>		
 					<tr>
 						<th>Nome</th>
@@ -517,8 +538,62 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } %>
 			</table>
 			</div>
-		   <%} %>
+		   <%} %>			
 			
+			<form id="new-card-form" method="post" class="overflow-container" onsubmit="return validateCard()">
+			<h3>Inserimento Tessera</h3>
+					<label for="codice_fiscale">Codice fiscale</label>
+					<input id="codice_fiscale" name="codice_fiscale" type="text">
+					<label for="card_id">Codice tessera (facoltativo)</label>
+					<input id="card_id" name="card_id" type="text">
+					<label for="associated">Associata:</label>
+					<input type="checkbox" name="associated" value="associated"> 
+					<button type="submit" class="save" formaction="admin?cards&new_card"><i class="fas fa-plus fa-lg"></i> Aggiungi Tessera</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+		</form>
+		
+		<script>
+				$("#error-list").hide();
+				var errors = [];
+				function validateCard() {
+					var codice_fiscale = document.getElementById("codice_fiscale").value;
+					var card_id = document.getElementById("card_id").value;
+
+						
+					if(!codice_fiscale) {
+						errors.push("Non tutti i campi sono stati compilati.");
+					}
+				
+					if(errors.length != 0) {
+						if(!document.getElementById("error-list")) {
+							var errors_div = document.createElement("div");
+							errors_div.setAttribute("id", "error-list");
+						}
+						else {
+							var errors_div = document.getElementById("error-list");
+						}
+						var txt = "<ul>";
+						$(".overflow-container h3").before(errors_div);
+						errors_div.className = "error";
+						errors.forEach(showErrors);
+						errors_div.innerHTML = txt;
+						
+						function showErrors(value, index, array) {
+							txt = txt + "<li>" + value + "</li>";
+						}
+						
+						errors_div.innerHTML = txt + "</ul>";
+						$(errors_div).fadeIn(300);
+						errors = [];
+						errors_div.focus();
+						$("#error-list").fadeOut(2500);
+						return false;
+					}
+					
+					$("#error-list").hide();
+					return true;
+				}
+		</script>
 		</div> <!-- fine section-container sezione Tessere -->
 		<%} %>
 		
@@ -545,8 +620,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</div>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
+			<button id="btn-booking">Aggiungi Prenotazione</button> 
 			
-			<%if(request.getAttribute("info_booking") != null) { %>
+      <%if(request.getAttribute("info_booking") != null) { %>
 				<div class="info"><%=request.getAttribute("info_booking") %></div>
 			<%} %>
 			
@@ -554,10 +630,24 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
 			});
+			$(document).ready(function() {
+				$("#new-booking-form").hide();
+				$("#btn-booking").click(function() {
+					$("#new-booking-form").slideDown();
+					$("#all-bookings-div").hide();
+				});
+				$("#show-all-btn").click(function() {
+					$("#all-bookings-div").slideDown();
+					$("#new-booking-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
 			</script>
 			
 			<%if(request.getAttribute("bookings") != null) { %>
-			<div class="overflow-container">
+			<div id="all-bookings-div" class="overflow-container">
 			<table>		
 					<tr>
 						<th>Codice prenotazione</th>
@@ -591,6 +681,76 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</div>
 			<%} %>
 			
+			<form id="new-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
+			<h3>Inserimento Prenotazione</h3>
+					<label for="email">Email(facoltativo)</label>
+					<input id="email" name="email" type="text">
+					<label for="codice_fiscale">Codice fiscale</label>
+					<input id="codice_fiscale" name="codice_fiscale" type="text">
+					<label for="card_id">Codice Tessera</label>
+					<input type="card_id" name="card_id"  type="text"> 
+					<label for="book_id">Codice Libro</label>
+					<input type="book_id" name="book_id"  type="text"> 
+					<label for="start_date">Data inizio</label>
+					<input type="start_date" name="start_date"  type="text"> 
+					<label for="end_date">Data fine</label>
+					<input type="end_date" name="end_date"  type="text"> 
+					<label for="state">Stato prenotazione</label>
+					<select class="dropdownFilters" name="state">
+  						<option value="Non ancora ritirato">Non ancora ritirato</option>
+  						<option value="Ritirato">Ritirato</option>
+  						<option value="Riconsegnato">Riconsegnato</option>
+  						<option value="Annullata">Annullata</option>
+					</select>
+					<button type="submit" class="save" formaction="admin?bookings&new_booking"><i class="fas fa-plus fa-lg"></i> Aggiungi Prenotazione</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+		</form>
+		
+		<script>
+				$("#error-list").hide();
+				var errors = [];
+			  function validateBooking() {
+					var codice_fiscale = document.getElementById("codice_fiscale").value;
+					var card_id = document.getElementById("card_id").value;
+					var book_id = document.getElementById("book_id").value;
+					var start_date = document.getElementById("start_date").value;
+					var end_date = document.getElementById("end_date").value;
+					
+					if(!codice_fiscale || !card_id || !book_id || !start_date || !end_date) {
+						errors.push("Non tutti i campi sono stati compilati.");
+					}
+				
+					if(errors.length != 0) {
+						if(!document.getElementById("error-list")) {
+							var errors_div = document.createElement("div");
+							errors_div.setAttribute("id", "error-list");
+						}
+						else {
+							var errors_div = document.getElementById("error-list");
+						}
+						var txt = "<ul>";
+						$(".overflow-container h3").before(errors_div);
+						errors_div.className = "error";
+						errors.forEach(showErrors);
+						errors_div.innerHTML = txt;
+						
+						function showErrors(value, index, array) {
+							txt = txt + "<li>" + value + "</li>";
+						}
+						
+						errors_div.innerHTML = txt + "</ul>";
+						$(errors_div).fadeIn(300);
+						errors = [];
+						errors_div.focus();
+						$("#error-list").fadeOut(2500);
+						return false;
+					}
+					
+					$("#error-list").hide();
+					return true;
+				}
+		</script>
+
 		</div> <!-- fine section-container sezione Prenotazioni -->
 		<%} %>
 		
@@ -613,8 +773,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</div>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
+			<button id="btn-manager">Aggiungi Gestore</button> 
 			
-			<%if(request.getAttribute("info_manager") != null) { %>
+      <%if(request.getAttribute("info_manager") != null) { %>
 				<div class="info"><%=request.getAttribute("info_manager") %></div>
 			<%} %>
 			
@@ -622,10 +783,24 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
 			});
+			$(document).ready(function() {
+				$("#new-manager-form").hide();
+				$("#btn-manager").click(function() {
+					$("#new-manager-form").slideDown();
+					$("#all-managers-div").hide();
+				});
+				$("#show-all-btn").click(function() {
+					$("#all-managers-div").slideDown();
+					$("#new-manager-form").hide();
+				});
+				<%if(request.getAttribute("error") != null) { %>
+					$(".overflow-container").slideDown();
+				<% } %>
+			});	
 			</script>
 
 			<%if(request.getAttribute("managers") != null) { %>
-			<div class="overflow-container">
+			<div id="all-managers-div" class="overflow-container">
 			<table>	
 					<tr>
 						<th>Email</th>
@@ -660,15 +835,103 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</div>
 			<%} %>
 			
-		</div> <!-- fine section-container sezione Prenotazioni -->
+			<form id="new-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
+			<h3>Inserimento Gestore</h3>
+
+					<label for="email">Email</label>
+					<input id="email" name="email" type="text">
+					
+					<label for="password">Password</label>
+					<input id="password" name="password" type="password">
+					
+					<label for="repeat_password">Ripeti Password</label>
+					<input id="repeat_password" name="repeat_password" type="password">
+					
+					<label for="name">Nome</label>
+					<input type="name" name="name"  type="text"> 
+					
+					<label for="surname">Cognome</label>
+					<input id="surname" name="surname"  type="text"> 
+					
+					<label for="address">Indirizzo</label>
+					<input id="address" name="address"  type="text"> 
+					
+					<label for="phone">Telefono</label>
+					<input id="phone" name="phone"  type="text"> 
+					
+					<label for="state">Ruolo</label>
+						<br>Gestore Utenti<input type="checkbox" name="users_manager" value="Gestore Utenti"><br>
+						Gestore Libri<input type="checkbox" name="books_manager" value="Gestore Libri"><br>
+						Gestore Tessere<input type="checkbox" name="cards_manager" value="Gestore Tessere"><br>
+						Gestore Prenotazioni<input type="checkbox" name="bookings_manager" value="Gestore Prenotazioni"><br>
+						Gestore Biblioteca<input type="checkbox" name="library_manager" value="Gestore Biblioteca"><br>
+					<button type="submit" class="save" formaction="admin?managers&new_manager"><i class="fas fa-plus fa-lg"></i> Aggiungi Gestore</button>
+					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+		</form>
+		
+		<script>
+      $("#error-list").hide();
+      var errors = [];
+      function validateManager() {
+        var email = document.getElementById("email").value;
+        var name = document.getElementById("name").value;
+        var surname = document.getElementById("surname").value;
+        var password = document.getElementById("password").value;
+        var repeat_password = document.getElementById("repeat_password").value;
+        var address = document.getElementById("address").value;
+        var phone = document.getElementById("phone").value;
+
+        //fare controllo anche sui checkbox
+
+        if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
+          errors.push("Non tutti i campi sono stati compilati.");
+        }
+
+        if(password != repeat_password){
+          errors.push("Le password non corrispondono");
+        }
+
+
+        if(errors.length != 0) {
+          if(!document.getElementById("error-list")) {
+            var errors_div = document.createElement("div");
+            errors_div.setAttribute("id", "error-list");
+          }
+          else {
+            var errors_div = document.getElementById("error-list");
+          }
+          var txt = "<ul>";
+          $(".overflow-container h3").before(errors_div);
+          errors_div.className = "error";
+          errors.forEach(showErrors);
+          errors_div.innerHTML = txt;
+
+          function showErrors(value, index, array) {
+            txt = txt + "<li>" + value + "</li>";
+          }
+
+          errors_div.innerHTML = txt + "</ul>";
+          $(errors_div).fadeIn(300);
+          errors = [];
+          errors_div.focus();
+          $("#error-list").fadeOut(2500);
+          return false;
+        }
+
+        $("#error-list").hide();
+        return true;
+      }
+     </script>
+        
+    </div> <!-- fine section-container sezione Gestori -->
 		
 		<!-- Sezione Gestore biblioteca -->
 		<div class="section-container">
 			<h2>Sezione Gestore biblioteca</h2>
 		</div>
-		<%} %>
+	<%} %>
 		
-		
+    
 	<!-- Script per il cambio di sezioni (cambio highlight della sezione "attiva" e relativo container di destra) -->
 	<script>
 		$(".section-container").hide();
