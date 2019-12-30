@@ -1,9 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"
     import="danteslibrary.model.LibraryBean"%>
-<script>
-$.post("library");
-</script>
 <header>
   <div class="container">
     <a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${applicationScope.library.logo}" /><span> ${applicationScope.library.name}</span></a>

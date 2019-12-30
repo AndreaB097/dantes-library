@@ -8,3 +8,5 @@
 <script src="./scripts/fontawesome.js"></script>
 <script src="./scripts/jquery-3.4.1.min.js"></script>
 <script src="./scripts/jquery-ui.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>

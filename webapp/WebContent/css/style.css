@@ -75,7 +75,7 @@ body {
 	font-family: "Roboto-Light", Arial, sans-serif;
 	font-size: 100%;
 	color: #444;
-	margin: 0 0 70px;
+	margin: 0 0 50px;
 }
 header {
   	font-family: 'Josefin Sans', Arial, sans-serif;
@@ -89,7 +89,7 @@ footer {
 	color: rgba(255,255,255,0.8);
 	text-align: center;
 	font-size: 13px;
-	height: 70px;
+	height: 50px;
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -98,7 +98,7 @@ footer {
 }
 footer p {
 	margin: 0;
-	padding: 20px;
+	padding: 14px 5px;
 }
 a {
 	text-decoration: none;
@@ -118,7 +118,9 @@ button:hover {
 	background-color: #2b7a78;
 	cursor: pointer;
 }
+button#btn-edit,
 button#btn-remove {
+	width: 30px;
 	background-color: rgba(0,0,0,0);
 	height: auto;
 }
@@ -572,9 +574,9 @@ div.dropdown-content table tr:nth-child(even) {
 	display: none;
 }
 .sidebar {
-	box-shadow: 0px 0px 5px 3px #ddd;
+	box-shadow: 0px 0px 3px 1px #ddd;
 	width: 20%;
-	margin: 10px 7px;
+	margin: 8px 8px 0 8px;
 	color: #667788;
 	float: left;
 }
@@ -592,12 +594,13 @@ div.dropdown-content table tr:nth-child(even) {
 }
 .section-container {
 	float: left;
-	margin: 10px 7px;
+	margin: 8px;
 	padding: 5px 10px;
-	box-shadow: 0px 0px 5px 3px #ddd;
+	box-shadow: 0px 0px 3px 1px #ddd;
 	width: 75%;
 }
 .section-container h3 {
+	margin: 10px 0;
 	padding: 10px 0;
 	border-bottom: 1px solid #ccc;
 }
@@ -609,6 +612,18 @@ div.dropdown-content table tr:nth-child(even) {
 .section-container p {
 	font-size: 18px;
 }
+.section-container div#image-preview {
+	width: 200px;
+	height: 200px;
+	margin: 3px 3px 20px 3px;
+}
+.section-container div#image-preview img,
+.section-container div#image-preview canvas {
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+	box-shadow: 0px 0px 5px #ccc;
+}
 .section-container input {
 	width: 50%;
 	border: 1px solid #d9d9d9;
@@ -618,8 +633,18 @@ div.dropdown-content table tr:nth-child(even) {
 	margin-bottom: 20px;
 	display: block;
 }
-.section-container input:focus {
+.section-container input:focus,
+.section-container textarea:focus {
 	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
+}
+.section-container textarea {
+	width: 50%;
+	border: 1px solid #d9d9d9;
+	border-radius: 5px;
+	padding: 16px;
+	margin-bottom: 20px;
+	display: block;
+	resize: none;
 }
 .section-container #search-bar {
 	max-width: 650px;
@@ -652,11 +677,11 @@ div.dropdown-content table tr:nth-child(even) {
 	background-color: #3aafa9;
 	color: #ffffff;
 }
-
-.section-container #show-all-btn {
-	width: 150px;
+.section-container #show-all-btn,
+.section-container #btn-all-books {
+	width: 140px;
 	height: 40px;
-	margin: 20px 0;
+	margin: 10px 0;
 }
 .section-container .overflow-container {
 	height: 350px;
@@ -670,13 +695,81 @@ div.dropdown-content table tr:nth-child(even) {
 	border-collapse: collapse;
 	text-align: center;
 }
+.section-container table th {
+	padding: 10px 15px;
+	border-bottom: 1px solid #ccc;
+}
 .section-container table td {
-	padding: 20px;
+	padding: 10px 15px;
 	border-bottom: 1px solid #ccc;
 	border-top: 1px solid #ccc;
 }
+.section-container table td img {
+	border-radius: 50%;
+	border: 1px solid #3aafa9;
+	height: 70px;
+	width: 70px;
+}
+.section-container label {
+	width: 150px;
+	display: block;
+	margin: 0 3px;
+}
 .section-container #search-bar input {
 	margin: 0;
+}
+.section-container button.cancel {
+	width: 150px;
+	margin-left: 50px;
+	margin-bottom: 10px;
+	background-color: rgba(255, 229, 229, 0.4);
+	color: #721c24;
+	padding: 10px;
+	border: none;
+	border-radius: 4px;
+	text-align: center;
+	display: inline-block;
+}
+.section-container button.save {
+	width: 150px;
+	margin-bottom: 10px;
+	margin-left: 3px;
+	background-color: rgba(180, 228, 227, 0.4);
+	color: #2b7a78;
+	padding: 10px;
+	border: none;
+	border-radius: 4px;
+	text-align: center;
+	display: inline-block;
+}
+.section-container button.cancel:hover {
+	background-color: rgba(255, 229, 229, 1);
+}
+.section-container button.save:hover {
+	background-color: rgba(180, 228, 227, 1);
+}
+.section-container label#btn-upload {
+	margin: 60px 0 0 20px;
+	display: inline-block;
+	font-size: 45px;
+	color: #bbb;
+}
+.section-container label#btn-upload:hover {
+	color: #666;
+}
+.section-container input#image {
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: 0;
+	float: left;
+	visibility: hidden;
+}
+.section-container #btn-book,
+.section-container #btn-genre,
+.section-container #btn-delgenre {
+	width: 140px;
+	margin: 10px 0;
 }
 
 /********************
@@ -787,6 +880,7 @@ div.dropdown-content table tr:nth-child(even) {
 		margin: 10px auto;
 	}
 	div.section-container input,
+	div.section-container textarea,
 	div.section-container .overflow-container table {
 		width: 100%;
 	}
@@ -813,5 +907,37 @@ div.dropdown-content table tr:nth-child(even) {
 	div.section-container .overflow-container td {
 		padding: 7px 4px;
 		font-size: 14px;
-	}	
+	}
+	div.section-container .overflow-container td img {
+		width: 30px;
+		height: 30px;
+	}
+	div.section-container .overflow-container label#btn-upload {
+		margin: 80px 5px;
+		font-size: 30px;
+		display: inline-block;
+		width: auto;
+	}
+	.section-container button.save {
+		margin: 0;
+		height: 50px;
+		vertical-align: middle;
+		width: 26%;
+	}
+	.section-container button.cancel {
+		margin: 0;
+		height: 50px;
+		vertical-align: middle;
+		width: 26%;
+		float: right;
+	}
+	.section-container button#btn-book,
+	.section-container button#btn-genre,
+	.section-container button#btn-delgenre,
+	.section-container button#btn-all-books {
+		display: inline-block;
+		vertical-align: middle;
+		height: 50px;
+		width: 23%;
+	}
 }

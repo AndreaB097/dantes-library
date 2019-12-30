@@ -46,7 +46,7 @@ create table if not exists books(
     description text,
 	publisher varchar(100) not null,
     quantity int not null,
-    cover varchar(191) default "./images/cover/default.png"
+    cover varchar(191) default "./images/covers/default.png"
 );
 
 create table if not exists authors(
