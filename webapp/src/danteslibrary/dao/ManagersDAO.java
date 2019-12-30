@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
+import danteslibrary.model.BooksBean;
 import danteslibrary.model.ManagersBean;
 import danteslibrary.util.DBConnection;
 
@@ -173,6 +175,34 @@ public class ManagersDAO {
 		}
 		return result;
 }
+	
+	
+	public static void newManager(ManagersBean manager) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			String query = "INSERT INTO managers(email, password, name, surname, address, phone) "
+					+ "VALUES(?, ?, ?, ?, ?, ?)";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, manager.getEmail());
+			ps.setString(2, manager.getPassword());
+			ps.setString(3, manager.getName());
+			ps.setString(4, manager.getSurname());
+			ps.setString(5, manager.getAddress());
+			ps.setString(6, manager.getPhone());
+	        ps.executeUpdate();
+			ArrayList<String> roles = manager.getRoles();
+			for(int i=0; i< roles.size();i++) {
+			query = "INSERT INTO managers_roles(email, role_name) VALUES ('"+manager.getEmail()+"', '"+ roles.get(i)+ "')";
+			ps = conn.prepareStatement(query);
+			ps.executeUpdate();
+		}
+	        return;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo newManager: " + e.getMessage());
+			return ;
+		}
+	}
 
 
 }

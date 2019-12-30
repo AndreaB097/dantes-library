@@ -3,14 +3,11 @@ package danteslibrary.control;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
-
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-
-
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
-
 
 
 @WebServlet("/admin")
@@ -182,6 +179,30 @@ public class ManagerServlet extends HttpServlet {
 							request.setAttribute("cards", cards);
 					}
 				}
+				
+				else if(request.getParameter("new_card") != null) {
+					CardsDAO dao = new CardsDAO();
+					CardsBean card = new CardsBean();
+					String codice_fiscale = request.getParameter("codice_fiscale");
+					boolean associated= false;
+					associated = request.getParameter( "associated" ) != null;
+					if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
+						try {
+								int card_id = Integer.parseInt(request.getParameter("card_id"));
+								card.setCard_id(card_id);
+							}
+						catch(NumberFormatException  e) {
+							request.setAttribute("error", "Errore formato codice tessera.");
+							return;
+					      	}
+						}
+						
+						card.setCodice_fiscale(codice_fiscale);
+						card.setAssociated(associated);
+						dao.newCardAdmin(card);
+					}
+				
+				
 				else if(request.getParameter("all_cards") != null) {
 					CardsDAO dao = new CardsDAO();
 					ArrayList<CardsBean> cards = dao.getAllCards();
@@ -219,6 +240,25 @@ public class ManagerServlet extends HttpServlet {
 						request.setAttribute("bookings", bookings);
 					}
 				}
+				
+				else if(request.getParameter("new_booking") != null) {
+					BookingsDAO dao = new BookingsDAO();
+					String codice_fiscale = request.getParameter("codice_fiscale");
+					int book_id = Integer.parseInt(request.getParameter("book_id"));
+					int card_id = Integer.parseInt(request.getParameter("card_id"));
+					String start_date = request.getParameter("start_date");
+					String end_date = request.getParameter("end_date");
+					String state = request.getParameter("state");
+					String email_booking;
+					if((request.getParameter("email")!=null) && !(request.getParameter("email").equals(""))) {
+								email_booking = request.getParameter("email");
+						}
+					else {
+						email_booking = null;
+						}
+					dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
+				}
+				
 				else if(request.getParameter("all_bookings") != null) {
 					BookingsDAO dao = new BookingsDAO();
 					ArrayList<BookingsBean> bookings = dao.getAllBookings();
@@ -250,6 +290,40 @@ public class ManagerServlet extends HttpServlet {
 						request.setAttribute("managers", managers);
 					}
 				}
+				
+				else if(request.getParameter("new_manager") != null) {
+					ManagersDAO dao = new ManagersDAO();
+					ManagersBean manager = new ManagersBean();
+					String manager_email = request.getParameter("email");
+					String manager_password = request.getParameter("password");
+					String name = request.getParameter("name");
+					String surname = request.getParameter("surname");
+					String address = request.getParameter("address");
+					String phone = request.getParameter("phone");
+					ArrayList<String> roles = new ArrayList<String>();
+					if (request.getParameter("users_manager") != null)
+						roles.add("Gestore Utenti");
+					if (request.getParameter("books_manager") != null)
+						roles.add("Gestore Libri");
+					if (request.getParameter("cards_manager") != null)
+						roles.add("Gestore Tessere");
+					if (request.getParameter("bookings_manager") != null)
+						roles.add("Gestore Prenotazioni");
+					if (request.getParameter("library_manager") != null)
+						roles.add("Gestore Biblioteca");
+
+					manager.setEmail(email);
+					manager.setPassword(password);
+					manager.setName(name);
+					manager.setSurname(surname);
+					manager.setPhone(phone);
+					manager.setAddress(address);
+					manager.setRoles(roles);
+
+					dao.newManager(manager);
+					
+					}
+			
 				/* - Mostra tutti i gestori presenti nel database*/
 				else if(request.getParameter("all_managers") != null) {
 					ManagersDAO dao = new ManagersDAO();
@@ -268,6 +342,7 @@ public class ManagerServlet extends HttpServlet {
 			
 			
 		}
+
 		
 		
 		
