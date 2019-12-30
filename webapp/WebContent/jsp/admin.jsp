@@ -159,6 +159,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			
 			<%if(request.getAttribute("info_book") != null) { %>
 				<div class="info"><%=request.getAttribute("info_book") %></div>
+			<%}
+			  else if(request.getAttribute("error") != null) { %>
+			  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
 
 			<button id="btn-book">Aggiungi Libro</button>     
@@ -196,8 +199,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<th>Id</th>
 						<th>Titolo</th>
 						<th>Autore</th>
-						<th>Casa Editrice</th>
 						<th>Genere</th>
+						<th>Casa Editrice</th>
 						<th>Quantità</th>
 						<th></th>
 						<th></th>
@@ -208,13 +211,29 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<tr>
 						<td><%=book.getBook_id() %></td>
 						<td><%=book.getTitle() %></td>
-						<td><% for(String s : book.getAuthors()) { %>
-							     <%=s%>
-							<% }%>
+						<td>
+						<%ArrayList<String> authors = book.getAuthors();
+						if(authors != null && !authors.isEmpty())
+							for(int i = 0; i < authors.size(); i++) {
+								if((i+1) < authors.size()) { %>
+									<%=authors.get(i) + ", " %>	
+								<%} 
+								else { %>
+									<%=authors.get(i) %>
+								<%} %>
+							<%} %>
 						</td>
-						<td><% for(String s : book.getGenres()) { %>
-							     <%=s%>
-							<% }%>
+						<td>
+						<%ArrayList<String> genres = book.getGenres();
+						if(genres != null && !genres.isEmpty())
+							for(int i = 0; i < genres.size(); i++) {
+								if((i+1) < genres.size()) { %>
+									<%=genres.get(i) + ", " %>	
+								<%}
+								else { %>
+								<%=genres.get(i) %>
+								<%} %>
+							<%} %>
 						</td>
 						<td><%=book.getPublisher() %></td>
 						<td><%=book.getQuantity() %></td>
@@ -236,6 +255,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</div>
 			<%}
 			else if(request.getAttribute("edit_book") != null) {
+				//edit_book contiene l'id del libro da editare
 				BooksBean book = (BooksBean) request.getAttribute("edit_book"); %>
 			<script>
 			$(document).ready(function() {
@@ -256,16 +276,59 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<label for="title">Titolo</label>
 				<input id="title" name="title" type="text" value="<%=book.getTitle() %>">
 				<label for="description">Descrizione</label>
-				<textarea id="description" name="description" rows="6" cols="60" value="<%=book.getDescription() %>"></textarea>
+				<textarea id="description" name="description" rows="6" cols="60"><%=book.getDescription() %></textarea>
+				
 				<label for="authors">Autori</label>
-				<input id="authors" name="authors" type="text" value="<%=book.getAuthors() %>">
+				<input id="authors" type="hidden" value="" name="authors" />
+				<select id="update-authors-select" multiple="multiple" style="width: 50%;">
+				<%for(String author : book.getAuthors()) {%>
+					<option value="<%=author %>" selected><%=author %></option>
+				<%} %>
+				</select>
+				<br/><br/>
+				<script>
+					$(document).ready(function() {
+					    $('#update-authors-select').select2({
+					    	tags: true
+					    });
+					    $('#update-authors-select').change(function() {
+					    	$('#authors').val($('#update-authors-select').val());
+					    });
+					});
+				</script>
+				
 				<label for="publisher">Casa editrice</label>
 				<input id="publisher" name="publisher" type="text" value="<%=book.getPublisher() %>">
+				
 				<label for="genres">Genere</label>
-				<input id="genres" name="genres" type="text" value="<%=book.getGenres() %>">
+				<input id="genres" type="hidden" value="" name="genres" />				
+				<select id="update-genres-select" multiple="multiple" style="width: 50%;">
+				<%for(String genres : book.getGenres()) {%>
+					<option value="<%=genres %>" selected><%=genres %></option>
+				<%} %>
+				</select>
+				<script>
+					$.post("admin?all_genres", function(all_genres) {
+						for(var i in all_genres) {
+							if($("#update-genres-select option[value=\"" + all_genres[i] + "\"]").length <= 0)
+								$("#update-genres-select").append("<option value='" + all_genres[i] + "'>"+ all_genres[i]+"</option>");
+						}
+					});
+				</script>
+				<br/><br/>
+				<script>
+					$(document).ready(function() {
+					    $('#update-genres-select').select2();
+					    $('#update-genres-select').change(function() {
+					    	$('#genres').val($('#update-genres-select').val());
+					    });
+					});
+				</script>
+				
 				<label for="quantity">Quantità</label>
 				<input id="quantity" name="quantity" type="text" value="<%=book.getQuantity() %>">
-				<button type="submit" class="save" formaction="admin?books&save_book=<%=book.getBook_id()%>"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
+				<input type="hidden" name="book_id" value="<%=book.getBook_id() %>"/>
+				<button type="submit" class="save" formaction="admin?books&save_book"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 				<script>
 					$(".cancel").click(function() {
@@ -274,36 +337,73 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</script>
 			</form>
 			<%} %>
+
 			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
 				<div style="margin-bottom: 20px;" id="error-list" tabindex="-1"></div>
 				<h3>Inserimento Libro</h3>
 				<div style="float:left" id="image-preview">
 					<img src="images/no_image.png" alt="Nessun immagine">
 				</div>
-				
 				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
 				<input id="image" type="file" name="file" accept=".jpg, .jpeg, .png">
 				<label for="title">Titolo</label>
 				<input id="title" name="title" type="text">
 				<label for="description">Descrizione</label>
 				<textarea id="description" name="description" rows="6" cols="60"></textarea>
+				
 				<label for="authors">Autori</label>
-				<input id="authors" name="authors" type="text">
+				<input id="authors" type="hidden" value="" name="authors" />
+				<select id="authors-select" multiple="multiple" style="width: 50%;">
+				</select>
+				<script>
+					$(document).ready(function() {
+					    $('#authors-select').select2({
+					    	tags: true
+					    });
+					    $('#authors-select').change(function() {
+					    	$('#authors').val($('#authors-select').val());
+					    });
+					});
+				</script>
+				<br/><br/>
+				
 				<label for="publisher">Casa editrice</label>
 				<input id="publisher" name="publisher" type="text">
+				
 				<label for="genres">Genere</label>
-				<input id="genres" name="genres" type="text">
+				<input id="genres" type="hidden" value="" name="genres" />
+				<select id="genres-select" multiple="multiple" style="width: 50%;">
+				</select>
+				<script>
+					$.post("admin?all_genres", function(genres) {
+						for(i in genres) {
+							$("#genres-select").append("<option value='" + genres[i] + "'>"+genres[i]+"</option>");
+						}
+					});
+					$(document).ready(function() {
+					    $('#genres-select').select2();
+					    $('#genres-select').change(function() {
+					    	$('#genres').val($('#genres-select').val());
+					    });
+					});
+				</script>				
+				<br/><br/>
+				
 				<label for="quantity">Quantità</label>
 				<input id="quantity" name="quantity" type="text">
 				<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 				<script>
+					$(".save").click(function() {
+						$('#authors').val($('#update-authors-select').val());
+						$('#genres').val($('#update-genres-select').val());
+					});
 					$(".cancel").click(function() {
 						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
 					});
 				</script>
 			</form>
-		
+
 		<script>
 		$("#error-list").hide();
 		var errors = [];

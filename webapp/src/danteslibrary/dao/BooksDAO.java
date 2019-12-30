@@ -4,6 +4,7 @@ import java.sql.*;
 import danteslibrary.util.DBConnection;
 import danteslibrary.model.BooksBean;
 import java.util.ArrayList;
+import org.json.*;
 
 public class BooksDAO {
 	
@@ -133,7 +134,7 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;	
 	}
 	
-	public ArrayList<String> retrieveAllGenres() {
+	public JSONArray retrieveAllGenres() {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -142,10 +143,10 @@ public ArrayList<BooksBean> getAllBooks() {
 			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
-			ArrayList<String> genres = new ArrayList<String>();
+			JSONArray genres = new JSONArray();
 			
 			while(result.next()) {
-				genres.add(result.getString("genre_name"));
+				genres.put(result.getString("genre_name"));
 			}
 
 			conn.close();
@@ -220,72 +221,94 @@ public ArrayList<BooksBean> getAllBooks() {
 	}
 	
 	
-	public int updateBook(BooksBean book) {
-		int result = 0;	
-		try {		
-			Connection conn = DBConnection.getConnection();
-			String query = "UPDATE books "
-					+ "SET title='" + book.getTitle().replace("'", "''") + "', "
-					+ "description='" + book.getDescription().replace("'", "''") + "', "
-					+ "publisher=\"" + book.getPublisher() + "\", "
-					+ "quantity=\"" + book.getQuantity() + "\""
-					+ " WHERE book_id =" + book.getBook_id();
+	public int updateBook(BooksBean book) throws SQLException {
+		int result = 0;
+		Connection conn = null;
+		try {
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
+			String query = "UPDATE books SET title= ?, description= ?, publisher = ?, quantity = ?, cover = ? WHERE book_id = ?";
 			PreparedStatement ps = conn.prepareStatement(query);
-			result = ps.executeUpdate();
-			ps.close();
+			ps.setString(1, book.getTitle());
+			ps.setString(2, book.getDescription());
+			ps.setString(3, book.getPublisher());
+			ps.setInt(4, book.getQuantity());
 			
-			if(System.getProperty("file.separator") == "\\") {
-				query = "UPDATE books "
-					+ "SET cover='" + book.getCover().replace("\\", "/") + "'"
-					+ " WHERE book_id = " + Integer.toString(book.getBook_id());
+			String link;
+			if(System.getProperty("file.separator").equals("\\")) {
+				link = book.getCover().replace("\\", "/");
 			}
 			else {
-				query = "UPDATE books "
-						+ "SET link='" + book.getCover() + "'"
-						+ " WHERE book_id = " + Integer.toString(book.getBook_id());
-				
+				link = book.getCover();
 			}
-			ps = conn.prepareStatement(query);
+			ps.setString(5, link);
+			ps.setInt(6, book.getBook_id());
 			result = ps.executeUpdate();
-			ps.close();
+			
+			/*Cancello gli autori precedentemente associati*/
 			ArrayList<String> authors = book.getAuthors();
-			for(int i=0; i< authors.size();i++) {
-				query = "INSERT INTO authors(name) VALUES ('" + authors.get(i) + "')";
-				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-				            result = ps.executeUpdate();
-				            ResultSet rs = ps.getGeneratedKeys();
-				int author_id = rs.getInt(1);
-				query = "INSERT INTO book_authors(book_id, author_id) VALUES ("+book.getBook_id()+ ", "+ author_id+ ")";
-				ps = conn.prepareStatement(query);
-				result = ps.executeUpdate();
-				ps.close();
+			for(int i = 0; i < authors.size(); i++) {
+				ps = conn.prepareStatement("SELECT * FROM authors, books_authors WHERE authors.author_id = books_authors.author_id "
+						+ "AND books_authors.book_id = ?");
+				ps.setInt(1, book.getBook_id());
+				ResultSet rs = ps.executeQuery();
+				while(rs.next()) {
+					ps = conn.prepareStatement("DELETE FROM authors WHERE author_id = ?");
+					ps.setInt(1, rs.getInt("author_id"));
+					ps.executeUpdate();
+				}
 			}
 			
+			/*Cancello i generi precedentemente associati*/
+			ps = conn.prepareStatement("DELETE FROM books_genres WHERE book_id = ?");
+			ps.setInt(1, book.getBook_id());
+			ps.executeUpdate();
+			
+			/*Inserisco gli autori aggiornati e li associo anche al libro modificato*/
+			for(int i=0; i< authors.size();i++) {
+				query = "INSERT INTO authors(name) VALUES (?)";
+				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, authors.get(i));
+				result = ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				rs.first();
+				int author_id = rs.getInt(1);
+				query = "INSERT INTO books_authors(book_id, author_id) VALUES (?, ?)";
+				ps = conn.prepareStatement(query);
+				ps.setInt(1, book.getBook_id());
+				ps.setInt(2, author_id);
+				result = ps.executeUpdate();
+			}
+			
+			/*Inserisco i generi aggiornati e li associo anche al libro modificato*/
 			ArrayList<String> genres = book.getGenres();
 			for(int i=0; i< genres.size();i++) {
-				query = "INSERT INTO genres(name) VALUES ('" + genres.get(i) + "')";
-				ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-				            result = ps.executeUpdate();
-				            ResultSet rs = ps.getGeneratedKeys();
-				int genre_id = rs.getInt(1);
-				query = "INSERT INTO book_genres(book_id, genre_id) VALUES ("+book.getBook_id()+ ", "+ genre_id+ ")";
+				query = "INSERT INTO books_genres(book_id, genre_name) VALUES (?, ?)";
 				ps = conn.prepareStatement(query);
+				ps.setInt(1, book.getBook_id());
+				ps.setString(2, genres.get(i));
 				result = ps.executeUpdate();
-				ps.close();
 			}
-			conn.close();
-			return result;
-		}
-		catch(SQLException e) {
-			System.out.println("Errore Database metodo updateBook: " + e.getMessage());
+			conn.commit();
+		} catch(SQLException e) {
+			if(conn != null) {
+					System.out.println("\nRollback! Non aggiorno il libro.\n"
+							+ "Errore Database metodo updateBook: " + e.getMessage());
+					conn.rollback();
+					return 0;
+			}
+		} finally {
+			conn.setAutoCommit(true);
 		}
 		return result;
 	}
 	
-	public int newBook(BooksBean book) {
+	public int newBook(BooksBean book) throws SQLException {
 		int result = 0;	
+		Connection conn = null;
 		try {
-			Connection conn = DBConnection.getConnection();
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
 			String query = "INSERT INTO books(title, description, quantity, publisher, cover) VALUES (?, ?, ?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, book.getTitle());
@@ -329,13 +352,18 @@ public ArrayList<BooksBean> getAllBooks() {
 				ps.setInt(2, author_id);
 				result = ps.executeUpdate();
 		   }
-		  conn.close();
-		  return result;
+		  conn.commit();
+		} catch(SQLException e) {
+			if(conn != null) {
+					System.out.println("\nRollback! Non aggiungo il libro.\n"
+							+ "Errore Database metodo newBook: " + e.getMessage());
+					conn.rollback();
+					return 0;
+			}
+		} finally {
+			conn.setAutoCommit(true);
 		}
-		catch(SQLException e) {
-			System.out.println("Errore Database metodo newBook: " + e.getMessage());
-			return result;
-		}
+		return result;
 	}
 	
 	public String getBookCoverById(int book_id) {
