@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import danteslibrary.model.BooksBean;
+
 import danteslibrary.model.ManagersBean;
 import danteslibrary.util.DBConnection;
 
@@ -101,7 +101,7 @@ public class ManagersDAO {
 			PreparedStatement ps = conn.prepareStatement("SELECT roles.role_name FROM roles, managers_roles WHERE roles.role_name = managers_roles.role_name AND managers_roles.email = ?");
 			ps.setString(1, email);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet ï¿½ vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> roles = new ArrayList<String>();
@@ -202,6 +202,87 @@ public class ManagersDAO {
 			System.out.println("Errore Database metodo newManager: " + e.getMessage());
 			return ;
 		}
+	}
+	
+	
+	public ManagersBean findManagerByEmail(String email) {
+		
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM managers WHERE managers.email = ?");
+			ps.setString(1, email);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Se il ResultSet ï¿½ vuoto, allora la query non ha prodotto risultati*/
+				return null;
+			
+			ManagersBean manager = new ManagersBean();
+			
+			while(result.next()) {
+				manager.setEmail(result.getString("email"));
+				manager.setPassword(result.getString("password"));
+				manager.setName(result.getString("name"));
+				manager.setSurname(result.getString("surname"));
+				manager.setPhone(result.getString("phone"));
+				manager.setAddress(result.getString("address"));
+				ArrayList<String> roles = retrieveManagerRoles(email);
+				manager.setRoles(roles);
+			}
+
+			conn.close();
+			return manager;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo findBookById: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	
+	public int updateManager(ManagersBean manager, String email) throws SQLException {
+		int result = 0;
+		Connection conn = null;
+		try {
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
+			String query = "UPDATE managers SET email= ?, password= ?, name = ?, surname = ?, phone = ?, address = ? WHERE managers.email = ?";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, manager.getEmail());
+			ps.setString(2, manager.getPassword());
+			ps.setString(3, manager.getName());
+			ps.setString(4, manager.getSurname());
+			ps.setString(5, manager.getPhone());
+			ps.setString(6, manager.getAddress());
+			ps.setString(7, email);
+			ps.executeUpdate();
+
+			query ="DELETE FROM managers_roles WHERE email = ?";
+			ps = conn.prepareStatement(query);
+			ps.setString(1, manager.getEmail());
+	    	ps.executeUpdate();
+	    	
+
+
+			ArrayList<String> roles = manager.getRoles();
+			for(int i=0; i< roles.size();i++) {
+				query = "INSERT INTO managers_roles(email, role_name) VALUES (?, ?)";
+				ps = conn.prepareStatement(query);
+				ps.setString(1, manager.getEmail());
+				ps.setString(2, roles.get(i));
+				result = ps.executeUpdate();
+			}
+			conn.commit();
+		} catch(SQLException e) {
+			if(conn != null) {
+					System.out.println("\nRollback! Non aggiorno il gestore.\n"
+							+ "Errore Database metodo updateManager: " + e.getMessage());
+					conn.rollback();
+					return 0;
+			}
+		} finally {
+			conn.setAutoCommit(true);
+		}
+		return result;
 	}
 
 

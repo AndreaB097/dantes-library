@@ -355,36 +355,59 @@ public class ManagerServlet extends HttpServlet {
           request.setAttribute("managers", managers);
         }
       }
-      else if(request.getParameter("new_manager") != null) {
+		else if(request.getParameter("edit_manager") != null) {
+			ManagersDAO dao = new ManagersDAO();
+			ManagersBean manager = dao.findManagerByEmail(request.getParameter("edit_manager"));
+			request.setAttribute("edit_manager", manager);
+			request.getRequestDispatcher("admin.jsp?managers").forward(request, response);
+			return;
+		}
+      else if(request.getParameter("new_manager") != null || request.getParameter("save_manager") != null) {
         ManagersDAO dao = new ManagersDAO();
         ManagersBean manager = new ManagersBean();
-        String manager_email = request.getParameter("email");
-        String manager_password = request.getParameter("password");
-        String name = request.getParameter("name");
-        String surname = request.getParameter("surname");
-        String address = request.getParameter("address");
-        String phone = request.getParameter("phone");
-        ArrayList<String> roles = new ArrayList<String>();
-        if (request.getParameter("users_manager") != null)
-          roles.add("Gestore Utenti");
-        if (request.getParameter("books_manager") != null)
-          roles.add("Gestore Libri");
-        if (request.getParameter("cards_manager") != null)
-          roles.add("Gestore Tessere");
-        if (request.getParameter("bookings_manager") != null)
-          roles.add("Gestore Prenotazioni");
-        if (request.getParameter("library_manager") != null)
-          roles.add("Gestore Biblioteca");
-
-        manager.setEmail(email);
-        manager.setPassword(password);
-        manager.setName(name);
-        manager.setSurname(surname);
-        manager.setPhone(phone);
-        manager.setAddress(address);
-        manager.setRoles(roles);
-
-        dao.newManager(manager);
+		try {
+			String original_email = request.getParameter("original_email");
+			String manager_email = request.getParameter("email");
+			String manager_password = request.getParameter("password");
+			String name = request.getParameter("name");
+			String surname = request.getParameter("surname");
+			String address = request.getParameter("address");
+			String phone = request.getParameter("phone");
+			ArrayList<String> roles = new ArrayList<String>();
+			if (request.getParameter("users_manager") != null)
+				roles.add("Gestore Utenti");
+			if (request.getParameter("books_manager") != null)
+				roles.add("Gestore Libri");
+			if (request.getParameter("cards_manager") != null)
+				roles.add("Gestore Tessere");
+			if (request.getParameter("bookings_manager") != null)
+				roles.add("Gestore Prenotazioni");
+			if (request.getParameter("library_manager") != null)
+				roles.add("Gestore Biblioteca");
+			manager.setEmail(manager_email);
+			manager.setPassword(password);
+			manager.setName(name);
+			manager.setSurname(surname);
+			manager.setPhone(phone);
+			manager.setAddress(address);
+			manager.setRoles(roles);
+			
+			if(request.getParameter("save_manager") != null) {
+				/*Aggiorno il manager nel DB*/
+				if(dao.updateManager(manager, original_email) != 0)
+					request.setAttribute("info_manager", "Il gestore " + manager.getName() +" "+ manager.getSurname() +" è stato aggiornato.");
+				else
+					request.setAttribute("error", "Si è verificato un errore.");
+			}
+			else {
+				dao.newManager(manager);
+			}
+		}
+		catch(Exception e) {
+			request.setAttribute("error", "Errore, qualche campo è vuoto "
+					+ "oppure non è stato compilato.");
+			return;
+		}
       }
 			/* - Mostra tutti i gestori presenti nel database*/
 			else if(request.getParameter("all_managers") != null) {

@@ -861,6 +861,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						</td>
 						<td>
 							<form action="admin?managers" method="post">
+								<input type="hidden" name="edit_manager" value="<%=manager.getEmail()%>">
+								<button id="btn-edit" type="submit"><i style="color: #404040;" class="fas fa-pencil-alt fa-lg"></i></button>
+						</td>
+						<td>
 								<input type="hidden" name="remove_manager" value="<%=manager.getEmail()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
 							</form>
@@ -869,7 +873,73 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%  } %>
 			</table>
 			</div>
+			<%} 			
+			else if(request.getAttribute("edit_manager") != null) {
+		
+				ManagersBean manager = (ManagersBean) request.getAttribute("edit_manager"); %>
+			<script>
+			$(document).ready(function() {
+				$("#update-manager-form").slideDown();
+				$("#new-manager-form").hide();
+				$("#all-managers-div").hide();
+			});
+			</script>
+			<form id="update-manager-form" method="post" class="overflow-container">
+				<h3>Modifica Gestore</h3>
+				<input type="hidden" id="original_email" name="original_email" value="<%=manager.getEmail() %>">
+				<label for="email">Email</label>
+				<input id="email" name="email" type="text" value="<%=manager.getEmail() %>">
+				<label for="password">Password</label>
+				<input id="password" name="password" type="password" value="<%=manager.getPassword() %>">
+				<label for="name">Nome</label>
+				<input id="name" name="name"  type="text" value="<%=manager.getName() %>"> 
+				<label for="surname">Cognome</label>
+				<input id="surname" name="surname"  type="text" value="<%=manager.getSurname() %>"> 
+				<label for="address">Indirizzo</label>
+				<input id="address" name="address"  type="text" value="<%=manager.getAddress() %>"> 
+				<label for="phone">Telefono</label>
+				<input id="phone" name="phone"  type="text" value="<%=manager.getPhone() %>"> 
+				<label>Ruolo</label>
+				<br/>
+
+					
+					<input type="checkbox" id ="users_manager" name="users_manager" value="Gestore Utenti">  Gestore Utenti<br>
+					<input type="checkbox" id ="books_manager" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
+					<input type="checkbox" id ="cards_manager" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
+					<input type="checkbox" id ="bookings_manager" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
+					<input type="checkbox" id ="library_manager" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
+				<br/><br/>
+						<% ArrayList <String> manager_roles = manager.getRoles();
+						if(manager_roles.contains("Gestore Utenti")) {%>
+						<script>
+						$("#users_manager").attr("checked", true);
+						</script>
+						<%}%>
+						<%if(manager_roles.contains("Gestore Libri")) {%>
+						<script>
+						$("#books_manager").attr("checked", true);
+						</script>
+						<%}%>
+						<%if(manager_roles.contains("Gestore Tessere")) {%>
+						<script>
+						$("#cards_manager").attr("checked", true);
+						</script>
+						<%}%>
+						<%if(manager_roles.contains("Gestore Prenotazioni")) {%>
+						<script>
+						$("#bookings_manager").attr("checked", true);
+						</script>
+						<%}%>
+						<%if(manager_roles.contains("Gestore Biblioteca")) {%>
+						<script>
+						$("#library_manager").attr("checked", true);
+						</script>
+						<%}%>
+				<button type="submit" class="save" formaction="admin?managers&save_manager"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+			</form>
 			<%} %>
+				
 			
 			<form id="new-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
 			<h3>Inserimento Gestore</h3>
