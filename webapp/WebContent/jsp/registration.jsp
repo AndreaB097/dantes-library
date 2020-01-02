@@ -67,6 +67,8 @@ var errors = [];
 			errors.push("Indirizzo email non valido.");
 		}
 		
+		/*Se mi viene restituito true, vuol dire che esiste già un account con
+		questa email, quindi l'utente non si può registrare e stampo l'errore.*/
 		$.ajax({
 			url: "register",
 			async: false,
@@ -74,11 +76,13 @@ var errors = [];
 			type: "POST",
 			dataType: "json",
 			success: function(response) {
-				if(response == false)
+				if(response == true)
 					errors.push("Questo indirizzo email è già in uso.");
 			}
 		});
 		
+		/*Se mi viene restituito true, vuol dire che esiste già un account con
+		questo codice fiscale, quindi l'utente non si può registrare e stampo l'errore.*/
 		$.ajax({
 			url: "register",
 			async: false,
@@ -86,7 +90,7 @@ var errors = [];
 			type: "POST",
 			dataType: "json",
 			success: function(response) {
-				if(response == false)
+				if(response == true)
 					errors.push("Questo codice fiscale è già in uso. Se non ti risulta, per favore contatta la biblioteca.");
 			}
 		});

@@ -77,7 +77,7 @@ public class ManagerServlet extends HttpServlet {
 				 * - 3: Genere */
 				int filter = Integer.parseInt(request.getParameter("filter"));
 				if(filter < 0 || filter > 3) {
-					request.setAttribute("info", "Filtro non valido.");
+					request.setAttribute("info_book", "Filtro non valido.");
 					request.getRequestDispatcher("admin.jsp").forward(request, response);
 					return;
 				} 
@@ -86,18 +86,6 @@ public class ManagerServlet extends HttpServlet {
 					ArrayList<BooksBean> books = dao_books.getBooksByFilter(filter, keyword);
 					request.setAttribute("books", books);
 				}
-			}
-			/*Con una richiesta $.post("book?all_genres") chiedo alla servlet tutti i generi
-			 * presenti nel database. Rispondo alla jsp mandando un array in formato json
-			 * contenenti i generi*/
-			else if(request.getParameter("all_genres") != null) {
-				BooksDAO dao = new BooksDAO();
-				JSONArray genres = dao.retrieveAllGenres();
-				response.setContentType("application/json");
-				PrintWriter pw = response.getWriter();
-				pw.write(genres.toString());
-				pw.close();
-				return;
 			}
 			else if(request.getParameter("edit_book") != null) {
 				BooksDAO dao = new BooksDAO();
@@ -225,6 +213,37 @@ public class ManagerServlet extends HttpServlet {
 				dao.removeBook(request.getParameter("remove_book"));
 				request.setAttribute("info_book", "Il libro " + request.getParameter("remove_book") + " è stato rimosso.");
 			}
+			else if(request.getParameter("new_genre") != null) {
+				BooksDAO dao = new BooksDAO();
+				String genre_name = request.getParameter("genre_name");
+				if(genre_name != null && !genre_name.equals("")) {
+					if(dao.newGenre(genre_name) != 0)
+						request.setAttribute("info_book", "Il genere " + genre_name + " è stato aggiunto.");
+					else
+						request.setAttribute("error", "Il genere " + genre_name + " è già presente nel sistema!");
+				}
+			}
+			/*Con una richiesta $.post("admin?json_genres") chiedo alla servlet tutti i generi
+			 * presenti nel database. Rispondo alla jsp mandando un array in formato json
+			 * contenenti i generi*/
+			else if(request.getParameter("json_genres") != null) {
+				BooksDAO dao = new BooksDAO();
+				JSONArray genres = dao.retrieveJSONAllGenres();
+				response.setContentType("application/json");
+				PrintWriter pw = response.getWriter();
+				pw.write(genres.toString());
+				pw.close();
+				return;
+			}
+			else if(request.getParameter("all_genres") != null) {
+				BooksDAO dao = new BooksDAO();
+				request.setAttribute("all_genres", dao.retrieveAllGenres());
+			}
+			else if(request.getParameter("remove_genre") != null) {
+				BooksDAO dao = new BooksDAO();
+				dao.removeGenre(request.getParameter("remove_genre"));
+				request.setAttribute("info_book", "Il genere " + request.getParameter("remove_genre") + " è stato rimosso.");
+			}
 				
 			/* -- Sezione Tessera -- */	
 			if(request.getParameter("keyword_card") != null && request.getParameter("keyword_card") != "") {
@@ -237,37 +256,55 @@ public class ManagerServlet extends HttpServlet {
 				 * - 4: Codice_tessera */
 				int filter = Integer.parseInt(request.getParameter("filter"));
 				if(filter < 0 || filter > 4) {
-					request.setAttribute("info", "Filtro non valido.");
+					request.setAttribute("info_card", "Filtro non valido.");
 					request.getRequestDispatcher("admin.jsp").forward(request, response);
 					return;
-				} 
+				}
 				else {
 					CardsDAO dao_cards = new CardsDAO();
 					ArrayList<CardsBean> cards = dao_cards.getCardsByFilter(filter, keyword);
-          if(!cards.isEmpty())
+					if(!cards.isEmpty())
 						request.setAttribute("cards", cards);
 				}
 			}
-      else if(request.getParameter("new_card") != null) {
-        CardsDAO dao = new CardsDAO();
-        CardsBean card = new CardsBean();
-        String codice_fiscale = request.getParameter("codice_fiscale");
-        boolean associated= false;
-        associated = request.getParameter( "associated" ) != null;
-        if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
-          try {
-              int card_id = Integer.parseInt(request.getParameter("card_id"));
-              card.setCard_id(card_id);
-          }
-          catch(NumberFormatException  e) {
-            request.setAttribute("error", "Errore formato codice tessera.");
-            return;
-          }
-        }
-        card.setCodice_fiscale(codice_fiscale);
-        card.setAssociated(associated);
-        dao.newCardAdmin(card);
-      }
+			else if(request.getParameter("new_card") != null) {
+		        CardsDAO dao = new CardsDAO();
+		        CardsBean card = new CardsBean();
+		        UsersDAO udao = new UsersDAO();
+		        String codice_fiscale = request.getParameter("codice_fiscale");
+		        boolean associated = request.getParameter("associated") != null;
+		        if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
+		          try {
+		              int card_id = Integer.parseInt(request.getParameter("card_id"));
+		              card.setCard_id(card_id);
+		          }
+		          catch(NumberFormatException  e) {
+		            request.setAttribute("error", "Errore formato codice tessera.");
+		            request.getRequestDispatcher("admin.jsp?cards").forward(request, response);
+		        	return;
+		          }
+		        }
+		        
+		        if(associated && !udao.checkExistingCodiceFiscale(codice_fiscale)) {
+		        	request.setAttribute("error", "L'utente con il codice fiscale: " + codice_fiscale
+		        			+ " non è presente nel sistema. Non puoi associare una tessera di un utente non registrato.");
+		        	request.getRequestDispatcher("admin.jsp?cards").forward(request, response);
+		        	return;
+		        }
+		        else {
+		        	card.setCodice_fiscale(codice_fiscale);
+			        card.setAssociated(associated);
+			        if(dao.newCardAdmin(card) != 0)
+			        	request.setAttribute("info_card", "La tessera è stata aggiunta con il codice fiscale: " + codice_fiscale);
+			        else
+			        	request.setAttribute("error", "Non è stato possibile aggiungere la tessera. "
+			        			+ "Assicurati che la tessera da inserire non sia già presente o che il codice fiscale non abbia "
+			        			+ "già una tessera associata.");
+			        request.getRequestDispatcher("admin.jsp?cards").forward(request, response);
+		        	return;
+		        }
+		        
+			}
 			else if(request.getParameter("all_cards") != null) {
 				CardsDAO dao = new CardsDAO();
 				ArrayList<CardsBean> cards = dao.getAllCards();
@@ -308,7 +345,7 @@ public class ManagerServlet extends HttpServlet {
       }
       else if(request.getParameter("new_booking") != null) {
         BookingsDAO dao = new BookingsDAO();
-        String codice_fiscale = request.getParameter("codice_fiscale");
+        // TODO cod. fiscale facoltativo String codice_fiscale = request.getParameter("codice_fiscale");
         int book_id = Integer.parseInt(request.getParameter("book_id"));
         int card_id = Integer.parseInt(request.getParameter("card_id"));
         String start_date = request.getParameter("start_date");

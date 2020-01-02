@@ -76,42 +76,42 @@ public class UsersDAO {
 		return false;
 	}
 	
-	public static boolean checkEmail(String email) {
+	public boolean checkExistingEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT users.email FROM users WHERE email = '" + email + "'");
-			
+			PreparedStatement ps = conn.prepareStatement("SELECT users.email FROM users WHERE email = ?");
+			ps.setString(1, email);
 			ResultSet result = ps.executeQuery();
 			
-			if(!result.isBeforeFirst()) { /*Nessuna corrispondenza trovata nel DB, restituisco true*/
+			if(!result.isBeforeFirst()) { /*Nessuna corrispondenza trovata nel DB, restituisco false*/
 				conn.close();
-				return true;
+				return false;
 			}
 		}
 		catch(SQLException e) {
 			System.out.println("Errore Database: " + e.getMessage());
 		}
 		
-		return false;
+		return true;
 	}
 	
-	public static boolean checkCodiceFiscale(String codice_fiscale) {
+	public boolean checkExistingCodiceFiscale(String codice_fiscale) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT users.codice_fiscale FROM users WHERE codice_fiscale = '" + codice_fiscale + "'");
-			
+			PreparedStatement ps = conn.prepareStatement("SELECT users.codice_fiscale FROM users WHERE codice_fiscale = ?");
+			ps.setString(1, codice_fiscale);
 			ResultSet result = ps.executeQuery();
 			
-			if(!result.isBeforeFirst()) { /*Nessuna corrispondenza trovata nel DB, restituisco true*/
+			if(!result.isBeforeFirst()) { /*Nessuna corrispondenza trovata nel DB, restituisco false*/
 				conn.close();
-				return true;
+				return false;
 			}
 		}
 		catch(SQLException e) {
 			System.out.println("Errore Database: " + e.getMessage());
 		}
 		
-		return false;
+		return true;
 	}
 	
 	public UsersBean getUserByEmail(String user_email) {

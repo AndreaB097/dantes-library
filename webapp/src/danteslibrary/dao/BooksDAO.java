@@ -52,7 +52,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM books WHERE books.book_id = ?");
 			ps.setString(1, id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet ï¿½ vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			BooksBean book = new BooksBean();
@@ -88,7 +88,7 @@ public ArrayList<BooksBean> getAllBooks() {
 					+ "WHERE genres.genre_name = books_genres.genre_name AND book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet ï¿½ vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> genres = new ArrayList<String>();
@@ -115,7 +115,7 @@ public ArrayList<BooksBean> getAllBooks() {
 					+ "WHERE authors.author_id = books_authors.author_id AND book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet ï¿½ vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> authors = new ArrayList<String>();
@@ -134,19 +134,43 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;	
 	}
 	
-	public JSONArray retrieveAllGenres() {
+	public JSONArray retrieveJSONAllGenres() {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres;");
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet Ã¨ vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			JSONArray genres = new JSONArray();
 			
 			while(result.next()) {
 				genres.put(result.getString("genre_name"));
+			}
+
+			conn.close();
+			return genres;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo retrieveJSONAllGenres: " + e.getMessage());
+			return null;	
+		}
+	}
+	
+	public ArrayList<String> retrieveAllGenres() {
+		
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres;");
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Se il ResultSet Ã¨ vuoto, allora la query non ha prodotto risultati*/
+				return null;
+			
+			ArrayList<String> genres = new ArrayList<String>();
+			
+			while(result.next()) {
+				genres.add(result.getString("genre_name"));
 			}
 
 			conn.close();
@@ -373,7 +397,7 @@ public ArrayList<BooksBean> getAllBooks() {
 					+ "WHERE books.book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet ï¿½ vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			result.first();
 			String cover = result.getString("cover");
@@ -381,9 +405,41 @@ public ArrayList<BooksBean> getAllBooks() {
 			return cover;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database metodo retrieveBookGenres: " + e.getMessage());
+			System.out.println("Errore Database metodo getBookCoverById: " + e.getMessage());
 			return null;
 		}	
+	}
+	
+	public int newGenre(String genre_name) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO genres(genre_name) VALUES (?)");
+			ps.setString(1, genre_name);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo : " + e.getMessage());
+			return result;
+		}
+	}
+	
+	public int removeGenre(String genre_name) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM genres WHERE genre_name = ?");
+			ps.setString(1, genre_name);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo removeGenre: " + e.getMessage());
+		}
+		return result;
 	}
 	
 }

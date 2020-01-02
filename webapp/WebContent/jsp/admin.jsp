@@ -159,7 +159,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 
 			<button id="btn-book">Aggiungi Libro</button>     
 			<button id="btn-genre">Aggiungi Genere</button>
-			<button id="btn-delgenre">Cancella Genere</button>
+			<button id="btn-delgenre" onClick="window.location = 'admin?books&all_genres'">Cancella Genere</button>
 
 			<%if(request.getAttribute("info_book") != null) { %>
 				<div class="info"><%=request.getAttribute("info_book") %></div>
@@ -168,26 +168,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
 
-			<script>
-			$(document).ready(function() {
-			    $('.dropdownFilters').selectmenu();
-			});
-			
-			$(document).ready(function() {
-				$("#new-book-form").hide();
-				$("#update-book-form").hide();
-				$("#btn-book").click(function() {
-					$("#new-book-form").slideDown();
-					$("#update-book-form").hide();
-					$("#all-books-div").hide();
-				});
-				$("#btn-all-books").click(function() {
-					$("#all-books-div").slideDown();
-					$("#new-book-form").hide();
-					$("#update-book-form").hide();
-				});
-			});	
-			</script>
 			
 			<%if(request.getAttribute("books") != null) { %>
 			<div id="all-books-div" class="overflow-container">
@@ -257,8 +237,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<script>
 			$(document).ready(function() {
 				$("#update-book-form").slideDown();
-				$("#new-book-form").hide();
-				$("#all-books-div").hide();
 			});
 			</script>
 			<form id="update-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
@@ -277,13 +255,15 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<label for="authors">Autori</label>
 				<input id="authors" type="hidden" value="" name="authors" />
 				<select id="update-authors-select" multiple="multiple" style="width: 50%;">
-				<%for(String author : book.getAuthors()) {%>
+			  <%if(book.getAuthors() != null && !book.getAuthors().isEmpty())
+				for(String author : book.getAuthors()) {%>
 					<option value="<%=author %>" selected><%=author %></option>
 				<%} %>
 				</select>
 				<br/><br/>
 				<script>
 					$(document).ready(function() {
+						$('#authors').val($('#update-authors-select').val());
 					    $('#update-authors-select').select2({
 					    	tags: true
 					    });
@@ -299,12 +279,13 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<label for="genres">Genere</label>
 				<input id="genres" type="hidden" value="" name="genres" />				
 				<select id="update-genres-select" multiple="multiple" style="width: 50%;">
-				<%for(String genres : book.getGenres()) {%>
+			  <%if(book.getGenres() != null && !book.getGenres().isEmpty())
+				for(String genres : book.getGenres()) {%>
 					<option value="<%=genres %>" selected><%=genres %></option>
 				<%} %>
 				</select>
 				<script>
-					$.post("admin?all_genres", function(all_genres) {
+					$.post("admin?json_genres", function(all_genres) {
 						for(var i in all_genres) {
 							if($("#update-genres-select option[value=\"" + all_genres[i] + "\"]").length <= 0)
 								$("#update-genres-select").append("<option value='" + all_genres[i] + "'>"+ all_genres[i]+"</option>");
@@ -314,6 +295,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<br/><br/>
 				<script>
 					$(document).ready(function() {
+						$('#genres').val($('#update-genres-select').val());
 					    $('#update-genres-select').select2();
 					    $('#update-genres-select').change(function() {
 					    	$('#genres').val($('#update-genres-select').val());
@@ -332,6 +314,30 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					});
 				</script>
 			</form>
+			<%}
+			else if(request.getParameter("all_genres") != null) {%>
+			<div id="all-genres-div" class="overflow-container">
+			<table>
+				<tr>
+					<th>Nome Genere</th>
+					<th></th>
+				</tr>
+				<%
+				@SuppressWarnings("unchecked")
+				ArrayList<String> genres = (ArrayList<String>) request.getAttribute("all_genres");
+				for(String genre : genres) { %>
+					<tr>
+						<td><%=genre %></td>
+						<td>
+							<form action="admin?books" method="post">
+								<input type="hidden" name="remove_genre" value="<%=genre%>">
+								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+							</form>
+						</td>
+					</tr>
+				<%} %>
+			</table>
+			</div>
 			<%} %>
 
 			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
@@ -370,7 +376,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<select id="genres-select" multiple="multiple" style="width: 50%;">
 				</select>
 				<script>
-					$.post("admin?all_genres", function(genres) {
+					$.post("admin?json_genres", function(genres) {
 						for(i in genres) {
 							$("#genres-select").append("<option value='" + genres[i] + "'>"+genres[i]+"</option>");
 						}
@@ -389,10 +395,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 				<script>
-					$(".save").click(function() {
-						$('#authors').val($('#authors-select').val());
-						$('#genres').val($('#genres-select').val());
-					});
 					$(".cancel").click(function() {
 						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
 					});
@@ -424,7 +426,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					var errors_div = document.getElementById("error-list");
 				}
 				var txt = "<ul>";
-				$("#books-section h3").before(errors_div);
+				$("#books-section h2").after(errors_div);
 				errors_div.className = "error";
 				errors.forEach(showErrors);
 				errors_div.innerHTML = txt;
@@ -477,6 +479,46 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		});
 		</script>
 		
+		<!-- Aggiungi Genere -->
+		<form id="new-genre-form" method="post" class="overflow-container">
+			<h3>Aggiunta Genere</h3>
+			<label for="genre">Nome del nuovo genere</label>
+			<input id="genre" name="genre_name" type="text" required>
+			<button type="submit" class="save" formaction="admin?books&new_genre"><i class="fas fa-plus fa-lg"></i> Aggiungi genere</button>
+		</form>
+			<script>
+			$(document).ready(function() {
+			    $('.dropdownFilters').selectmenu();
+			});
+			$("#new-book-form").hide();
+			$("#new-genre-form").hide();
+			$("#update-book-form").hide();
+			$("#new-genre-form").hide();
+			$(document).ready(function() {
+				$("#btn-book").click(function() {
+					$("#update-book-form").remove(); /*remove, altrimenti la funzione validateBook ottiene i dati di update-book-form
+					nel caso in cui si cerca prima di modificare un libro e subito dopo aggiungerlo (senza ricaricare la pagina). */
+					$("#new-genre-form").hide();
+					$("#all-books-div").hide();
+					$("#all-genres-div").hide();
+					$("#new-book-form").slideDown();
+				});
+				$("#btn-all-books").click(function() {
+					$("#new-book-form").hide();
+					$("#new-genre-form").hide();
+					$("#update-book-form").hide();
+					$("#all-genres-div").hide();
+					$("#all-books-div").slideDown();
+				});
+				$("#btn-genre").click(function() {
+					$("#update-book-form").hide();
+					$("#new-book-form").hide();
+					$("#all-books-div").hide();
+					$("#all-genres-div").hide();
+					$("#new-genre-form").slideDown();
+				});
+			});	
+			</script>
 		</div> <!-- fine section-container sezione Libri -->
 		<%} %>
 		
@@ -505,6 +547,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			
 			<%if(request.getAttribute("info_card") != null) { %>
 				<div class="info"><%=request.getAttribute("info_card") %></div>
+			<%}
+			  else if(request.getAttribute("error") != null) { %>
+			  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
       
       <script>
@@ -521,9 +566,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$("#all-cards-div").slideDown();
 					$("#new-card-form").hide();
 				});
-				<%if(request.getAttribute("error") != null) { %>
-					$(".overflow-container").slideDown();
-				<% } %>
 			});	
 			</script> 
 			
@@ -554,7 +596,14 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					 <%} %>
 						<td><%=card.getCodice_fiscale() %></td>
 						<td><%=card.getCard_id() %></td>
-						<td><%=card.isAssociated() %></td>
+						<td>
+						<%if(card.isAssociated()) { %>
+							<i class="fas fa-check-circle fa-lg" style="color: #50ebaf"></i>
+						<%}
+						else {%>
+							<i class="fas fa-times-circle fa-lg" style="color: #eb5050"></i>
+						<%} %>
+						</td>
 						<td>
 							<form action="admin?cards" method="post">
 								<input type="hidden" name="remove_card" value="<%=card.getCard_id()%>">
@@ -574,10 +623,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<label for="card_id">Codice tessera (facoltativo)</label>
 					<input id="card_id" name="card_id" type="text">
 					<label for="associated" style="display: inline;">Associata:</label>
-					<input id="associated" type="checkbox" name="associated" value="associated"><br/><br/>
+					<input id="associated" type="checkbox" name="associated"><br/><br/>
 					<button type="submit" class="save" formaction="admin?cards&new_card"><i class="fas fa-plus fa-lg"></i> Aggiungi Tessera</button>
 					<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
-		</form>
+			</form>
 		
 		<script>
 			$("#error-list").hide();

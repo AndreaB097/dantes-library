@@ -19,27 +19,32 @@ public class RegistrationServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
-		/*Controllo Utente gi� autenticato*/
+		/*Controllo Utente già autenticato*/
 		if(session.getAttribute("user") != null) {
 			response.sendRedirect("index.jsp");
 			return;
 		}
 		
-		/*Controllo se l'email e' gia' presente nel sistema*/
+		/*Controllo se l'email e' gia' presente nel sistema.
+		 * Se mi viene restituito true, vuol dire che l'utente non può 
+		 * registrarsi*/
+		UsersDAO dao = new UsersDAO();
 		String email = request.getParameter("email");
-		if(UsersDAO.checkEmail(email) == false) {
+		if(dao.checkExistingEmail(email) == true) {
 			response.setContentType("application/json");
 			PrintWriter pw = response.getWriter();
-			pw.write("false");
+			pw.write("true");
 			pw.close();
 			return;
 		}
-		/*Controllo se il codice fiscale e' gia' presente nel sistema*/
+		/*Controllo se il codice fiscale e' gia' presente nel sistema.
+		 * Se mi viene restituito true, vuol dire che l'utente non può 
+		 * registrarsi*/
 		String codice_fiscale = request.getParameter("codice_fiscale");
-		if(UsersDAO.checkCodiceFiscale(codice_fiscale) == false) {
+		if(dao.checkExistingCodiceFiscale(codice_fiscale) == true) {
 			response.setContentType("application/json");
 			PrintWriter pw = response.getWriter();
-			pw.write("false");
+			pw.write("true");
 			pw.close();
 			return;
 		}

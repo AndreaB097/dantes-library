@@ -38,8 +38,7 @@
 				if(card.isAssociated()) { %>
 					Stato: <i class="fas fa-check-circle fa-lg" style="color: #50ebaf"></i>
 				<%}
-				else {
-				System.out.println(card.isAssociated());%>				
+				else {%>				
 					Stato: <i class="fas fa-times-circle fa-lg" style="color: #eb5050"></i>
 					<br/>
 					<br/>
