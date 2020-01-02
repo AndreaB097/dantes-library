@@ -96,6 +96,6 @@ create table if not exists bookings(
 
 create table if not exists library(
 	name varchar(100) primary key default "Dante's Library",
-    logo varchar(191) not null default "./images/logo.png",
+    logo varchar(191) not null default "./images/default_logo.png",
     contacts text
 );

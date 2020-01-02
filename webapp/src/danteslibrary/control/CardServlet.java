@@ -45,10 +45,11 @@ public class CardServlet extends HttpServlet {
 			UsersBean user = (UsersBean) session.getAttribute("user_incomplete");
 			/**NUOVA TESSERA**/
 			if(request.getParameter("new_card") != null) {
+				CardsDAO cdao = new CardsDAO();
 				/*Controllo che l'utente non abbia alcuna tessera gia' associata
 				 *al suo codice fiscale (null = non ha tessera, altrimenti si)*/
-				if(CardsDAO.getCardByCodice_fiscale(user.getCodice_fiscale()) == null) {
-					int card_id = CardsDAO.newCard(user.getCodice_fiscale(), true);
+				if(cdao.getCardByCodice_fiscale(user.getCodice_fiscale()) == null) {
+					int card_id = cdao.newCard(user.getCodice_fiscale(), true);
 					if(card_id == 0) {
 						request.setAttribute("error", "Esiste già una tessera associata al codice fiscale: "
 								+ user.getCodice_fiscale());
@@ -56,10 +57,11 @@ public class CardServlet extends HttpServlet {
 						return;
 					}
 					else {
-						UsersDAO.register(user);
+						UsersDAO udao = new UsersDAO();
+						udao.register(user);
 						/*Registrazione completata. Autenticazione*/
 						session.removeAttribute("user_incomplete");
-						session.setAttribute("user", UsersDAO.login(user.getEmail(), user.getPassword()));
+						session.setAttribute("user", udao.login(user.getEmail(), user.getPassword()));
 						session.setAttribute("card_date", LocalDate.now().plusDays(GIORNI_TESSERA).format(DateTimeFormatter.ofPattern("d MMMM Y", Locale.ITALY)));
 					}
 				}
@@ -75,17 +77,19 @@ public class CardServlet extends HttpServlet {
 			/**TESSERA GIA' IN POSSESSO**/
 			else if(request.getParameter("card_id") != null && !request.getParameter("card_id").equals("")) {
 				try {
+					CardsDAO cdao = new CardsDAO();
 					int card_id = Integer.parseInt(request.getParameter("card_id"));
-					CardsBean card = CardsDAO.getCardById(card_id);
+					CardsBean card = cdao.getCardById(card_id);
 					/*Controllo se esiste la tessera, che risulti NON ancora associata
 					 * e che abbia lo stesso codice fiscale dell'utente che la sta associando*/
 					if(card != null && !card.isAssociated() && card.getCodice_fiscale().equals(user.getCodice_fiscale())) {
-						UsersDAO.register(user);
-						CardsDAO.associateCard(card_id);
+						UsersDAO udao = new UsersDAO();
+						udao.register(user);
+						cdao.associateCard(card_id);
 						/*Registrazione completata. Autenticazione*/
 						session.removeAttribute("user_incomplete");
-						session.setAttribute("user", UsersDAO.login(user.getEmail(), user.getPassword()));
-						session.setAttribute("card", CardsDAO.getCardById(card_id));
+						session.setAttribute("user", udao.login(user.getEmail(), user.getPassword()));
+						session.setAttribute("card", cdao.getCardById(card_id));
 					}
 					else {
 						request.setAttribute("error", "Questa tessera non esiste oppure � gi� associata a qualche cliente."

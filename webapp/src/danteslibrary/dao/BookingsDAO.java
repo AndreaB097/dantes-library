@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import danteslibrary.util.DBConnection;
 import danteslibrary.model.BookingsBean;
-import danteslibrary.model.ManagersBean;
 
 import java.util.ArrayList;
 
@@ -126,7 +125,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 		return result;
 	}
 	
-	public static ArrayList<BookingsBean> getUserBookings(String email) {
+	public ArrayList<BookingsBean> getUserBookings(String email) {
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
 			Connection conn = DBConnection.getConnection();

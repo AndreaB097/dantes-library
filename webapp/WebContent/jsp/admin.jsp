@@ -51,7 +51,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%}
 			if(roles.contains("Gestore Biblioteca")) {%>
 				<section id="sidebar-managers"><i class="fas fa-users-cog fa-lg"></i>&nbsp;&nbsp;Gestori</section>
-				<section id="sidebar-library"><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;Gestore biblioteca</section>
+				<section id="sidebar-library"><i class="fas fa-university fa-lg"></i>&nbsp;&nbsp;Biblioteca</section>
 			<%} %>
 		</div>
 		
@@ -70,7 +70,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%}
 			if(roles.contains("Gestore Biblioteca")) {%>
 				<section id="sidebar-managers"><i class="fas fa-users-cog fa-lg"></i><br><p>Gestori</p></section>
-				<section id="sidebar-library"><i class="fas fa-user-shield fa-lg"></i><br>Gestore biblioteca</section>
+				<section id="sidebar-library"><i class="fas fa-university fa-lg"></i><br>Biblioteca</section>
 			<%} %>
 		</div>
 		
@@ -223,8 +223,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							<form action="admin?books" method="post">
 								<input type="hidden" name="remove_book" value="<%=book.getBook_id()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
-								</td>
-							</form>
+							</form>	
+						</td>
 					</tr>
 			<%  } %>
 			</table>
@@ -240,12 +240,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</script>
 			<form id="update-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
 				<h3>Modifica Libro</h3>
-				<div style="float:left" id="image-preview">
+				<div style="float:left" id="update-book-image-preview" class="image-preview">
 					<img src="<%=book.getCover() %>" alt="Nessun immagine">
 				</div>
 				
-				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
-				<input id="image" type="file" name="file" accept=".jpg, .jpeg, .png">
+				<label id="btn-upload" for="update-book-image"><i class="far fa-images"></i></label>
+				<input id="update-book-image" class="image" type="file" name="file" accept=".jpg, .jpeg, .png">
 				<label for="title">Titolo</label>
 				<input id="title" name="title" type="text" value="<%=book.getTitle() %>">
 				<label for="description">Descrizione</label>
@@ -308,9 +308,34 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<button type="submit" class="save" formaction="admin?books&save_book"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 				<script>
-					$(".cancel").click(function() {
-						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
-					});
+                    $(".cancel").click(function() {
+                        $("#update-book-image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
+                        $("#update-book-image").val('');
+                    });
+                </script>
+				<script>
+				/*Script per il caricamento delle immagini e preview*/
+				var updated_image = document.getElementById("update-book-image");
+				updated_image.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
+				$("#update-book-image").change(function() {
+					if(updated_image.files[0].type !== 'image/jpeg' && updated_image.files[0].type !== 'image/jpg' && updated_image.files[0].type !== 'image/png') {
+						return false;
+					}
+					else if(updated_image.files[0].size <= 0 || updated_image.files[0].size > 1048576 /*1MB*/) {
+						return false;
+					}
+					var img = new Image();
+					var canvas = document.createElement("canvas");
+					canvas.width = 1000;
+					canvas.height = 1000;
+					img.onload = function() {
+						var ctx = canvas.getContext("2d");
+						ctx.drawImage(img, 0, 0, 1000, 1000);
+					};
+					img.src = URL.createObjectURL(updated_image.files[0]);
+					$("#update-book-image-preview").html(canvas);
+					return true;
+				});
 				</script>
 			</form>
 			<%}
@@ -341,11 +366,11 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 
 			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
 				<h3>Inserimento Libro</h3>
-				<div style="float:left" id="image-preview">
+				<div style="float:left" id="new-book-image-preview" class="image-preview">
 					<img src="images/no_image.png" alt="Nessun immagine">
 				</div>
-				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
-				<input id="image" type="file" name="file" accept=".jpg, .jpeg, .png">
+				<label id="btn-upload" for="new-book-image"><i class="far fa-images"></i></label>
+				<input id="new-book-image" class="image" type="file" name="file" accept=".jpg, .jpeg, .png">
 				<label for="title">Titolo</label>
 				<input id="title" name="title" type="text">
 				<label for="description">Descrizione</label>
@@ -394,12 +419,36 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 				<script>
-					$(".cancel").click(function() {
-						$("#image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
-					});
+                    $(".cancel").click(function() {
+                        $("#new-book-image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
+                    });
+                </script>
+				<script>
+				/*Script per il caricamento delle immagini e preview*/
+				var book_image = document.getElementById("new-book-image");
+				
+				book_image.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
+				$("#new-book-image").change(function() {
+					if(book_image.files[0].type !== 'image/jpeg' && book_image.files[0].type !== 'image/jpg' && book_image.files[0].type !== 'image/png') {
+						return false;
+					}
+					else if(book_image.files[0].size <= 0 || book_image.files[0].size > 1048576 /*1MB*/) {
+						return false;
+					}
+					var img = new Image();
+					var canvas = document.createElement("canvas");
+					canvas.width = 1000;
+					canvas.height = 1000;
+					img.onload = function() {
+						var ctx = canvas.getContext("2d");
+						ctx.drawImage(img, 0, 0, 1000, 1000);
+					};
+					img.src = URL.createObjectURL(book_image.files[0]);
+					$("#new-book-image-preview").html(canvas);
+					return true;
+				});
 				</script>
 			</form>
-
 		<script>
 		$("#error-list").hide();
 		var errors = [];
@@ -448,36 +497,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		}
 		</script>
 		
-		<script>
-		/*Script per il caricamento delle immagini e preview*/
-		var file = document.getElementById("image");
-		file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
-		function validateImage() {
-			if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
-				return false;
-			}
-			else if(file.files[0].size <= 0 || file.files[0].size > 1048576 /*1MB*/) {
-				return false;
-			}
-			return true;
-		}
-		$("#image").change(function() {
-			if(!validateImage())
-				return false;
-			var img = new Image();
-			var canvas = document.createElement("canvas");
-			canvas.width = 1000;
-			canvas.height = 1000;
-			img.onload = function() {
-				var ctx = canvas.getContext("2d");
-				ctx.drawImage(img, 0, 0, 1000, 1000);
-			};
-			img.src = URL.createObjectURL(file.files[0]);
-			$("#image-preview").html(canvas);
-			return true;
-		});
-		</script>
-		
 		<!-- Aggiungi Genere -->
 		<form id="new-genre-form" method="post" class="overflow-container">
 			<h3>Aggiunta Genere</h3>
@@ -485,6 +504,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<input id="genre" name="genre_name" type="text" required>
 			<button type="submit" class="save" formaction="admin?books&new_genre"><i class="fas fa-plus fa-lg"></i> Aggiungi genere</button>
 		</form>
+		
 			<script>
 			$(document).ready(function() {
 			    $('.dropdownFilters').selectmenu();
@@ -550,23 +570,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			  else if(request.getAttribute("error") != null) { %>
 			  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
-      
-      <script>
-			$(document).ready(function() {
-			    $('.dropdownFilters').selectmenu();
-			});
-			$(document).ready(function() {
-				$("#new-card-form").hide();
-				$("#btn-card").click(function() {
-					$("#new-card-form").slideDown();
-					$("#all-cards-div").hide();
-				});
-				$("#show-all-btn").click(function() {
-					$("#all-cards-div").slideDown();
-					$("#new-card-form").hide();
-				});
-			});	
-			</script> 
 			
 			<%if(request.getAttribute("cards") != null) { %>
 			<div id="all-cards-div" class="overflow-container">
@@ -607,8 +610,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							<form action="admin?cards" method="post">
 								<input type="hidden" name="remove_card" value="<%=card.getCard_id()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+							</form>
 						</td>
-						</form>
 					</tr>
 			<%  } %>
 			</table>
@@ -670,6 +673,22 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				return true;
 			}
 		</script>
+		<script>
+		$(document).ready(function() {
+		    $('.dropdownFilters').selectmenu();
+		});
+		$("#new-card-form").hide();
+		$(document).ready(function() {
+			$("#btn-card").click(function() {
+				$("#new-card-form").slideDown();
+				$("#all-cards-div").hide();
+			});
+			$("#show-all-btn").click(function() {
+				$("#all-cards-div").slideDown();
+				$("#new-card-form").hide();
+			});
+		});	
+		</script> 
 		</div> <!-- fine section-container sezione Tessere -->
 		<%} %>
 		
@@ -698,26 +717,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
 			<button id="btn-booking">Aggiungi Prenotazione</button> 
 			
-      <%if(request.getAttribute("info_booking") != null) { %>
+      		<%if(request.getAttribute("info_booking") != null) { %>
 				<div class="info"><%=request.getAttribute("info_booking") %></div>
+			<%}
+      		else if(request.getAttribute("error") != null) { %>
+		  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
-			
-			<script>
-			$(document).ready(function() {
-			    $('.dropdownFilters').selectmenu();
-			});
-			$(document).ready(function() {
-				$("#new-booking-form").hide();
-				$("#btn-booking").click(function() {
-					$("#new-booking-form").slideDown();
-					$("#all-bookings-div").hide();
-				});
-				$("#show-all-btn").click(function() {
-					$("#all-bookings-div").slideDown();
-					$("#new-booking-form").hide();
-				});
-			});	
-			</script>
 			
 			<%if(request.getAttribute("bookings") != null) { %>
 			<div id="all-bookings-div" class="overflow-container">
@@ -754,8 +759,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							<form action="admin?bookings" method="post">
 								<input type="hidden" name="remove_booking" value="<%=booking.getBooking_id()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
-						</td>
 							</form>
+						</td>
+							
 					</tr>
 			<%  } %>
 			 </table>
@@ -787,8 +793,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<input id="start_date"   type="text" value="<%=booking.getStart_date() %>" readonly> 
 				<label for="end_date">Data fine</label>
 				<input id="end_date" type="text" value="<%=booking.getEnd_date() %>" readonly> 
-					<select id="state" name="state">
 					<label for="state">Stato</label>
+					<select id="state" name="state">
 						<option value="Non ancora ritirato">Non ancora ritirato</option>
 						<option value="Ritirato">Ritirato</option>
 						<option value="Riconsegnato">Riconsegnato</option>
@@ -873,7 +879,22 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			return true;
 		}
 		</script>
-
+		<script>
+		$(document).ready(function() {
+		    $('.dropdownFilters').selectmenu();
+		});
+		$("#new-booking-form").hide();
+		$(document).ready(function() {
+			$("#btn-booking").click(function() {
+				$("#new-booking-form").slideDown();
+				$("#all-bookings-div").hide();
+			});
+			$("#show-all-btn").click(function() {
+				$("#all-bookings-div").slideDown();
+				$("#new-booking-form").hide();
+			});
+		});	
+		</script>
 		</div> <!-- fine section-container sezione Prenotazioni -->
 		<%} %>
 		
@@ -898,27 +919,13 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
 			<button id="btn-manager">Aggiungi Gestore</button> 
 			
-      <%if(request.getAttribute("info_manager") != null) { %>
+      		<%if(request.getAttribute("info_manager") != null) { %>
 				<div class="info"><%=request.getAttribute("info_manager") %></div>
+			<%}
+      		else if(request.getAttribute("error") != null) { %>
+		  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
 			
-			<script>
-			$(document).ready(function() {
-			    $('.dropdownFilters').selectmenu();
-			});
-			$(document).ready(function() {
-				$("#new-manager-form").hide();
-				$("#btn-manager").click(function() {
-					$("#new-manager-form").slideDown();
-					$("#all-managers-div").hide();
-				});
-				$("#show-all-btn").click(function() {
-					$("#all-managers-div").slideDown();
-					$("#new-manager-form").hide();
-				});
-			});	
-			</script>
-
 			<%if(request.getAttribute("managers") != null) { %>
 			<div id="all-managers-div" class="overflow-container">
 			<table>	
@@ -1066,67 +1073,135 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 		</form>
 		
-		<script>
-      $("#error-list").hide();
-      var errors = [];
-      function validateManager() {
-        var email = document.getElementById("email").value;
-        var name = document.getElementById("name").value;
-        var surname = document.getElementById("surname").value;
-        var password = document.getElementById("password").value;
-        var repeat_password = document.getElementById("repeat_password").value;
-        var address = document.getElementById("address").value;
-        var phone = document.getElementById("phone").value;
+	<script>
+    $("#error-list").hide();
+    var errors = [];
+    function validateManager() {
+      var email = document.getElementById("email").value;
+      var name = document.getElementById("name").value;
+      var surname = document.getElementById("surname").value;
+      var password = document.getElementById("password").value;
+      var repeat_password = document.getElementById("repeat_password").value;
+      var address = document.getElementById("address").value;
+      var phone = document.getElementById("phone").value;
 
-        //TODO fare controllo anche sui checkbox
+      //TODO fare controllo anche sui checkbox
 
-        if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
-          errors.push("Non tutti i campi sono stati compilati.");
-        }
-
-        if(password != repeat_password){
-          errors.push("Le password non corrispondono");
-        }
-
-
-        if(errors.length != 0) {
-          if(!document.getElementById("error-list")) {
-            var errors_div = document.createElement("div");
-            errors_div.setAttribute("id", "error-list");
-            errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
-          }
-          else {
-            var errors_div = document.getElementById("error-list");
-          }
-          var txt = "<ul>";
-          $("#managers-section h3").before(errors_div);
-          errors_div.className = "error";
-          errors.forEach(showErrors);
-          errors_div.innerHTML = txt;
-
-          function showErrors(value, index, array) {
-            txt = txt + "<li>" + value + "</li>";
-          }
-
-          errors_div.innerHTML = txt + "</ul>";
-          $(errors_div).fadeIn(300);
-          errors = [];
-          errors_div.focus();
-          $("#error-list").fadeOut(2500);
-          return false;
-        }
-
-        $("#error-list").hide();
-        return true;
+      if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
+        errors.push("Non tutti i campi sono stati compilati.");
       }
-     </script>
-        
+
+      if(password != repeat_password){
+        errors.push("Le password non corrispondono");
+      }
+
+
+      if(errors.length != 0) {
+        if(!document.getElementById("error-list")) {
+          var errors_div = document.createElement("div");
+          errors_div.setAttribute("id", "error-list");
+          errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
+        }
+        else {
+          var errors_div = document.getElementById("error-list");
+        }
+        var txt = "<ul>";
+        $("#managers-section h3").before(errors_div);
+        errors_div.className = "error";
+        errors.forEach(showErrors);
+        errors_div.innerHTML = txt;
+
+        function showErrors(value, index, array) {
+          txt = txt + "<li>" + value + "</li>";
+        }
+
+        errors_div.innerHTML = txt + "</ul>";
+        $(errors_div).fadeIn(300);
+        errors = [];
+        errors_div.focus();
+        $("#error-list").fadeOut(2500);
+        return false;
+      }
+
+      $("#error-list").hide();
+      return true;
+    }
+    </script>
+    <script>
+	$(document).ready(function() {
+	    $('.dropdownFilters').selectmenu();
+	});
+	$("#new-manager-form").hide();
+	$(document).ready(function() {
+		$("#btn-manager").click(function() {
+			$("#new-manager-form").slideDown();
+			$("#all-managers-div").hide();
+		});
+		$("#show-all-btn").click(function() {
+			$("#all-managers-div").slideDown();
+			$("#new-manager-form").hide();
+		});
+	});	
+	</script>   
     </div> <!-- fine section-container sezione Gestori -->
 		
-		<!-- Sezione Gestore biblioteca -->
+		<!-- Sezione Biblioteca -->
 		<div id="library-section" class="section-container">
-			<h2>Sezione Gestore biblioteca</h2>
-		</div>
+			<h2>Sezione Biblioteca</h2>
+			
+			<%if(request.getAttribute("info_library") != null) { %>
+				<div class="info"><%=request.getAttribute("info_library") %></div>
+			<%}
+      		else if(request.getAttribute("error") != null) { %>
+		  	<div class="error"><%=request.getAttribute("error") %></div>
+			<%} %>
+			
+			<form method="post" enctype="multipart/form-data">
+				<label for="image-preview">Logo Biblioteca</label>
+				<div style="float:left" id="image-preview" class="image-preview">
+						<img src="${applicationScope.library.logo}" alt="Nessun immagine">
+				</div>
+				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
+				<input id="image" class="image" type="file" name="file" accept=".jpg, .jpeg, .png">
+				<label for="name">Nome biblioteca</label>
+				<input id="name" name="name" type="text" value="${applicationScope.library.name}">
+				<label for="contacts">Contatti</label>
+				<textarea id="contacts" name="contacts" rows="6" cols="60">${applicationScope.library.contacts}</textarea>
+				<button type="submit" class="save" formaction="admin?library&save_library"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+				<script>
+                    $(".cancel").click(function() {
+                        $("#image-preview").html('<img src="images/logo.png" alt="Nessun immagine">');
+                    });
+                </script>
+				<script>
+				/*Script per il caricamento delle immagini e preview*/
+				var file = document.getElementById("image");
+				
+				file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
+				$("#image").change(function() {
+					console.log("biblioteca: " + file.files[0]);
+					if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
+						return false;
+					}
+					else if(file.files[0].size <= 0 || file.files[0].size > 1048576 /*1MB*/) {
+						return false;
+					}
+					var img = new Image();
+					var canvas = document.createElement("canvas");
+					canvas.width = 1000;
+					canvas.height = 1000;
+					img.onload = function() {
+						var ctx = canvas.getContext("2d");
+						ctx.drawImage(img, 0, 0, 1000, 1000);
+					};
+					img.src = URL.createObjectURL(file.files[0]);
+					$("#image-preview").html(canvas);
+					return true;
+				});
+				</script>
+			</form>
+		</div> <!-- fine section-container sezione Biblioteca -->
 	<%} %>
 		
     
@@ -1154,7 +1229,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			$("#managers-section").show();
 			$(".sidebar #sidebar-managers").addClass("active");
 			$(".sidebar-responsive #managers-section").addClass("active");
-			<%} else if(request.getParameter("library_manager") != null) { %>
+			<%} else if(request.getParameter("library") != null) { %>
 			$("#library-section").show();
 			$(".sidebar #sidebar-library").addClass("active");
 			$(".sidebar-responsive #sidebar-library").addClass("active"); 

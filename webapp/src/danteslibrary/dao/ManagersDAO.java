@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 
@@ -177,7 +176,7 @@ public class ManagersDAO {
 }
 	
 	
-	public static void newManager(ManagersBean manager) {
+	public void newManager(ManagersBean manager) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			String query = "INSERT INTO managers(email, password, name, surname, address, phone) "

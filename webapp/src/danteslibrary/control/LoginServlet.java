@@ -25,7 +25,7 @@ public class LoginServlet extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		
-		/*Controllo Utente già autenticato. */
+		/*Controllo Utente giï¿½ autenticato. */
 		if(session.getAttribute("user") != null) {
 			response.sendRedirect("profile.jsp");
 			return;
@@ -38,12 +38,15 @@ public class LoginServlet extends HttpServlet {
 		
 		/*Autenticazione*/
 		else {
-			UsersBean user = UsersDAO.login(email, password);		
+			UsersDAO udao = new UsersDAO();
+			CardsDAO cdao = new CardsDAO();
+			BookingsDAO bdao = new BookingsDAO();
+			UsersBean user = udao.login(email, password);		
 			if(user != null) {
-				ArrayList<BookingsBean> bookings = BookingsDAO.getUserBookings(email);
+				ArrayList<BookingsBean> bookings = bdao.getUserBookings(email);
 				if(bookings != null)
 					session.setAttribute("bookings", bookings);
-				CardsBean card = CardsDAO.getCardByEmail(email);
+				CardsBean card = cdao.getCardByEmail(email);
 				if(card != null)
 					session.setAttribute("card", card);
 				session.setAttribute("user", user);

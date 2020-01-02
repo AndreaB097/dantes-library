@@ -104,13 +104,12 @@ public class ManagerServlet extends HttpServlet {
 					link = dao.getBookCoverById(Integer.parseInt(request.getParameter("book_id")));
 				else
 					link = null;
-				
 				/*Salvo la nuova immagine SOLO se l'admin ha cambiata, quindi
 				 * nel campo input ci sarà un'immagine con dimensione diversa da 0 byte */	
 				if(filePart.getSize() != 0) {
 					InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
-					String absolute_path = getServletContext().getRealPath("");
-					String path = "./images/covers/";
+					String absolute_path = System.getProperty("upload.location");
+					String path = "book_covers/";
 					File directory = new File(absolute_path + path);
 					if(!directory.exists()) {
 						directory.mkdirs();
@@ -123,10 +122,15 @@ public class ManagerServlet extends HttpServlet {
 					 * L'immagine precedente invece, viene cancellata.*/
 					if(request.getParameter("save_book") != null) {
 						String oldFileName = dao.getBookCoverById(Integer.parseInt(request.getParameter("book_id")));
-						Files.deleteIfExists(new File(absolute_path + oldFileName).toPath());
+						Files.deleteIfExists(new File(absolute_path + path + oldFileName.substring(oldFileName.lastIndexOf("/") + 1)).toPath());
 					}
 					Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-					link = path + randomFileName;
+					link = "./files/" + path + randomFileName;
+				}
+				/*Se non ricevo il filename dalla form, vuol dire che ho cliccato su
+				 * Pulisci Campi, e quindi rimuovo l'immagine mettendone una di default.*/
+				else if(filePart.getSubmittedFileName().equals("")) {
+					link = "./images/no_image.png";
 				}
 				try {
 					String title = request.getParameter("title");
@@ -169,7 +173,7 @@ public class ManagerServlet extends HttpServlet {
 					BooksBean book = new BooksBean();
 					/*Costruisco il libro (se lo sto modificando, allora mi serve l'id
 					 * del libro che sto modificando, altrimenti vuol dire che lo sto
-					 * aggiungendo, quindi l'id verra'� auto generato dal db)*/
+					 * aggiungendo, quindi l'id verra' auto generato dal db)*/
 					if(request.getParameter("save_book") != null) {
 						book.setBook_id(Integer.parseInt(request.getParameter("book_id")));
 					}
@@ -361,34 +365,34 @@ public class ManagerServlet extends HttpServlet {
           }
         dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
       }
-			else if(request.getParameter("all_bookings") != null) {
-				BookingsDAO dao = new BookingsDAO();
-				ArrayList<BookingsBean> bookings = dao.getAllBookings();
-				request.setAttribute("bookings", bookings);
-			}
-			else if(request.getParameter("edit_booking") != null) {
-				BookingsDAO dao = new BookingsDAO();
-				BookingsBean booking = dao.getBookingById(Integer.parseInt(request.getParameter("edit_booking")));
-				request.setAttribute("edit_booking", booking);
-				request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
-				return;
-			}
-			else if(request.getParameter("save_booking") != null) {
-				BookingsDAO dao = new BookingsDAO();
-				int booking_id= Integer.parseInt(request.getParameter("booking_id"));
-				String state = request.getParameter("state");
-				try {
-					dao.updateBooking(booking_id, state);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			else if(request.getParameter("remove_booking") != null) {
-				BookingsDAO dao = new BookingsDAO();
-				dao.removeBooking(request.getParameter("remove_booking"));
-				request.setAttribute("info_booking", "La prenotazione con codice: "
-				+ request.getParameter("remove_booking") + " è stata rimossa.");
-			}	
+      else if(request.getParameter("all_bookings") != null) {
+		BookingsDAO dao = new BookingsDAO();
+		ArrayList<BookingsBean> bookings = dao.getAllBookings();
+		request.setAttribute("bookings", bookings);
+      }
+      else if(request.getParameter("edit_booking") != null) {
+		BookingsDAO dao = new BookingsDAO();
+		BookingsBean booking = dao.getBookingById(Integer.parseInt(request.getParameter("edit_booking")));
+		request.setAttribute("edit_booking", booking);
+		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+		return;
+      }
+      else if(request.getParameter("save_booking") != null) {
+		BookingsDAO dao = new BookingsDAO();
+		int booking_id= Integer.parseInt(request.getParameter("booking_id"));
+		String state = request.getParameter("state");
+		try {
+			dao.updateBooking(booking_id, state);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+      }
+      else if(request.getParameter("remove_booking") != null) {
+		BookingsDAO dao = new BookingsDAO();
+		dao.removeBooking(request.getParameter("remove_booking"));
+		request.setAttribute("info_booking", "La prenotazione con codice: "
+		+ request.getParameter("remove_booking") + " è stata rimossa.");
+      }	
 				
       /*--Sezione Gestori--*/
       if(request.getParameter("keyword_manager") != null && request.getParameter("keyword_manager") != "") {
@@ -410,13 +414,13 @@ public class ManagerServlet extends HttpServlet {
           request.setAttribute("managers", managers);
         }
       }
-		else if(request.getParameter("edit_manager") != null) {
-			ManagersDAO dao = new ManagersDAO();
-			ManagersBean manager = dao.findManagerByEmail(request.getParameter("edit_manager"));
-			request.setAttribute("edit_manager", manager);
-			request.getRequestDispatcher("admin.jsp?managers").forward(request, response);
-			return;
-		}
+      else if(request.getParameter("edit_manager") != null) {
+		ManagersDAO dao = new ManagersDAO();
+		ManagersBean manager = dao.findManagerByEmail(request.getParameter("edit_manager"));
+		request.setAttribute("edit_manager", manager);
+		request.getRequestDispatcher("admin.jsp?managers").forward(request, response);
+		return;
+      }
       else if(request.getParameter("new_manager") != null || request.getParameter("save_manager") != null) {
         ManagersDAO dao = new ManagersDAO();
         ManagersBean manager = new ManagersBean();
@@ -440,7 +444,7 @@ public class ManagerServlet extends HttpServlet {
 			if (request.getParameter("library_manager") != null)
 				roles.add("Gestore Biblioteca");
 			manager.setEmail(manager_email);
-			manager.setPassword(password);
+			manager.setPassword(manager_password);
 			manager.setName(name);
 			manager.setSurname(surname);
 			manager.setPhone(phone);
@@ -464,22 +468,68 @@ public class ManagerServlet extends HttpServlet {
 			return;
 		}
       }
-			/* - Mostra tutti i gestori presenti nel database*/
-			else if(request.getParameter("all_managers") != null) {
-				ManagersDAO dao = new ManagersDAO();
-				ArrayList<ManagersBean> managers = dao.getAllManagers();
-				request.setAttribute("managers", managers);
+      /* - Mostra tutti i gestori presenti nel database*/
+      else if(request.getParameter("all_managers") != null) {
+		ManagersDAO dao = new ManagersDAO();
+		ArrayList<ManagersBean> managers = dao.getAllManagers();
+		request.setAttribute("managers", managers);
+      }
+      else if(request.getParameter("remove_manager") != null) {
+		ManagersDAO dao = new ManagersDAO();
+		dao.removeManager(request.getParameter("remove_manager"));
+		request.setAttribute("info_manager", "Il Gestore:  "
+		+ request.getParameter("remove_manager") + " è stato rimosso.");
+      }
+      
+      /*TODO -- Sezione Biblioteca -- */	
+      if(request.getParameter("save_library") != null) {
+    	  Part filePart = request.getPart("file"); /*Serve per prelevare dal campo <input type="file" name="file">*/
+    	  String name = request.getParameter("name");
+    	  String fileName = null;
+    	  String contacts = request.getParameter("contacts");
+    	  long fileSize = filePart.getSize();
+    	  LibraryBean library = new LibraryBean();
+    	  
+    	  if(name.equals("") || contacts.equals("") || name == null || contacts == null) {
+    		  request.setAttribute("error", "Assicurati di aver compilato correttamente il nome e i contatti "
+    		  		+ "della biblioteca");
+    		  request.getRequestDispatcher("admin.jsp?library").forward(request, response);
+    		  return;
+    	  }
+    	  /*Salvo la nuova immagine SOLO se l'admin ha cambiata, quindi
+    	   * nel campo input ci sarà un'immagine con dimensione diversa da 0 byte */	
+			if(fileSize != 0) {
+				fileName = "library_logo.png";
+				InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
+				String absolute_path = System.getProperty("upload.location");
+				File directory = new File(absolute_path);
+				if(!directory.exists()) {
+					directory.mkdirs();
+				}
+				File file = new File(absolute_path + fileName);
+				/*L'immagine viene copiata nel percorso sopra specificato e se esiste un file con lo stesso
+				 * nome, viene sovrascritto.*/
+				Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				library.setLogo("./files/" + fileName);
 			}
-			else if(request.getParameter("remove_manager") != null) {
-				ManagersDAO dao = new ManagersDAO();
-				dao.removeManager(request.getParameter("remove_manager"));
-				request.setAttribute("info_manager", "Il Gestore:  "
-				+ request.getParameter("remove_manager") + " è stato rimosso.");
-			}
+
+		LibraryDAO dao = new LibraryDAO();
+		
+		library.setName(name);
+		
+		library.setContacts(contacts);
+		if(dao.updateLibraryInfo(library) != 0) {
+			request.setAttribute("info_library", "Le informazioni della biblioteca sono state salvate.");
+			getServletContext().setAttribute("library", library);
+		}
+		else
+			request.setAttribute("error", "Errore imprevisto. Se il problema persiste, contattare l'amministratore di sistema.");
+      }
+      
       
 			request.getRequestDispatcher("admin.jsp").forward(request, response);
 			return;
-		}
+	} //chiusura if(session.getAttribute("admin") != null)
 
 		if(email == null || password == null) {
 			response.sendRedirect("admin.jsp");

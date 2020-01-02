@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class UsersDAO {
 	
-	public static UsersBean login(String email, String password) {
+	public UsersBean login(String email, String password) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT users.name, users.surname, users.codice_fiscale, users.address FROM users WHERE email = ? AND password = ?");
@@ -50,7 +50,7 @@ public class UsersDAO {
 		return null;
 	}
 
-	public static boolean register(UsersBean user) {
+	public boolean register(UsersBean user) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO users(name, surname, email, password, "

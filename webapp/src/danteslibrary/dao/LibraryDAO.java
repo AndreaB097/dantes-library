@@ -25,8 +25,30 @@ public class LibraryDAO {
 			return library;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getLibraryInfo: " + e.getMessage());
 		}
 		return null;
+	}
+	
+	public int updateLibraryInfo(LibraryBean library) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM library");
+			ps.executeUpdate();
+			
+			ps = conn.prepareStatement("INSERT INTO library(name, logo, contacts) VALUES(?, ?, ?)");
+			ps.setString(1, library.getName());
+			ps.setString(2, library.getLogo());
+			ps.setString(3, library.getContacts());
+			result = ps.executeUpdate();
+			
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo updateLibraryInfo: " + e.getMessage());
+			return result;
+		}
 	}
 }

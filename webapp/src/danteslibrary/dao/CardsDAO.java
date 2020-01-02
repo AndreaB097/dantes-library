@@ -163,7 +163,7 @@ public class CardsDAO {
 		}
 	}
 	
-	public static CardsBean getCardByEmail(String email) {
+	public CardsBean getCardByEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, users WHERE cards.codice_fiscale = users.codice_fiscale "
@@ -187,7 +187,7 @@ public class CardsDAO {
 		}
 	}
 	
-	public static CardsBean getCardByCodice_fiscale(String codice_fiscale) {
+	public CardsBean getCardByCodice_fiscale(String codice_fiscale) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards WHERE "
@@ -211,7 +211,7 @@ public class CardsDAO {
 		}
 	}
 	
-	public static CardsBean getCardById(int card_id) {
+	public CardsBean getCardById(int card_id) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards WHERE cards.card_id = ?");
@@ -234,7 +234,7 @@ public class CardsDAO {
 		}
 	}
 	
-	public static int associateCard(int card_id) {
+	public int associateCard(int card_id) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("UPDATE cards SET associated = true WHERE cards.card_id = ?");
@@ -250,7 +250,7 @@ public class CardsDAO {
 		}
 	}
 
-	public static int newCard(String codice_fiscale, boolean associated) {
+	public int newCard(String codice_fiscale, boolean associated) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			String query = "INSERT INTO cards(codice_fiscale, associated) "

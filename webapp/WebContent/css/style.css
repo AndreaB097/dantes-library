@@ -131,7 +131,7 @@ input:focus {
 	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
 }
 input[type="number"] {
-	/*Larghezza dei campi per l'inserimento di quantità e durata noleggio
+	/*Larghezza dei campi per l'inserimento di quantitï¿½ e durata noleggio
 	(di default sono troppo larghi)*/
 	width: 50px; 
 	padding: 7px;
@@ -612,13 +612,13 @@ div.dropdown-content table tr:nth-child(even) {
 .section-container p {
 	font-size: 18px;
 }
-.section-container div#image-preview {
+.section-container div.image-preview {
 	width: 200px;
 	height: 200px;
 	margin: 3px 3px 20px 3px;
 }
-.section-container div#image-preview img,
-.section-container div#image-preview canvas {
+.section-container div.image-preview img,
+.section-container div.image-preview canvas {
 	width: 100%;
 	height: 100%;
 	background-color: #ffffff;
@@ -760,7 +760,7 @@ div.section-container input[type='checkbox'] {
 .section-container label#btn-upload:hover {
 	color: #666;
 }
-.section-container input#image {
+.section-container input.image {
 	width: 1px;
 	height: 1px;
 	padding: 0;
