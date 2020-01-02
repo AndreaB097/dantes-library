@@ -90,8 +90,8 @@ create table if not exists bookings(
     state_name varchar(100) not null,
     card_id int not null,
     book_id int not null,
-    foreign key(state_name) references booking_states(state_name),
-    foreign key(book_id) references books(book_id)
+    foreign key(state_name) references booking_states(state_name)
+    on update cascade on delete set null
 );
 
 create table if not exists library(

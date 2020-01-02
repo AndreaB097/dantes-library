@@ -24,7 +24,7 @@ public class CardServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 		
-		/*Controllo Utente già autenticato*/
+		/*Controllo Utente giÃ  autenticato*/
 		if(session.getAttribute("user") != null) {
 			response.sendRedirect("profile.jsp");
 			return;
@@ -50,7 +50,7 @@ public class CardServlet extends HttpServlet {
 				if(CardsDAO.getCardByCodice_fiscale(user.getCodice_fiscale()) == null) {
 					int card_id = CardsDAO.newCard(user.getCodice_fiscale(), true);
 					if(card_id == 0) {
-						request.setAttribute("error", "Esiste già una tessera associata al codice fiscale: "
+						request.setAttribute("error", "Esiste giÃ  una tessera associata al codice fiscale: "
 								+ user.getCodice_fiscale());
 						request.getRequestDispatcher("card.jsp").forward(request, response);
 						return;
@@ -66,7 +66,7 @@ public class CardServlet extends HttpServlet {
 				/*Il codice fiscale dell'utente risulta gia' associato a qualche carta,
 				 * quindi mostro un errore*/
 				else {
-					request.setAttribute("error", "Esiste già una tessera associata al codice fiscale: "
+					request.setAttribute("error", "Esiste giÃ  una tessera associata al codice fiscale: "
 							+ user.getCodice_fiscale());
 					request.getRequestDispatcher("card.jsp").forward(request, response);
 					return;
@@ -88,7 +88,7 @@ public class CardServlet extends HttpServlet {
 						session.setAttribute("card", CardsDAO.getCardById(card_id));
 					}
 					else {
-						request.setAttribute("error", "Questa tessera non esiste oppure è già associata a qualche cliente."
+						request.setAttribute("error", "Questa tessera non esiste oppure ï¿½ giï¿½ associata a qualche cliente."
 								+ " Se non ti risulta, per favore contatta la biblioteca.");
 						request.getRequestDispatcher("card.jsp").forward(request, response);
 						return;

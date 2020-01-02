@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class CardsDAO {
 
-	public static ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
+	public ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
 		String[] filters = {"users.name", "users.surname", "users.email", "cards.codice_fiscale", "card_id"};
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;
@@ -99,7 +99,7 @@ public class CardsDAO {
 		}
 	}
 	
-	public static ArrayList<CardsBean> getAllCards() {
+	public ArrayList<CardsBean> getAllCards() {
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;
 		try {
@@ -147,7 +147,7 @@ public class CardsDAO {
 		return null;	
 	}
 
-	public static int removeCard(String card_id) {
+	public int removeCard(String card_id) {
 		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -271,7 +271,8 @@ public class CardsDAO {
 	}
 	
 	
-	public void newCardAdmin(CardsBean card) {
+	public int newCardAdmin(CardsBean card) {
+		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
 			int card_id = card.getCard_id();
@@ -280,18 +281,19 @@ public class CardsDAO {
 			if(card_id != 0) {
 				query = "INSERT INTO cards(card_id, codice_fiscale, associated) VALUES ("+card_id+", '"+card.getCodice_fiscale()+"', "+ card.isAssociated()+")";
 				ps = conn.prepareStatement(query);
-				ps.executeUpdate();
+				result = ps.executeUpdate();
 			 }
 			else { query = "INSERT INTO cards(codice_fiscale, associated) VALUES ('"+card.getCodice_fiscale()+"', "+ card.isAssociated()+")";
 			       ps = conn.prepareStatement(query);
-			       ps.executeUpdate();
+			       result = ps.executeUpdate();
 			}
-			  conn.close();
-			  return;
+			conn.close();
+			return result;
+
 		   }
 		catch(SQLException e) {
 			System.out.println("Errore Database metodo newCard: " + e.getMessage());
-			return;
+			return result;
 		}
 	}
 	
