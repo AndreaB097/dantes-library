@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import danteslibrary.util.DBConnection;
 import danteslibrary.model.BookingsBean;
+import danteslibrary.model.ManagersBean;
 
 import java.util.ArrayList;
 
@@ -161,5 +162,73 @@ public ArrayList<BookingsBean> getAllBookings() {
 		}
 		return null;
 	}
+	
+	public BookingsBean getBookingById(int booking_id) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM bookings WHERE bookings.booking_id = ?");
+			ps.setInt(1,booking_id);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+				return null;
+			BookingsBean booking = new BookingsBean();		
+			result.first();
+			int card_id = result.getInt("card_id");
+			String email = result.getString("email");
+			int book_id = result.getInt("book_id");
+			String state_name = result.getString("state_name");
+			LocalDate start_date = result.getDate("start_date").toLocalDate();
+			LocalDate end_date = result.getDate("end_date").toLocalDate();
+			booking.setCard_id(card_id);
+			booking.setBook_id(book_id);
+			booking.setEmail(email);
+			booking.setState_name(state_name);
+			booking.setStart_date(start_date);
+			booking.setEnd_date(end_date);
+			booking.setBooking_id(booking_id);
+			ps = conn.prepareStatement("SELECT codice_fiscale FROM cards WHERE card_id = ?");
+			ps.setInt(1,card_id);
+			result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
+				return null;
+			result.first();
+			String codice_fiscale = result.getString("codice_fiscale");
+			booking.setCodice_fiscale(codice_fiscale);
+			conn.close();
+			return booking;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo getBookingById: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	
+	public void updateBooking(int booking_id, String state) throws SQLException {
+		Connection conn = null;
+		try {
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
+			String query = "UPDATE bookings SET state_name= ? WHERE bookings.booking_id = ?";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, state);
+			ps.setInt(2, booking_id);
+			ps.executeUpdate();
+
+			conn.commit();
+		} catch(SQLException e) {
+			if(conn != null) {
+					System.out.println("\nRollback! Non aggiorno la prenotazione.\n"
+							+ "Errore Database metodo updateBooking: " + e.getMessage());
+					conn.rollback();
+					return;
+			}
+		} finally {
+			conn.setAutoCommit(true);
+		}
+		return;
+	}
+
 
 }

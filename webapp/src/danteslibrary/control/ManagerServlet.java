@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -327,6 +328,23 @@ public class ManagerServlet extends HttpServlet {
 				BookingsDAO dao = new BookingsDAO();
 				ArrayList<BookingsBean> bookings = dao.getAllBookings();
 				request.setAttribute("bookings", bookings);
+			}
+			else if(request.getParameter("edit_booking") != null) {
+				BookingsDAO dao = new BookingsDAO();
+				BookingsBean booking = dao.getBookingById(Integer.parseInt(request.getParameter("edit_booking")));
+				request.setAttribute("edit_booking", booking);
+				request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+				return;
+			}
+			else if(request.getParameter("save_booking") != null) {
+				BookingsDAO dao = new BookingsDAO();
+				int booking_id= Integer.parseInt(request.getParameter("booking_id"));
+				String state = request.getParameter("state");
+				try {
+					dao.updateBooking(booking_id, state);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 			else if(request.getParameter("remove_booking") != null) {
 				BookingsDAO dao = new BookingsDAO();

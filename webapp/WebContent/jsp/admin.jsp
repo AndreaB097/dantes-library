@@ -22,7 +22,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		<input id="email" type="text" name="email"/>
 		<label for="password">Password</label>
 		<input id="password" type="password" name="password"/><br/><br/>
-		
 		<button type="submit">Accedi</button>
 	</form>
 	<% if(request.getAttribute("login_error") != null) { %>
@@ -244,8 +243,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							<form action="admin?books" method="post">
 								<input type="hidden" name="remove_book" value="<%=book.getBook_id()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+								</td>
 							</form>
-						</td>
 					</tr>
 			<%  } %>
 			</table>
@@ -559,8 +558,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							<form action="admin?cards" method="post">
 								<input type="hidden" name="remove_card" value="<%=card.getCard_id()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
-							</form>
 						</td>
+						</form>
 					</tr>
 			<%  } %>
 			</table>
@@ -682,6 +681,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<th>Stato</th>
 						<th>Data inizio</th>
 						<th>Data fine</th>
+						<th></th>
+						<th></th>
 					</tr>
 			<%	@SuppressWarnings("unchecked")
 				ArrayList<BookingsBean> bookings = (ArrayList<BookingsBean>) request.getAttribute("bookings");
@@ -696,17 +697,59 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<td><%=booking.getEnd_date() %></td>
 						<td>
 							<form action="admin?bookings" method="post">
-								<input type="hidden" name="remove_booking" value="<%=booking.getBooking_id()%>">
-								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+								<input type="hidden" name="edit_booking" value="<%=booking.getBooking_id()%>">
+								<button id="btn-edit" type="submit"><i style="color: #404040;" class="fas fa-pencil-alt fa-lg"></i></button>
 							</form>
 						</td>
+						<td>	
+							<form action="admin?bookings" method="post">
+								<input type="hidden" name="remove_booking" value="<%=booking.getBooking_id()%>">
+								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
+						</td>
+							</form>
 					</tr>
 			<%  } %>
 			 </table>
 			</div>
+			<%} 
+			else if(request.getAttribute("edit_booking") != null) {
+			BookingsBean booking = (BookingsBean) request.getAttribute("edit_booking");%> 
+			<script>
+			$(document).ready(function() {
+				$("#update-booking-form").slideDown();
+				$("#new-booking-form").hide();
+				$("#all-bookings-div").hide();
+			});
+			</script>
+			<form id="update-booking-form" method="post" class="overflow-container">
+				<h3>Modifica Stato Prenotazione</h3>
+				<input type="hidden" id="booking_id" name="booking_id" value="<%=booking.getBooking_id() %>">
+				<%if (booking.getEmail()!=null) { %>
+				<label for="email">Email(facoltativo)</label>
+				<input id="email" type="text" value="<%=booking.getEmail() %>" readonly>
+				<%} %>
+				<label for="codice_fiscale">Codice fiscale</label>
+				<input id="codice_fiscale" type="text" value="<%=booking.getCodice_fiscale()%>" readonly>
+				<label for="card_id">Codice Tessera</label>
+				<input id="card_id" type="text" value="<%=booking.getCard_id() %>" readonly> 
+				<label for="book_id">Codice Libro</label>
+				<input id="book_id"   type="text" value="<%=booking.getBook_id() %>" readonly> 
+				<label for="start_date">Data inizio</label>
+				<input id="start_date"   type="text" value="<%=booking.getStart_date() %>" readonly> 
+				<label for="end_date">Data fine</label>
+				<input id="end_date" type="text" value="<%=booking.getEnd_date() %>" readonly> 
+					<select id="state" name="state">
+					<label for="state">Stato</label>
+						<option value="Non ancora ritirato">Non ancora ritirato</option>
+						<option value="Ritirato">Ritirato</option>
+						<option value="Riconsegnato">Riconsegnato</option>
+						<option value="Annullata">Annullata</option>
+					</select>
+				<button type="submit" class="save" formaction="admin?bookings&save_booking"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
+			</form>
 			<%} %>
 			
-			<form id="new-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
+			<form id="new-booking-form" method="post" class="overflow-container">
 			<h3>Inserimento Prenotazione</h3>
 				<label for="email">Email(facoltativo)</label>
 				<input id="email" name="email" type="text">
@@ -837,6 +880,8 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						<th>Indirizzo</th>
 						<th>Telefono</th>
 						<th>Ruolo</th>
+						<th></th>
+						<th></th>
 					</tr>
 			<%	@SuppressWarnings("unchecked")
 				ArrayList<ManagersBean> managers = (ArrayList<ManagersBean>) request.getAttribute("managers");
@@ -860,14 +905,16 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 							<%} %>
 						</td>
 						<td>
-							<form action="admin?managers" method="post">
+						<form action="admin?managers" method="post">
 								<input type="hidden" name="edit_manager" value="<%=manager.getEmail()%>">
 								<button id="btn-edit" type="submit"><i style="color: #404040;" class="fas fa-pencil-alt fa-lg"></i></button>
+						</form>
 						</td>
 						<td>
+						<form action="admin?managers" method="post">
 								<input type="hidden" name="remove_manager" value="<%=manager.getEmail()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
-							</form>
+						</form>
 						</td>
 					</tr>
 			<%  } %>
@@ -876,7 +923,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<%} 			
 			else if(request.getAttribute("edit_manager") != null) {
 		
-				ManagersBean manager = (ManagersBean) request.getAttribute("edit_manager"); %>
+			ManagersBean manager = (ManagersBean) request.getAttribute("edit_manager"); %>
 			<script>
 			$(document).ready(function() {
 				$("#update-manager-form").slideDown();
@@ -930,9 +977,9 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						$("#bookings_manager").attr("checked", true);
 						</script>
 						<%}%>
-						<%if(manager_roles.contains("Gestore Biblioteca")) {%>
+						<%if(manager_roles.contains("Gestore Libri")) {%>
 						<script>
-						$("#library_manager").attr("checked", true);
+						$("#books_manager").attr("checked", true);
 						</script>
 						<%}%>
 				<button type="submit" class="save" formaction="admin?managers&save_manager"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
