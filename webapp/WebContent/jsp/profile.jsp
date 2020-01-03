@@ -64,6 +64,7 @@
 					<th>Data Inizio</th>
 					<th>Data Fine</th>
 					<th>Stato</th>
+					<th></th>
 				</tr>
 			<% 
 				for(int i = 0; i < bookings.size(); i++) {
@@ -78,6 +79,17 @@
 						<td><%=booking.getStart_date()%></td>
 						<td><%=booking.getEnd_date()%></td>
 						<td><i><%=booking.getState_name() %></i></td>
+						<%if(booking.getState_name().equals("Non ancora ritirato"))  {%>
+						<td>
+						<form action="booking?cancel_booking" method="post">
+								<input type="hidden" name="booking_id" value="<%=booking.getBooking_id()%>">
+								<button id="btn-cancel_booking" type="submit">Annulla Prenotazione</button>
+						</form>
+						</td>
+						<%}
+						else {%>
+						<td></td>
+						<%}%>
 					</tr>
 				<% }
 			}else {%>

@@ -204,29 +204,21 @@ public ArrayList<BookingsBean> getAllBookings() {
 	}
 	
 	
-	public void updateBooking(int booking_id, String state) throws SQLException {
-		Connection conn = null;
+	public int updateBooking(int booking_id, String state){
+		int result = 0;
 		try {
-			conn = DBConnection.getConnection();
-			conn.setAutoCommit(false);
+			Connection conn = DBConnection.getConnection();
 			String query = "UPDATE bookings SET state_name= ? WHERE bookings.booking_id = ?";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, state);
 			ps.setInt(2, booking_id);
-			ps.executeUpdate();
-
-			conn.commit();
-		} catch(SQLException e) {
-			if(conn != null) {
-					System.out.println("\nRollback! Non aggiorno la prenotazione.\n"
-							+ "Errore Database metodo updateBooking: " + e.getMessage());
-					conn.rollback();
-					return;
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+			} catch(SQLException e) {
+			System.out.println("Errore Database metodo updateBooking: " + e.getMessage());
+			return result;
 			}
-		} finally {
-			conn.setAutoCommit(true);
-		}
-		return;
 	}
 
 

@@ -4,6 +4,8 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.sql.SQLException;
+
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;
 import danteslibrary.model.UsersBean;
@@ -20,15 +22,30 @@ public class BookingServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 
 		HttpSession session = request.getSession();
-		
-		if(request.getParameter("book_id") == null || request.getParameter("book_id").equals("")) {
-			response.sendError(404);
-			return;
-		}
-		
+			
 		if(session.getAttribute("user") == null) {
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			return;
+		}
+		
+		else if(request.getParameter("cancel_booking") != null) {
+			UsersBean user = (UsersBean) session.getAttribute("user");
+			String email = user.getEmail();
+			BookingsDAO dao = new BookingsDAO();
+			int booking_id = Integer.parseInt(request.getParameter("booking_id"));
+			System.out.println("AA");
+			String state = "Annullata";
+				if(dao.updateBooking(booking_id, state) != 0) {
+					request.setAttribute("info", "La prenotazione è andata a buon fine");
+				}
+				else {
+					request.setAttribute("error", "Errore: l'annullamento della prenotazione non è andato buon fine");
+				}
+				ArrayList<BookingsBean> bookings = dao.getUserBookings(email);
+				if(bookings != null)
+					session.setAttribute("bookings", bookings);
+				request.getRequestDispatcher("profile.jsp").forward(request, response);
+				return;
 		}
 		
 		int start_day = Integer.parseInt(request.getParameter("start_day"));
@@ -41,6 +58,11 @@ public class BookingServlet extends HttpServlet {
 		LocalDate end_date = LocalDate.of(end_year, end_month, end_day);
 		UsersBean user = (UsersBean) session.getAttribute("user");
 		String email = user.getEmail();
+
+		if(request.getParameter("book_id") == null || request.getParameter("book_id").equals("")) {
+			response.sendError(404);
+	    	return;
+		}
 		int book_id = Integer.parseInt(request.getParameter("book_id"));
 		BookingsDAO dao = new BookingsDAO();
 		CardsDAO cardsDAO = new CardsDAO();

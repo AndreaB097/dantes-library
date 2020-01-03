@@ -381,11 +381,8 @@ public class ManagerServlet extends HttpServlet {
 		BookingsDAO dao = new BookingsDAO();
 		int booking_id= Integer.parseInt(request.getParameter("booking_id"));
 		String state = request.getParameter("state");
-		try {
-			dao.updateBooking(booking_id, state);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		dao.updateBooking(booking_id, state);
+
       }
       else if(request.getParameter("remove_booking") != null) {
 		BookingsDAO dao = new BookingsDAO();
