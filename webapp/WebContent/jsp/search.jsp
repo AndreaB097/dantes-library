@@ -25,6 +25,7 @@
 				<strong id="book-title"><%=rows.get(i).getTitle()%></strong><br/>
 				<span><b>Genere: </b>
 				<%ArrayList<String> genres = rows.get(i).getGenres();
+				if(genres != null && !genres.isEmpty())
 				for(int j = 0; j < genres.size(); j++) {
 					if((j+1) < genres.size()) { %>
 						<%=genres.get(j) + ", " %>	
@@ -34,8 +35,8 @@
 				<%} %>
 				</span>
 				<span><b>Autori: </b>
-				<%
-				ArrayList<String> authors = rows.get(i).getAuthors();
+				<%ArrayList<String> authors = rows.get(i).getAuthors();
+				if(authors != null && !authors.isEmpty())
 				for(int j = 0; j < authors.size(); j++) {
 					if((j+1) < authors.size()) { %>
 						<%=authors.get(j) + ", " %>	

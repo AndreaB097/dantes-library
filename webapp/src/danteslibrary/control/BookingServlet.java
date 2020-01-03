@@ -4,7 +4,6 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;

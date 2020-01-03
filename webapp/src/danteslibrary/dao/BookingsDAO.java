@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class BookingsDAO {
 	
 	public int newBooking(String email, String start_date, String end_date, String state_name, int card_id, int book_id) {
+		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO bookings(email, start_date, end_date, state_name, card_id, book_id) "
@@ -22,12 +23,14 @@ public class BookingsDAO {
 			ps.setInt(5, card_id);
 			ps.setInt(6, book_id);
 			
-			return ps.executeUpdate(); 
+			result =  ps.executeUpdate();
+			conn.close();
+			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo newBooking: " + e.getMessage());
+			return 0;
 		}
-		return 0;
 	}
 	
 	public ArrayList<BookingsBean> getBookingsByFilter(int filter, String keyword) {
@@ -215,11 +218,10 @@ public ArrayList<BookingsBean> getAllBookings() {
 			result = ps.executeUpdate();
 			conn.close();
 			return result;
-			} catch(SQLException e) {
+		} catch(SQLException e) {
 			System.out.println("Errore Database metodo updateBooking: " + e.getMessage());
 			return result;
-			}
+		}
 	}
-
 
 }

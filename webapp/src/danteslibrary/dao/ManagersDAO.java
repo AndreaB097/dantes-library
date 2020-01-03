@@ -176,7 +176,8 @@ public class ManagersDAO {
 }
 	
 	
-	public void newManager(ManagersBean manager) {
+	public int newManager(ManagersBean manager) {
+		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
 			String query = "INSERT INTO managers(email, password, name, surname, address, phone) "
@@ -191,15 +192,15 @@ public class ManagersDAO {
 	        ps.executeUpdate();
 			ArrayList<String> roles = manager.getRoles();
 			for(int i=0; i< roles.size();i++) {
-			query = "INSERT INTO managers_roles(email, role_name) VALUES ('"+manager.getEmail()+"', '"+ roles.get(i)+ "')";
-			ps = conn.prepareStatement(query);
-			ps.executeUpdate();
-		}
-	        return;
+				query = "INSERT INTO managers_roles(email, role_name) VALUES ('"+manager.getEmail()+"', '"+ roles.get(i)+ "')";
+				ps = conn.prepareStatement(query);
+				result = ps.executeUpdate();
+			}
+	        return result;
 		}
 		catch(SQLException e) {
 			System.out.println("Errore Database metodo newManager: " + e.getMessage());
-			return ;
+			return result;
 		}
 	}
 	

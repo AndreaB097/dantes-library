@@ -239,6 +239,7 @@ a.menu-icon img {
 	margin: 0;
 }
 .box {
+	width: 100%;
 	margin: 5px 0;
 	padding: 15px;
 	background-color: #ffffff;
@@ -383,7 +384,7 @@ div.cover {
 	text-align: center;
 }
 div.cover img {
-	max-width: 250px;
+	max-width: 300px;
 }
 .ui-selectmenu-menu .ui-menu {
 	max-height: 100px;
@@ -774,7 +775,7 @@ div.section-container input[type='checkbox'] {
 	width: 140px;
 	margin: 10px 0;
 }
-.section-container #state-button {
+.section-container #booking_state-button {
 	display: block;
 	margin-bottom: 20px;
 }

@@ -44,7 +44,7 @@ public class UsersDAO {
 			}
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo login: " + e.getMessage());
 		}
 		
 		return null;
@@ -70,12 +70,15 @@ public class UsersDAO {
 			return true;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo register: " + e.getMessage());
 		}
 		
 		return false;
 	}
 	
+	/**
+	 * @return true = Esiste una corrispondenza, false altrimenti
+	 **/
 	public boolean checkExistingEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -89,7 +92,7 @@ public class UsersDAO {
 			}
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo checkExistingEmail: " + e.getMessage());
 		}
 		
 		return true;
@@ -108,7 +111,7 @@ public class UsersDAO {
 			}
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo checkExistingCodiceFiscale: " + e.getMessage());
 		}
 		
 		return true;
@@ -148,7 +151,7 @@ public class UsersDAO {
 			}
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getUserByEmail: " + e.getMessage());
 		}
 		return null;
 	}
@@ -188,7 +191,7 @@ public class UsersDAO {
 
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getUsersByFilter: " + e.getMessage());
 		}
 		
 		return null;
@@ -227,7 +230,7 @@ public class UsersDAO {
 			return users;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getAllUsers: " + e.getMessage());
 		}
 		return null;
 	}
@@ -243,10 +246,80 @@ public class UsersDAO {
 			return result;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo removeUser: " + e.getMessage());
 		}
 		return result;
 	}
 	
+	public int setTemporaryLink(String email, String tmp_link) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE users SET tmp_link = ? WHERE email = ? ");
+			ps.setString(1, tmp_link);
+			ps.setString(2, email);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo setTemporaryLink: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	public String getEmailByTemporaryLink(String tmp_link) {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT users.email FROM users WHERE tmp_link = ?");
+			ps.setString(1, tmp_link);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) {
+				conn.close();
+				return null;
+			}
+			result.first();
+			String email = result.getString("email");
+			conn.close();
+			return email;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo getEmailByTemporaryLink: " + e.getMessage());
+			return null;
+		}	
+	}
+	
+	public int updateUserPassword(String email, String new_password) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE users SET password = ? WHERE email = ? ");
+			ps.setString(1, new_password);
+			ps.setString(2, email);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo updateUserPassword: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	public int deleteTemporaryLink(String email) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE users SET tmp_link = NULL WHERE email = ? ");
+			ps.setString(1, email);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo deleteTemporaryLink: " + e.getMessage());
+		}
+		return result;
+	}
 	
 }

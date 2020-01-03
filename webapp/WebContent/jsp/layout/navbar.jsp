@@ -8,13 +8,10 @@
 	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp" title="LOGOUT"><i class="fas fa-sign-out-alt fa-lg"></i></a>
 	<%}%>
-	  <a class="menu-ui" href="./contacts.jsp" title="CONTATTI"><i class="fas fa-question-circle fa-lg"></i></a>
+	  <a href="./contacts.jsp" title="CONTATTI"><i class="fas fa-question-circle fa-lg"></i></a>
 	  <% if(session.getAttribute("user") != null) {%>
 		<a href="./profile.jsp" title="AREA UTENTE"><i class="fas fa-user fa-lg"></i><span>${user.name}</span></a>
 	  <%} else if(session.getAttribute("admin") != null) { %>
-	  	<script>
-			$(".menu-ui").hide();
-		</script>
 		<a href="./admin.jsp" title="PANNELLO DI CONTROLLO"><i class="fas fa-user-shield fa-lg"></i><span>${admin.name}</span></a>
 		<%} else {%>
 			<a href="./login.jsp" title="ACCEDI"><i class="fas fa-user fa-lg"></i></a>

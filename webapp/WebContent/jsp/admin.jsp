@@ -27,12 +27,24 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 	<% if(request.getAttribute("login_error") != null) { %>
 		<div class="error">Indirizzo e-mail o password non validi.</div>
 	<% } %>
+	<% if(request.getAttribute("no_roles_error") != null) { %>
+		<div class="error">
+			<p><b>ATTENZIONE!</b>
+			Non ti sono ancora stati assegnati dei ruoli. Contatta il tuo responsabile per maggiori informazioni.
+			</p>
+		</div>
+	<% } %>
 </div>
 
 <% } 
-	else { 
+	else {
 	ManagersBean admin = (ManagersBean) session.getAttribute("admin");
-	ArrayList<String> roles = admin.getRoles();%>
+	ArrayList<String> roles = admin.getRoles();
+	if(roles == null || roles.isEmpty()) {
+		session.invalidate();
+		request.setAttribute("no_roles_error", "");
+		request.getRequestDispatcher("admin.jsp").forward(request, response);%>
+	<%}%>
 	<!-- Pannello di controllo Gestori -->
 	<div class="container">
 		<!-- Menu laterale -->
@@ -421,6 +433,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<script>
                     $(".cancel").click(function() {
                         $("#new-book-image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
+                        $("#new-book-image").val('');
                     });
                 </script>
 				<script>
@@ -715,7 +728,14 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</div>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?bookings&all_bookings'">Mostra tutti</button>
-			<button id="btn-booking">Aggiungi Prenotazione</button> 
+			<button id="btn-booking">Aggiungi Prenotazione</button>
+			<script>
+			$(document).ready(function() {
+				$("#btn-booking").click(function() {
+					$("#update-booking-form").remove();
+				});
+			});
+			</script>
 			
       		<%if(request.getAttribute("info_booking") != null) { %>
 				<div class="info"><%=request.getAttribute("info_booking") %></div>
@@ -771,30 +791,30 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			BookingsBean booking = (BookingsBean) request.getAttribute("edit_booking");%> 
 			<script>
 			$(document).ready(function() {
-				$("#update-booking-form").slideDown();
 				$("#new-booking-form").hide();
 				$("#all-bookings-div").hide();
+				$("#update-booking-form").slideDown();
 			});
 			</script>
-			<form id="update-booking-form" method="post" class="overflow-container">
+			<form id="update-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
 				<h3>Modifica Stato Prenotazione</h3>
 				<input type="hidden" id="booking_id" name="booking_id" value="<%=booking.getBooking_id() %>">
 				<%if (booking.getEmail()!=null) { %>
-				<label for="email">Email(facoltativo)</label>
-				<input id="email" type="text" value="<%=booking.getEmail() %>" readonly>
+				<label for="booking_email">Email(facoltativo)</label>
+				<input id="booking_email" type="text" value="<%=booking.getEmail() %>" readonly>
 				<%} %>
-				<label for="codice_fiscale">Codice fiscale</label>
-				<input id="codice_fiscale" type="text" value="<%=booking.getCodice_fiscale()%>" readonly>
-				<label for="card_id">Codice Tessera</label>
-				<input id="card_id" type="text" value="<%=booking.getCard_id() %>" readonly> 
-				<label for="book_id">Codice Libro</label>
-				<input id="book_id"   type="text" value="<%=booking.getBook_id() %>" readonly> 
-				<label for="start_date">Data inizio</label>
-				<input id="start_date"   type="text" value="<%=booking.getStart_date() %>" readonly> 
-				<label for="end_date">Data fine</label>
-				<input id="end_date" type="text" value="<%=booking.getEnd_date() %>" readonly> 
-					<label for="state">Stato</label>
-					<select id="state" name="state">
+				<label for="booking_codice_fiscale">Codice fiscale</label>
+				<input id="booking_codice_fiscale" type="text" value="<%=booking.getCodice_fiscale()%>" readonly>
+				<label for="booking_card_id">Codice Tessera</label>
+				<input id="booking_card_id" type="text" value="<%=booking.getCard_id() %>" readonly> 
+				<label for="booking_book_id">Codice Libro</label>
+				<input id="booking_book_id"   type="text" value="<%=booking.getBook_id() %>" readonly> 
+				<label for="booking_start_date">Data inizio</label>
+				<input id="booking_start_date"   type="text" value="<%=booking.getStart_date() %>" readonly> 
+				<label for="booking_end_date">Data fine</label>
+				<input id="booking_end_date" type="text" value="<%=booking.getEnd_date() %>" readonly> 
+					<label for="booking_state">Stato</label>
+					<select id="booking_state" class="booking_state" name="state">
 						<option value="Non ancora ritirato">Non ancora ritirato</option>
 						<option value="Ritirato">Ritirato</option>
 						<option value="Riconsegnato">Riconsegnato</option>
@@ -804,22 +824,22 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</form>
 			<%} %>
 			
-			<form id="new-booking-form" method="post" class="overflow-container">
+			<form id="new-booking-form" method="post" class="overflow-container" onsubmit="return validateBooking()">
 			<h3>Inserimento Prenotazione</h3>
-				<label for="email">Email(facoltativo)</label>
-				<input id="email" name="email" type="text">
-				<label for="codice_fiscale">Codice fiscale</label>
-				<input id="codice_fiscale" name="codice_fiscale" type="text">
-				<label for="card_id">Codice Tessera</label>
-				<input id="card_id" name="card_id"  type="text"> 
-				<label for="book_id">Codice Libro</label>
-				<input id="book_id" name="book_id"  type="text"> 
-				<label for="start_date">Data inizio</label>
-				<input id="start_date" name="start_date"  type="text"> 
-				<label for="end_date">Data fine</label>
-				<input id="end_date" name="end_date"  type="text"> 
-				<label for="state">Stato prenotazione</label>
-				<select id="state" name="state">
+				<label for="booking_email">Email(facoltativo)</label>
+				<input id="booking_email" name="email" type="text">
+				<label for="booking_codice_fiscale">Codice fiscale</label>
+				<input id="booking_codice_fiscale" name="codice_fiscale" type="text">
+				<label for="booking_card_id">Codice Tessera</label>
+				<input id="booking_card_id" name="card_id"  type="text"> 
+				<label for="booking_book_id">Codice Libro</label>
+				<input id="booking_book_id" name="book_id"  type="text"> 
+				<label for="booking_start_date">Data inizio</label>
+				<input id="booking_start_date" name="start_date"  type="text"> 
+				<label for="booking_end_date">Data fine</label>
+				<input id="booking_end_date" name="end_date"  type="text"> 
+				<label for="booking_state">Stato prenotazione</label>
+				<select id="booking_state" class="booking_state" name="state">
 					<option value="Non ancora ritirato">Non ancora ritirato</option>
 					<option value="Ritirato">Ritirato</option>
 					<option value="Riconsegnato">Riconsegnato</option>
@@ -827,23 +847,23 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				</select>
 				<script>
 				$(document).ready(function() {
-				    $('#state').selectmenu();
+				    $('.booking_state').selectmenu();
 				});
 				</script>
 				<button type="submit" class="save" formaction="admin?bookings&new_booking"><i class="fas fa-plus fa-lg"></i> Aggiungi Prenotazione</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
-		</form>
+			</form>
 		
 		<script>
 		$("#error-list").hide();
 		var errors = [];
 	  	function validateBooking() {
-			var codice_fiscale = document.getElementById("codice_fiscale").value;
-			var card_id = document.getElementById("card_id").value;
-			var book_id = document.getElementById("book_id").value;
-			var start_date = document.getElementById("start_date").value;
-			var end_date = document.getElementById("end_date").value;
-			
+			var codice_fiscale = document.getElementById("booking_codice_fiscale").value;
+			var card_id = document.getElementById("booking_card_id").value;
+			var book_id = document.getElementById("booking_book_id").value;
+			var start_date = document.getElementById("booking_start_date").value;
+			var end_date = document.getElementById("booking_end_date").value;
+			console.log(codice_fiscale);
 			if(!codice_fiscale || !card_id || !book_id || !start_date || !end_date) {
 				errors.push("Non tutti i campi sono stati compilati.");
 			}
@@ -918,6 +938,13 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
 			<button id="btn-manager">Aggiungi Gestore</button> 
+			<script>
+			$(document).ready(function() {
+				$("#btn-manager").click(function() {
+					$("#update-manager-form").remove();
+				});
+			});
+			</script>
 			
       		<%if(request.getAttribute("info_manager") != null) { %>
 				<div class="info"><%=request.getAttribute("info_manager") %></div>
@@ -983,17 +1010,17 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<script>
 			$(document).ready(function() {
 				$("#update-manager-form").slideDown();
-				$("#new-manager-form").hide();
-				$("#all-managers-div").hide();
 			});
 			</script>
-			<form id="update-manager-form" method="post" class="overflow-container">
+			<form id="update-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
 				<h3>Modifica Gestore</h3>
 				<input type="hidden" id="original_email" name="original_email" value="<%=manager.getEmail() %>">
 				<label for="email">Email</label>
 				<input id="email" name="email" type="text" value="<%=manager.getEmail() %>">
 				<label for="password">Password</label>
 				<input id="password" name="password" type="password" value="<%=manager.getPassword() %>">
+				<label for="repeat_password">Ripeti Password</label>
+				<input id="repeat_password" name="repeat_password" type="password" value="<%=manager.getPassword() %>">
 				<label for="name">Nome</label>
 				<input id="name" name="name"  type="text" value="<%=manager.getName() %>"> 
 				<label for="surname">Cognome</label>
@@ -1004,40 +1031,40 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<input id="phone" name="phone"  type="text" value="<%=manager.getPhone() %>"> 
 				<label>Ruolo</label>
 				<br/>
-
-					
-					<input type="checkbox" id ="users_manager" name="users_manager" value="Gestore Utenti">  Gestore Utenti<br>
-					<input type="checkbox" id ="books_manager" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
-					<input type="checkbox" id ="cards_manager" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
-					<input type="checkbox" id ="bookings_manager" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
-					<input type="checkbox" id ="library_manager" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
+				<input type="checkbox" id ="users_manager" name="users_manager" value="Gestore Utenti">  Gestore Utenti<br>
+				<input type="checkbox" id ="books_manager" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
+				<input type="checkbox" id ="cards_manager" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
+				<input type="checkbox" id ="bookings_manager" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
+				<input type="checkbox" id ="library_manager" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
 				<br/><br/>
 						<% ArrayList <String> manager_roles = manager.getRoles();
-						if(manager_roles.contains("Gestore Utenti")) {%>
-						<script>
-						$("#users_manager").attr("checked", true);
-						</script>
-						<%}%>
-						<%if(manager_roles.contains("Gestore Libri")) {%>
-						<script>
-						$("#books_manager").attr("checked", true);
-						</script>
-						<%}%>
-						<%if(manager_roles.contains("Gestore Tessere")) {%>
-						<script>
-						$("#cards_manager").attr("checked", true);
-						</script>
-						<%}%>
-						<%if(manager_roles.contains("Gestore Prenotazioni")) {%>
-						<script>
-						$("#bookings_manager").attr("checked", true);
-						</script>
-						<%}%>
-						<%if(manager_roles.contains("Gestore Libri")) {%>
-						<script>
-						$("#books_manager").attr("checked", true);
-						</script>
-						<%}%>
+						if(manager_roles != null && !manager_roles.isEmpty()) {
+							if(manager_roles.contains("Gestore Utenti")) {%>
+							<script>
+							$("#users_manager").attr("checked", true);
+							</script>
+							<%}%>
+							<%if(manager_roles.contains("Gestore Libri")) {%>
+							<script>
+							$("#books_manager").attr("checked", true);
+							</script>
+							<%}%>
+							<%if(manager_roles.contains("Gestore Tessere")) {%>
+							<script>
+							$("#cards_manager").attr("checked", true);
+							</script>
+							<%}%>
+							<%if(manager_roles.contains("Gestore Prenotazioni")) {%>
+							<script>
+							$("#bookings_manager").attr("checked", true);
+							</script>
+							<%}%>
+							<%if(manager_roles.contains("Gestore Biblioteca")) {%>
+							<script>
+							$("#library_manager").attr("checked", true);
+							</script>
+							<%}
+						}%>
 				<button type="submit" class="save" formaction="admin?managers&save_manager"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 			</form>
@@ -1106,7 +1133,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
           var errors_div = document.getElementById("error-list");
         }
         var txt = "<ul>";
-        $("#managers-section h3").before(errors_div);
+        $("#managers-section h2").after(errors_div);
         errors_div.className = "error";
         errors.forEach(showErrors);
         errors_div.innerHTML = txt;

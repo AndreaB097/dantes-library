@@ -30,7 +30,8 @@ create table if not exists users(
     email varchar(100) primary key,
     password varchar(191) not null,
     codice_fiscale char(16) unique not null,
-    address varchar(100) not null
+    address varchar(100) not null,
+    tmp_link varchar(100) unique
 );
 
 create table if not exists cards(
@@ -87,7 +88,7 @@ create table if not exists bookings(
     email varchar(100), /*facoltativo per gli utenti non registrati*/
     start_date date not null,
     end_date date not null,
-    state_name varchar(100) not null,
+    state_name varchar(100),
     card_id int not null,
     book_id int not null,
     foreign key(state_name) references booking_states(state_name)

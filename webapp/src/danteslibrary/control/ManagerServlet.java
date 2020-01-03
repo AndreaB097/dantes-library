@@ -6,7 +6,6 @@ import javax.servlet.ServletException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -358,12 +357,15 @@ public class ManagerServlet extends HttpServlet {
         String state = request.getParameter("state");
         String email_booking;
         if((request.getParameter("email")!=null) && !(request.getParameter("email").equals(""))) {
-              email_booking = request.getParameter("email");
-          }
+        	email_booking = request.getParameter("email");
+        }
         else {
-          email_booking = null;
-          }
-        dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
+        	email_booking = null;
+        }
+        if(dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id) != 0)
+        	request.setAttribute("info_booking", "La prenotazione è stata aggiunta con successo.");
+        else
+        	request.setAttribute("error", "Non è stato possibile aggiungere la prenotazione.");
       }
       else if(request.getParameter("all_bookings") != null) {
 		BookingsDAO dao = new BookingsDAO();
@@ -379,10 +381,13 @@ public class ManagerServlet extends HttpServlet {
       }
       else if(request.getParameter("save_booking") != null) {
 		BookingsDAO dao = new BookingsDAO();
-		int booking_id= Integer.parseInt(request.getParameter("booking_id"));
+		int booking_id = Integer.parseInt(request.getParameter("booking_id"));
 		String state = request.getParameter("state");
-		dao.updateBooking(booking_id, state);
-
+		if(dao.updateBooking(booking_id, state) != 0)
+			request.setAttribute("info_booking", "La prenotazione con codice: " + booking_id
+					+ " è stata aggiornata.");
+		else
+			request.setAttribute("error", "Non è stato possibile aggiornare la prenotazione.");
       }
       else if(request.getParameter("remove_booking") != null) {
 		BookingsDAO dao = new BookingsDAO();
@@ -456,7 +461,10 @@ public class ManagerServlet extends HttpServlet {
 					request.setAttribute("error", "Si è verificato un errore.");
 			}
 			else {
-				dao.newManager(manager);
+				if(dao.newManager(manager) != 0)
+					request.setAttribute("info_manager", "Il gestore " + manager.getName() +" "+ manager.getSurname() +" è stato aggiunto.");
+					else
+						request.setAttribute("error", "Si è verificato un errore.");
 			}
 		}
 		catch(Exception e) {
