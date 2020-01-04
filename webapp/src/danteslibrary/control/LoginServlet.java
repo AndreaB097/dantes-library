@@ -8,6 +8,7 @@ import java.io.IOException;
 import danteslibrary.model.UsersBean;
 import danteslibrary.model.BookingsBean;
 import danteslibrary.model.CardsBean;
+import danteslibrary.model.ManagersBean;
 import danteslibrary.dao.UsersDAO;
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;
@@ -20,16 +21,43 @@ public class LoginServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		String email = request.getParameter("email");
-		String password = request.getParameter("password");
+
 		
 		HttpSession session = request.getSession();
 		
-		/*Controllo Utente gi� autenticato. */
+		/*Controllo Utente già autenticato. */
 		if(session.getAttribute("user") != null) {
-			response.sendRedirect("profile.jsp");
+			if(request.getParameter("edit_user") != null) {
+				UsersDAO dao = new UsersDAO();
+				UsersBean user = new UsersBean();
+				String email = request.getParameter("email");
+				String old_email = request.getParameter("old_email");
+				String password = request.getParameter("password");
+				String address = request.getParameter("address");
+				user = dao.getUserByEmail(old_email);
+				if (email != null && !email.equals("")) {
+					user.setEmail(email);
+				}
+				if (password != null && !password.equals("")) {
+					dao.updateUserPassword(email, password);
+				}
+				if (address != null && !address.equals("")) {
+					user.setAddress(address);
+				}
+				dao.updateUser(user, old_email);
+			request.setAttribute("info","Il tuo profilo è stato aggiornato");
+			session.setAttribute("user", user);
+			request.getRequestDispatcher("profile.jsp").forward(request, response);
+			return;	
+			}
+			
+			else
+				response.sendRedirect("profile.jsp");
 			return;
 		}
+		
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
 		
 		if(email == null || password == null) {
 			response.sendRedirect("login.jsp");

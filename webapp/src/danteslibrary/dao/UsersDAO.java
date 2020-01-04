@@ -322,4 +322,22 @@ public class UsersDAO {
 		return result;
 	}
 	
+	public void updateUser (UsersBean user, String email)
+	{
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE users SET email= ?, address = ? WHERE users.email = ?");
+			ps.setString(1, user.getEmail());
+			ps.setString(2, user.getAddress());
+			ps.setString(3, email);
+			ps.executeUpdate();
+			conn.close();
+			return;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo deleteTemporaryLink: " + e.getMessage());
+		}
+		return;	
+	}
+	
 }

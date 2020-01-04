@@ -32,7 +32,6 @@ public class BookingServlet extends HttpServlet {
 			String email = user.getEmail();
 			BookingsDAO dao = new BookingsDAO();
 			int booking_id = Integer.parseInt(request.getParameter("booking_id"));
-			System.out.println("AA");
 			String state = "Annullata";
 				if(dao.updateBooking(booking_id, state) != 0) {
 					request.setAttribute("info", "La prenotazione è andata a buon fine");

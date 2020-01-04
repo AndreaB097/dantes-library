@@ -125,11 +125,34 @@
 			</table>
 		</div>
 		<button class="dropdown-btn"><i class="fas fa-user"></i>&nbsp;&nbsp;Dati personali</button>
-		<div id="user-info" class="dropdown-content">
-			<p><strong>Nome: </strong>${user.name}</p>
-			<p><strong>Cognome: </strong>${user.surname}</p>
-			<p><strong>Email: </strong>${user.email}</p>
-			<p><strong>Indirizzo: </strong>${user.address}</p>
+		<div id="user-info" class="dropdown-content section-container">
+			<form method ="post" action="login?edit_user">
+			<label for="email">Email</label>
+			<input id="email" name="email" class="editable" type="text" value="${user.email}" readonly>
+			<input id="old_email" name="old_email" class="editable" type="hidden" value="${user.email}" readonly> 
+			
+			<label id="lbl_password" for="password">Password</label>
+			<input id="password" name="password" placeholder="Scrivi qui la nuova password" class="editable" type="password" value="" readonly>  
+		
+			<label for="address">Indirizzo</label>
+			<input id="address" name="address" class="editable" type="text" value="${user.address}" readonly>
+			
+			<button id="btn-sv" type="submit">Salva</button>
+
+			<button type="button" id="btn-user">Modifica Dati</button>  
+			<script>
+				$("#btn-sv").hide();
+				$("#lbl_password").hide();
+				$("#password").hide();
+				$("#btn-user").click(function() {
+				$(".editable").removeAttr("readonly");
+				$("#btn-sv").show();
+				$("#password").show();
+				$("#lbl_password").show();
+				$("#btn-user").hide();
+				});
+			</script>
+		</form>	
 		</div>
 	</div>
 </div>
