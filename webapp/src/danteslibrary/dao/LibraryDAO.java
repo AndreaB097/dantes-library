@@ -14,6 +14,9 @@ public class LibraryDAO {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM library");
 			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst())
+				return null;
+			
 			result.first();
 			
 			LibraryBean library = new LibraryBean();
@@ -32,15 +35,25 @@ public class LibraryDAO {
 	
 	public int updateLibraryInfo(LibraryBean library) {
 		int result = 0;
+		PreparedStatement ps;
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("DELETE FROM library");
+			 ps = conn.prepareStatement("DELETE FROM library");
 			ps.executeUpdate();
+			if(library.getLogo() != null) {
+				ps.close();
+				ps = conn.prepareStatement("INSERT INTO library(name, logo, contacts) VALUES(?, ?, ?)");
+				ps.setString(1, library.getName());
+				ps.setString(2, library.getLogo());
+				ps.setString(3, library.getContacts());
+			}
+			else {
+				ps.close();
+				ps = conn.prepareStatement("INSERT INTO library(name, contacts) VALUES(?, ?)");
+				ps.setString(1, library.getName());
+				ps.setString(2, library.getContacts());
+			}
 			
-			ps = conn.prepareStatement("INSERT INTO library(name, logo, contacts) VALUES(?, ?, ?)");
-			ps.setString(1, library.getName());
-			ps.setString(2, library.getLogo());
-			ps.setString(3, library.getContacts());
 			result = ps.executeUpdate();
 			
 			conn.close();

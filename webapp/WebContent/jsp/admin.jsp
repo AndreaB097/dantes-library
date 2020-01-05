@@ -1185,7 +1185,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			
 			<form method="post" enctype="multipart/form-data">
 				<label for="image-preview">Logo Biblioteca</label>
-				<div style="float:left" id="image-preview" class="image-preview">
+				<div style="float:left; width: 200px; height: 200px;" id="image-preview" class="image-preview" >
 						<img src="${applicationScope.library.logo}" alt="Nessun immagine">
 				</div>
 				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>

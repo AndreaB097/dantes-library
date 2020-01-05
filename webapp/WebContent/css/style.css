@@ -148,6 +148,7 @@ hr {
 	color: #ccc;
 	border: 1px solid rgba(240, 240, 240, 0.6);
 	margin: 0;
+	display: block;
 }
 
 /*Contenitore largo 90% e centrato orizzontalmente rispetto all'elemento padre*/
@@ -369,6 +370,98 @@ header #menu-responsive a {
 }
 
 /***********************
+* Sezione per homepage *
+************************/
+.section-divider {
+	border: 3px solid #3aafa9/*#2b7a78*/;
+}
+.home-container {
+	height: 500px;
+}
+.centered-text {
+	font-family: "RobotoCondensed-Light";
+	font-size: 4vw;
+	padding: 150px 40px;
+	height: 100%;
+
+}
+.centered-text p {
+	font-weight: 100;
+	font-size: 2.5vw;
+	margin: 0;
+}
+.centered-text button {
+	width: 200px;
+	height: 40px;
+	border-radius: 0px;
+}
+#genres {
+	background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(255,255,255,0)), 
+									url('../images/genres_wallp.jpg');
+	background-repeat: no-repeat;
+	background-position: 10% 50%;
+	background-size: cover;
+	color: #ffffff;
+}
+#random {
+	background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(255,255,255,0)), 
+									url('../images/random_wallp.jpg');
+	background-repeat: no-repeat;
+	background-position: 50% 100%;
+	background-size: cover;
+	color: #ffffff;
+}
+
+/***********************
+* Sezione Lista Generi *
+************************/
+div.section-genre {
+	margin: 5px;
+	padding: 10px;
+}
+div.section-genre h3 {
+	border-radius: 4px;
+	margin: 0;
+	padding: 5px;
+	color: #ffffff;
+	background-image: linear-gradient(to right, rgba(43, 122, 120, 1), rgba(43, 122, 120, 0.3), rgba(255, 255, 255, 1));
+	
+}
+div.section-genre .card {
+	display: inline-block;
+	width: 160px;
+	height: 300px;
+	padding: 10px;
+	margin: 10px 0px;
+	border-radius: 4px;
+	vertical-align: top;
+}
+div.section-genre .card .card-title {
+	width: 100%;
+	margin-top: 20px;
+	display: -webkit-box;
+  	-webkit-line-clamp: 3;
+  	-webkit-box-orient: vertical;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+div.section-genre .card img {
+	width: 100%;
+	height: 215px;
+	display: block;
+	filter: brightness(95%);
+	box-shadow: -4px 0px 4px 1px #bbb;
+	transition: all 0.2s;
+}
+div.section-genre .card:hover img {
+	width: 105%;
+	height: calc(215px + 5%);
+	box-shadow: -5px 5px 10px 5px #666;
+	filter: brightness(105%);
+}
+
+/***********************
 * Sezione pagina libro *
 ************************/
 div.book-container {
@@ -405,14 +498,15 @@ button#booking-btn {
 * Sezione Ricerca libri *
 *************************/
 .row {
-	padding: 5px;
-	height: 160px;
+	padding: 10px;
+	height: 225px;
 	display: block;
 }
 .row img {
 	float: left;
 	margin-right: 15px;
-	height: 150px;
+	width: 140px;
+	height: 100%;
 }
 .row a strong#book-title {
 	/*Nome prodotto*/
@@ -614,8 +708,8 @@ div.dropdown-content table tr:nth-child(even) {
 	font-size: 18px;
 }
 .section-container div.image-preview {
-	width: 200px;
-	height: 200px;
+	width: 140px;
+	height: 215px;
 	margin: 3px 3px 20px 3px;
 }
 .section-container div.image-preview img,
@@ -832,6 +926,26 @@ div.section-container input[type='checkbox'] {
 	#search-filters-responsive-button {
 		width: 150px;
 		margin: 3px;
+	}
+	/**
+	* Homepage - responsive
+	**/
+	.home-container {
+		height: 300px;
+	}
+	.centered-text {
+		font-size: 25px;
+		padding: 100px 20px;
+	}
+	.centered-text p {
+		font-weight: 100;
+		font-size: 20px;
+	}
+	.centered-text button {
+		width: 100px;
+		height: 30px;
+		margin-top: 20px;
+		border-radius: 0px;
 	}
 	/**
 	* Pagina libro - responsive

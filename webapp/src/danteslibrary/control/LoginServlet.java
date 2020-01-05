@@ -8,7 +8,6 @@ import java.io.IOException;
 import danteslibrary.model.UsersBean;
 import danteslibrary.model.BookingsBean;
 import danteslibrary.model.CardsBean;
-import danteslibrary.model.ManagersBean;
 import danteslibrary.dao.UsersDAO;
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;

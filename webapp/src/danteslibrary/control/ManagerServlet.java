@@ -108,7 +108,7 @@ public class ManagerServlet extends HttpServlet {
 				if(filePart.getSize() != 0) {
 					InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
 					String absolute_path = System.getProperty("upload.location");
-					String path = "book_covers/";
+					String path = "/book_covers";
 					File directory = new File(absolute_path + path);
 					if(!directory.exists()) {
 						directory.mkdirs();
@@ -124,7 +124,7 @@ public class ManagerServlet extends HttpServlet {
 						Files.deleteIfExists(new File(absolute_path + path + oldFileName.substring(oldFileName.lastIndexOf("/") + 1)).toPath());
 					}
 					Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-					link = "./files/" + path + randomFileName;
+					link = "./files" + path + randomFileName;
 				}
 				/*Se non ricevo il filename dalla form, vuol dire che ho cliccato su
 				 * Pulisci Campi, e quindi rimuovo l'immagine mettendone una di default.*/
@@ -232,7 +232,7 @@ public class ManagerServlet extends HttpServlet {
 			 * contenenti i generi*/
 			else if(request.getParameter("json_genres") != null) {
 				BooksDAO dao = new BooksDAO();
-				JSONArray genres = dao.retrieveJSONAllGenres();
+				JSONArray genres = dao.getJSONAllGenres();
 				response.setContentType("application/json");
 				PrintWriter pw = response.getWriter();
 				pw.write(genres.toString());
@@ -241,7 +241,7 @@ public class ManagerServlet extends HttpServlet {
 			}
 			else if(request.getParameter("all_genres") != null) {
 				BooksDAO dao = new BooksDAO();
-				request.setAttribute("all_genres", dao.retrieveAllGenres());
+				request.setAttribute("all_genres", dao.getAllGenres());
 			}
 			else if(request.getParameter("remove_genre") != null) {
 				BooksDAO dao = new BooksDAO();
@@ -504,9 +504,9 @@ public class ManagerServlet extends HttpServlet {
     	  /*Salvo la nuova immagine SOLO se l'admin ha cambiata, quindi
     	   * nel campo input ci sarà un'immagine con dimensione diversa da 0 byte */	
 			if(fileSize != 0) {
-				fileName = "library_logo.png";
 				InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
 				String absolute_path = System.getProperty("upload.location");
+				fileName = "./library_logo.png";
 				File directory = new File(absolute_path);
 				if(!directory.exists()) {
 					directory.mkdirs();

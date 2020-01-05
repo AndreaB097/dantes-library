@@ -3,7 +3,7 @@
     import="danteslibrary.model.LibraryBean"%>
 <header>
   <div class="container">
-    <a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${applicationScope.library.logo}" /><span> ${applicationScope.library.name}</span></a>
+	<a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${applicationScope.library.logo }" />&nbsp;<span>${applicationScope.library.name}</span></a>
 	<nav id="menu">
 	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp" title="LOGOUT"><i class="fas fa-sign-out-alt fa-lg"></i></a>
@@ -24,7 +24,7 @@
   				<option value="2">Casa Editrice</option>
   				<option value="3">Genere</option>
 			</select>
-		<input type="search" name="q" placeholder="Seleziona il filtro ed effettua la ricerca"/>
+		<input type="text" name="q" placeholder="Seleziona il filtro ed effettua la ricerca" required pattern=".*\S+.*"/>
 	  </form>
 	
 	<script>
@@ -34,7 +34,7 @@
 	$(document).ready(function() {
 		$('.dropdownFilters').selectmenu();
 		$("#search-filters-button").hide();
-		if($("#search input").val() != "") {
+		if($("#search input").val().match(".*\S+.*")) {
 			$("#search input").animate({width : "68%"}, 500, function() {
 				$("#search input").show();
 			});
@@ -45,16 +45,18 @@
 	});
 	/*Se l'utente clicca l'icona per la ricerca, la barra si estende (o si restringe se era gia' estesa).
 	Ma, se all'interno della barra l'utente non scrive niente e clicca di nuovo sull'icona, non succede niente.
-	Invece, se l'utente ha scritto qualcosa, allora il submit andra'  a buon fine (cerca() restituisce true) e verra' 
-	reindirizzato alla jsp dedicata alla ricerca dei libri.*/
+	Invece, se l'utente ha scritto qualcosa, allora il submit andra'  a buon fine e verra' 
+	reindirizzato alla jsp dedicata alla ricerca dei libri.
+	REGEX /([^\s])/.test(input) - true se l'input contiene almeno 1 carattere, false altrimenti*/
 	$("#search-icon").click(function() {
-	
-		if($("#search input").val() == "" && $("#search input").is(":hidden")) {
+	var input = $("#search input").val();
+
+		if(!/([^\s])/.test(input) && $("#search input").is(":hidden")) {
 			$("#search input, #search-filters-button").show();
 			$("#search input").animate({width : "68%"}, 500);
 			$("#search-filters-button").animate({width : "130px"}, 500);
 		}
-		else if($("#search input").val() == "" && $("#search input").is(":visible")) {
+		else if(!/([^\s])/.test(input) && $("#search input").is(":visible")) {
 			$("#search input, #search-filters-button").animate({width : "1px"}, 500, function() {
 				$("#search input, #search-filters-button").hide();
 			});
@@ -63,15 +65,6 @@
 			$("#search").submit();	
 		}
 	});
-
-	function cerca() {
-		if($("#search input").val() != "" || $("#search-responsive input").val() != "") {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
 	</script>
 	</nav>
 	

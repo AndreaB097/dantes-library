@@ -16,6 +16,14 @@ public class LibraryServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		LibraryDAO dao = new LibraryDAO();
 		LibraryBean library = dao.getLibraryInfo();
+		if(library == null) {
+			library = new LibraryBean();
+			library.setName("Dante's Library");
+			library.setLogo("./images/default_logo.png");
+			library.setContacts("Problemi con il nostro software? Contattaci al"
+					+ " seguente indirizzo: assistenza@danteslibrary.com");
+			dao.updateLibraryInfo(library);
+		}
 		config.getServletContext().setAttribute("library", library);
 	}
 

@@ -4,6 +4,7 @@ import java.sql.*;
 import danteslibrary.util.DBConnection;
 import danteslibrary.model.BooksBean;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import org.json.*;
 
 public class BooksDAO {
@@ -24,8 +25,8 @@ public ArrayList<BooksBean> getAllBooks() {
 				String title = result.getString("title");
 				String publisher = result.getString("publisher");
 				int quantity = result.getInt("quantity");
-				ArrayList<String> genres = retrieveBookGenres(book_id);
-				ArrayList<String> authors = retrieveBookAuthors(book_id);
+				ArrayList<String> genres = getBookGenres(book_id);
+				ArrayList<String> authors = getBookAuthors(book_id);
 				
 				BooksBean book = new BooksBean();
 				book.setBook_id(book_id);
@@ -44,6 +45,44 @@ public ArrayList<BooksBean> getAllBooks() {
 		}
 		return null;
 	}
+
+	public LinkedHashMap<String, ArrayList<BooksBean>> getBookList() {
+		LinkedHashMap<String, ArrayList<BooksBean>> list = new LinkedHashMap<String, ArrayList<BooksBean>>();
+		try {
+			ArrayList<String> genres = getAllGenres();
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps;
+			/*Per ogni genere nel DB seleziono al piu' 10 libri appartenenti
+			 * a quel genere*/
+			for(String genre : genres) {
+				ps = conn.prepareStatement("SELECT * FROM books, books_genres WHERE books.book_id = books_genres.book_id AND books_genres.genre_name = ? ORDER BY RAND() LIMIT 10");
+				ps.setString(1, genre);
+				ResultSet result = ps.executeQuery();
+				if(!result.isBeforeFirst()) /*Non ci sono libri per il genere 'genre', metto null nell'hashmap*/
+					list.put(genre, null);
+				else {
+					ArrayList<BooksBean> books = new ArrayList<BooksBean>();
+					while(result.next()) {
+						BooksBean book = new BooksBean();
+						book.setBook_id(result.getInt("book_id"));
+						book.setTitle(result.getString("title"));
+						book.setDescription(result.getString("description"));
+						book.setPublisher(result.getString("publisher"));
+						book.setQuantity(result.getInt("quantity"));
+						book.setCover(result.getString("cover"));
+						books.add(book);
+					}
+					list.put(genre, books);
+				}
+			}
+			conn.close();
+			return list;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo getBookList: " + e.getMessage());
+		}
+		return null;
+	}
 	
 	public BooksBean findBookById(String id) {
 		
@@ -52,7 +91,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM books WHERE books.book_id = ?");
 			ps.setString(1, id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			BooksBean book = new BooksBean();
@@ -66,8 +105,8 @@ public ArrayList<BooksBean> getAllBooks() {
 				book.setCover(result.getString("cover"));
 				
 				//Prelevo generi e autori del libro che ha come chiave book_id
-				book.setAuthors(retrieveBookAuthors(book.getBook_id()));
-				book.setGenres(retrieveBookGenres(book.getBook_id()));
+				book.setAuthors(getBookAuthors(book.getBook_id()));
+				book.setGenres(getBookGenres(book.getBook_id()));
 			}
 
 			conn.close();
@@ -80,7 +119,7 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;
 	}
 	
-	public ArrayList<String> retrieveBookGenres(int book_id) {
+	public ArrayList<String> getBookGenres(int book_id) {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -107,7 +146,7 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;	
 	}
 	
-	public ArrayList<String> retrieveBookAuthors(int book_id) {
+	public ArrayList<String> getBookAuthors(int book_id) {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -134,7 +173,7 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;	
 	}
 	
-	public JSONArray retrieveJSONAllGenres() {
+	public JSONArray getJSONAllGenres() {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -153,16 +192,16 @@ public ArrayList<BooksBean> getAllBooks() {
 			return genres;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database metodo retrieveJSONAllGenres: " + e.getMessage());
+			System.out.println("Errore Database metodo getJSONAllGenres: " + e.getMessage());
 			return null;	
 		}
 	}
 	
-	public ArrayList<String> retrieveAllGenres() {
+	public ArrayList<String> getAllGenres() {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres;");
+			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres ORDER BY genre_name ASC;");
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
 				return null;
@@ -177,7 +216,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			return genres;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database metodo retrieveAllGenres: " + e.getMessage());
+			System.out.println("Errore Database metodo getAllGenres: " + e.getMessage());
 			return null;	
 		}
 	}
@@ -188,7 +227,13 @@ public ArrayList<BooksBean> getAllBooks() {
 		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity, books.cover FROM books, authors, genres WHERE "+filters[filter]+" LIKE ? GROUP BY title;");
+			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity, books.cover "
+					+ "FROM books, authors, genres, books_authors, books_genres WHERE "+filters[filter]+" LIKE ? "
+							+ "AND authors.author_id = books_authors.author_id "
+							+ "AND books.book_id = books_authors.book_id "
+							+ "AND genres.genre_name = books_genres.genre_name "
+							+ "AND books.book_id = books_genres.book_id "
+							+ "GROUP BY title;");
 			ps.setString(1, "%"+keyword+"%");
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
@@ -202,8 +247,8 @@ public ArrayList<BooksBean> getAllBooks() {
 				String publisher = result.getString("publisher");
 				String cover = result.getString("cover");
 				int quantity = result.getInt("quantity");
-				ArrayList<String> genres = retrieveBookGenres(book_id);
-				ArrayList<String> authors = retrieveBookAuthors(book_id);
+				ArrayList<String> genres = getBookGenres(book_id);
+				ArrayList<String> authors = getBookAuthors(book_id);
 				
 				BooksBean book = new BooksBean();
 				book.setBook_id(book_id);
@@ -226,6 +271,24 @@ public ArrayList<BooksBean> getAllBooks() {
 		}
 		
 		return null;
+	}
+	
+	public int getRandomBookId() {
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT book_id FROM books ORDER BY RAND() LIMIT 1");
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst())
+				return 0;
+			result.first();
+			int book_id = result.getInt("book_id");
+			conn.close();
+			return book_id;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo getRandomBookId: " + e.getMessage());
+			return 0;
+		}
 	}
 	
 	public int removeBook(String book_id) {
