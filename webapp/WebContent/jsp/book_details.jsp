@@ -1,7 +1,8 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"
-import="java.util.ArrayList, danteslibrary.model.BooksBean, java.time.*, 
-java.time.format.*, java.util.Locale"%>
+import="java.util.ArrayList, danteslibrary.model.BooksBean, java.time.*,
+java.time.format.*, java.util.*"%>
 
 <!doctype html>
 <html>
@@ -50,76 +51,59 @@ java.time.format.*, java.util.Locale"%>
 				<%} %>
 			<%} %>
 			</p>
+			<p><strong>Editore: </strong><%=book.getPublisher() %></p>
 			<%if(book.getQuantity() > 0) {%>
 			<p style="color: #0cc481"><strong>Disponibile</strong></p>
 				<% if(request.getAttribute("error") != null) { %>
 					<div class="error"><%=request.getAttribute("error") %></div>
 				<% } %>
-			<%int current_day = LocalDate.now().getDayOfMonth();
-			  int current_month = LocalDate.now().getMonthValue();
-			  int current_year = LocalDate.now().getYear(); %>
+
 			<form action="booking" method="post">
 				<input type="hidden" name="book_id" value="<%=request.getParameter("id")%>">
 			<label for="start-date">Data inizio prestito</label> 
-			<div id="start-date">
-				<select class="dropdown" name="start_day">
-  					<%for(int i = 1; i <= 31; i++) { 
-  						if(i == current_day) { %>
-  							<option value="<%=i%>" selected><%=i %></option>
-  					  <%} 
-  						else {%>
-  					 		<option value="<%=i%>"><%=i %></option>
-  				  <%   }
-  					}%>
-				</select>
-				<select class="dropdown" name="start_month">
-  					<%for(int i = 1; i <= 12; i++) {
-  					  	if(i < current_month && i != (current_month % 12) +1) { %>
-  							<option value="<%=i%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-  					<%	}
-  					  	else if(i == current_month) {%>
-  				      	<option value="<%=i%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-  				    <%  }
-  					  	else { %>
-  					  	<option value="<%=i%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-  					<%  }
-  					}%>
-				</select>
-				<select class="dropdown" name="start_year">
-  					<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
-  					<option value="<%=LocalDate.now().getYear() + 1 %>"><%=LocalDate.now().getYear() + 1%></option>
-				</select>
-			</div>
+			<input type="text" id="start-date" name="start_date" value="" required>
 			<label for="end-date">Data fine prestito</label>
-			<div id="end-date">
-				<select class="dropdown" name="end_day">
-					<%for(int i = 1; i <= 31; i++) { 
-						if(i == current_day) { %>
-							<option value="<%=i%>" selected><%=i %></option>
-					  <%} 
-						else {%>
-					 		<option value="<%=i%>"><%=i %></option>
-				    <%  }
-					}%>
-				</select>
-				<select class="dropdown" name="end_month">
-					<%for(int i = 1; i <= 12; i++) {
-					  	if(i < current_month && i != (current_month % 12) +1) { %>
-							<option value="<%=i%>" disabled><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-					<%	}
-					  	else if(i == current_month) {%>
-				      	<option value="<%=i%>" selected><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-				    <%  }
-					  	else { %>
-					  	<option value="<%=i%>"><%=Month.of(i).getDisplayName(TextStyle.FULL, Locale.ITALIAN)%></option>
-					<%  }
-					}%>
-				</select>
-				<select class="dropdown" name="end_year">
-	 				<option value="<%=LocalDate.now().getYear() %>"><%=LocalDate.now().getYear() %></option>
-	 				<option value="<%=LocalDate.now().getYear() + 1 %>"><%=LocalDate.now().getYear() + 1 %></option>
-				</select>
-			</div>
+			<input type="text" id="end-date" name="end_date" value="" required>
+			<script>
+			$(document).ready(function() {
+				$("#start-date, #end-date").datepicker({
+					minDate: "+3d",
+					maxDate: "+4m",
+					autoSize: true,
+					dateFormat: "d MM yy",
+					monthNames: [ "Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
+						"Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre" ],
+				});
+				$('#start-date').datepicker("setDate", "0");
+				
+				var start_date = $('#start-date').datepicker("getDate");
+				var end_date = $('#end-date').datepicker("getDate");
+				
+				/*Se la data di fine e' stata settata, allora aggiorno l'attributo value,
+				altrimenti value=""*/
+				if(end_date)
+					$('#end-date').attr("value", end_date.getFullYear() + "-" + (end_date.getMonth()+1) + "-" + end_date.getDate());
+				
+				$('#start-date').attr("value", start_date.getFullYear() + "-" + (start_date.getMonth()+1) + "-" + start_date.getDate());
+				
+				/*Ogni volta che cambia la data di inizio, ottengo l'oggetto Date con getDate
+				e aggiorno l'attribute value di start-date.
+				Inoltre, reimposto la data minima selezionabile di end-date in base a quella
+				selezionata in start-date.*/
+				$('#start-date').change(function() {
+					start_date = $('#start-date').datepicker("getDate");
+					end_date = $('#end-date').datepicker("getDate");
+					$('#start-date').attr("value", start_date.getFullYear() + "-" + (start_date.getMonth()+1) + "-" + start_date.getDate());
+					$('#end-date').datepicker("option", "minDate" , $("#start-date").datepicker("getDate"));
+				});
+				/*Ogni volta che cambia la data di fine, ottengo l'oggetto Date con getDate
+				e aggiorno l'attribute value di end-date.*/
+				$('#end-date').change(function() {
+					end_date = $('#end-date').datepicker("getDate");
+					$('#end-date').attr("value", end_date.getFullYear() + "-" + (end_date.getMonth()+1) + "-" + end_date.getDate());
+				});
+			});
+			</script>
 			<button type="submit" id="booking-btn">Prenota</button>
 			</form>
 			<%} else {%>

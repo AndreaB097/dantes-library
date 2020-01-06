@@ -10,10 +10,12 @@ import java.util.ArrayList;
 
 public class BookingsDAO {
 	
-	public int newBooking(String email, String start_date, String end_date, String state_name, int card_id, int book_id) {
+	public int newBooking(String email, String start_date, String end_date, String state_name, int card_id, int book_id) throws SQLException {
 		int result = 0;
+		Connection conn = null;
 		try {
-			Connection conn = DBConnection.getConnection();
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO bookings(email, start_date, end_date, state_name, card_id, book_id) "
 					+ "VALUES(?, ?, ?, ?, ?, ?)");
 			ps.setString(1, email);
@@ -24,13 +26,23 @@ public class BookingsDAO {
 			ps.setInt(6, book_id);
 			
 			result =  ps.executeUpdate();
-			conn.close();
-			return result;
+			
+			ps = conn.prepareStatement("UPDATE books SET quantity = quantity - 1 WHERE book_id = ?");
+			ps.setInt(1, book_id);
+			result = ps.executeUpdate();
+			conn.commit();
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database metodo newBooking: " + e.getMessage());
-			return 0;
+			if(conn != null) {
+				System.out.println("\nRollback! Errore Database metodo newBooking: " + e.getMessage());
+				conn.rollback();
+				return 0;
+			}
+		} finally {
+			conn.setAutoCommit(true);
+			conn.close();
 		}
+		return result;
 	}
 	
 	public ArrayList<BookingsBean> getBookingsByFilter(int filter, String keyword) {
@@ -107,23 +119,42 @@ public ArrayList<BookingsBean> getAllBookings() {
 			return bookings;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			System.out.println("Errore Database metodo getAllBookings: " + e.getMessage());
 		}
 		return null;
 	}
 
-	public int removeBooking(String booking_id) {
+	public int removeBooking(int booking_id) throws SQLException {
 		int result = 0;
+		Connection conn = null;
 		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("DELETE FROM bookings WHERE booking_id = ?");
-			ps.setString(1, booking_id);
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM bookings WHERE booking_id = ?");
+			ps.setInt(1, booking_id);
+			ResultSet rs = ps.executeQuery();
+			rs.first();
+			String booking_state = rs.getString("booking_state");
+			int book_id = rs.getInt("book_id");
+			if(!booking_state.equals("Annullata") && !booking_state.equals("Riconsegnato")) {
+				ps = conn.prepareStatement("UPDATE books SET quantity = quantity + 1 WHERE book_id = ?");
+				ps.setInt(1, book_id);
+				ps.executeUpdate();
+			}
+			ps = conn.prepareStatement("DELETE FROM bookings WHERE booking_id = ?");
+			ps.setInt(1, booking_id);
 			result = ps.executeUpdate();
-			conn.close();
-			return result;
+			conn.commit();
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
+			if(conn != null) {
+				conn.rollback();
+				System.out.println("\nRollback! Errore Database metodo removeBooking: " + e.getMessage());
+				return 0;
+			}
+		} finally {
+			conn.setAutoCommit(true);
+			conn.close();
 		}
 		return result;
 	}
@@ -171,7 +202,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM bookings WHERE bookings.booking_id = ?");
 			ps.setInt(1,booking_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			BookingsBean booking = new BookingsBean();		
 			result.first();
@@ -206,22 +237,39 @@ public ArrayList<BookingsBean> getAllBookings() {
 		return null;
 	}
 	
-	
-	public int updateBooking(int booking_id, String state){
+	public int updateBooking(int booking_id, String state) throws SQLException {
 		int result = 0;
+		Connection conn = null;
 		try {
-			Connection conn = DBConnection.getConnection();
-			String query = "UPDATE bookings SET state_name= ? WHERE bookings.booking_id = ?";
-			PreparedStatement ps = conn.prepareStatement(query);
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
+			PreparedStatement ps;
+			if(state.equals("Annullata") || state.equals("Riconsegnato")) {
+				ps = conn.prepareStatement("SELECT * FROM bookings WHERE booking_id = ?");
+				ps.setInt(1, booking_id);
+				ResultSet rs = ps.executeQuery();
+				rs.first();
+				int book_id = rs.getInt("book_id");
+				ps = conn.prepareStatement("UPDATE books SET quantity = quantity + 1 WHERE books.book_id = ?");
+				ps.setInt(1, book_id);
+				ps.executeUpdate();
+			}
+			ps = conn.prepareStatement("UPDATE bookings SET state_name= ? WHERE bookings.booking_id = ?");
 			ps.setString(1, state);
 			ps.setInt(2, booking_id);
 			result = ps.executeUpdate();
-			conn.close();
-			return result;
+			conn.commit();
 		} catch(SQLException e) {
-			System.out.println("Errore Database metodo updateBooking: " + e.getMessage());
-			return result;
+			if(conn != null) {
+				conn.rollback();
+				System.out.println("\nRollback! Errore Database metodo updateBooking: " + e.getMessage());
+				return 0;
+			}
+		} finally {
+			conn.setAutoCommit(true);
+			conn.close();
 		}
+	return result;
 	}
 
 }

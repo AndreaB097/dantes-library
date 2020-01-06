@@ -30,7 +30,7 @@ public class ManagersDAO {
 				ManagersBean admin = new ManagersBean();
 				admin.setEmail(result.getString("email"));
 				admin.setName(result.getString("name"));
-				admin.setName(result.getString("surname"));
+				admin.setSurname(result.getString("surname"));
 				admin.setAddress(result.getString("address"));
 				admin.setPhone(result.getString("phone"));
 				admin.setRoles(retrieveManagerRoles(email));

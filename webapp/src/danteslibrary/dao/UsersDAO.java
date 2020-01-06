@@ -5,6 +5,7 @@ import java.sql.*;
 import danteslibrary.model.UsersBean;
 import danteslibrary.util.DBConnection;
 import java.util.ArrayList;
+import danteslibrary.util.BCrypt;
 
 
 public class UsersDAO {
@@ -12,15 +13,17 @@ public class UsersDAO {
 	public UsersBean login(String email, String password) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT users.name, users.surname, users.codice_fiscale, users.address FROM users WHERE email = ? AND password = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE email = ?");
 			ps.setString(1, email);
-			ps.setString(2,	password);
 			ResultSet result = ps.executeQuery();
 			
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 				return null;
 			
 			if(result.first()) {
+				String hashed_password = result.getString("password");
+				if(!BCrypt.checkpw(password, hashed_password))
+					return null;
 				/*Ottengo i dati dell'utente dal DB*/
 				String name = result.getString("name");
 				String surname = result.getString("surname");
@@ -322,22 +325,35 @@ public class UsersDAO {
 		return result;
 	}
 	
-	public void updateUser (UsersBean user, String email)
-	{
+	public int updateUser (UsersBean user, String old_email) throws SQLException {
+		Connection conn = null;
+		int result = 0;
 		try {
-			Connection conn = DBConnection.getConnection();
+			conn = DBConnection.getConnection();
+			conn.setAutoCommit(false);
 			PreparedStatement ps = conn.prepareStatement("UPDATE users SET email= ?, address = ? WHERE users.email = ?");
 			ps.setString(1, user.getEmail());
 			ps.setString(2, user.getAddress());
-			ps.setString(3, email);
+			ps.setString(3, old_email);
 			ps.executeUpdate();
-			conn.close();
-			return;
+			ps = conn.prepareStatement("UPDATE bookings SET email = ? WHERE email = ?");
+			ps.setString(1, user.getEmail());
+			ps.setString(2, old_email);
+			result = ps.executeUpdate();
+			conn.commit();
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database metodo deleteTemporaryLink: " + e.getMessage());
+			if(conn != null) {
+				conn.rollback();
+				System.out.println("\nRollback! Errore Database metodo updateUser: " + e.getMessage());
+				return result = 0;
+			}
+			
+		} finally {
+			conn.setAutoCommit(true);
+			conn.close();
 		}
-		return;	
+		return result;	
 	}
 	
 }

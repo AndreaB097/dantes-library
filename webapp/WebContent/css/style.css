@@ -110,7 +110,6 @@ button {
 	border-radius: 4px;
 	background-color: #3aafa9;
 	color: #ffffff;
-	text-align: center;
 	box-shadow: 0px 0px 3px 1px #ccc;
 	padding: 4px 8px;
 }
@@ -479,15 +478,14 @@ div.cover {
 div.cover img {
 	max-width: 300px;
 }
-.ui-selectmenu-menu .ui-menu {
-	max-height: 100px;
-}
-.ui-widget {
-	font-size: 16px !important;
-}
-div#start-date,
-div#end-date {
-	padding: 10px 0;
+input#start-date,
+input#end-date {
+	border: 1px solid #d9d9d9;
+	border-radius: 5px;
+	font-size: 18px;
+	padding: 10px;
+	margin-bottom: 10px;
+	display: block;
 }
 button#booking-btn {
 	width: 150px;

@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -362,16 +363,22 @@ public class ManagerServlet extends HttpServlet {
         else {
         	email_booking = null;
         }
-        if(dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id) != 0)
-        	request.setAttribute("info_booking", "La prenotazione è stata aggiunta con successo.");
-        else
-        	request.setAttribute("error", "Non è stato possibile aggiungere la prenotazione.");
+        try {
+			dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
+			request.setAttribute("info_booking", "La prenotazione è stata aggiunta con successo.");
+				
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Non è stato possibile aggiungere la prenotazione.");
+		}
       }
+      /*Mostra tutte le prenotazioni*/
       else if(request.getParameter("all_bookings") != null) {
 		BookingsDAO dao = new BookingsDAO();
 		ArrayList<BookingsBean> bookings = dao.getAllBookings();
 		request.setAttribute("bookings", bookings);
       }
+      /*Pulsante di modifca prenotazione premuto*/
       else if(request.getParameter("edit_booking") != null) {
 		BookingsDAO dao = new BookingsDAO();
 		BookingsBean booking = dao.getBookingById(Integer.parseInt(request.getParameter("edit_booking")));
@@ -379,22 +386,32 @@ public class ManagerServlet extends HttpServlet {
 		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
 		return;
       }
+      /*Modifica stato prenotazione*/
       else if(request.getParameter("save_booking") != null) {
 		BookingsDAO dao = new BookingsDAO();
 		int booking_id = Integer.parseInt(request.getParameter("booking_id"));
 		String state = request.getParameter("state");
-		if(dao.updateBooking(booking_id, state) != 0)
+		try {
+			dao.updateBooking(booking_id, state);
 			request.setAttribute("info_booking", "La prenotazione con codice: " + booking_id
 					+ " è stata aggiornata.");
-		else
+		} catch(SQLException e) {
+			e.printStackTrace();
 			request.setAttribute("error", "Non è stato possibile aggiornare la prenotazione.");
+		}
       }
+      /*Cancellazione prenotazione*/
       else if(request.getParameter("remove_booking") != null) {
 		BookingsDAO dao = new BookingsDAO();
-		dao.removeBooking(request.getParameter("remove_booking"));
-		request.setAttribute("info_booking", "La prenotazione con codice: "
-		+ request.getParameter("remove_booking") + " è stata rimossa.");
-      }	
+		try {
+			dao.removeBooking(Integer.parseInt(request.getParameter("remove_booking")));
+			request.setAttribute("info_booking", "La prenotazione con codice: "
+			+ request.getParameter("remove_booking") + " è stata rimossa.");
+		} catch(SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Non è stato possibile cancellare la prenotazione. Riprovare più tardi.");
+		}
+      }
 				
       /*--Sezione Gestori--*/
       if(request.getParameter("keyword_manager") != null && request.getParameter("keyword_manager") != "") {
@@ -506,7 +523,7 @@ public class ManagerServlet extends HttpServlet {
 			if(fileSize != 0) {
 				InputStream input = filePart.getInputStream(); /*Ottengo il flusso dell'immagine*/
 				String absolute_path = System.getProperty("upload.location");
-				fileName = "./library_logo.png";
+				fileName = "/library_logo.png";
 				File directory = new File(absolute_path);
 				if(!directory.exists()) {
 					directory.mkdirs();

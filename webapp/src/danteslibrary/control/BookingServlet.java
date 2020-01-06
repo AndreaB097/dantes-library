@@ -4,13 +4,19 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;
 import danteslibrary.model.UsersBean;
+import danteslibrary.model.CardsBean;
 import danteslibrary.model.BookingsBean;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 @WebServlet("/booking")
 public class BookingServlet extends HttpServlet {
@@ -19,77 +25,118 @@ public class BookingServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-
+		BookingsDAO bookingsDAO = new BookingsDAO();
+		CardsDAO cardsDAO = new CardsDAO();
+		
 		HttpSession session = request.getSession();
 			
 		if(session.getAttribute("user") == null) {
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			return;
 		}
-		
+		/*Annulla prenotazione*/
 		else if(request.getParameter("cancel_booking") != null) {
 			UsersBean user = (UsersBean) session.getAttribute("user");
 			String email = user.getEmail();
-			BookingsDAO dao = new BookingsDAO();
 			int booking_id = Integer.parseInt(request.getParameter("booking_id"));
+			BookingsBean booking = bookingsDAO.getBookingById(booking_id);
 			String state = "Annullata";
-				if(dao.updateBooking(booking_id, state) != 0) {
-					request.setAttribute("info", "La prenotazione è andata a buon fine");
-				}
-				else {
-					request.setAttribute("error", "Errore: l'annullamento della prenotazione non è andato buon fine");
-				}
-				ArrayList<BookingsBean> bookings = dao.getUserBookings(email);
-				if(bookings != null)
-					session.setAttribute("bookings", bookings);
+			/*Controllo se la prenotazione sia già stata Annullata*/
+			if(booking.getState_name().equals(state)) {
+				request.setAttribute("error", "Errore: Questa prenotazione è già stata annullata.");
 				request.getRequestDispatcher("profile.jsp").forward(request, response);
 				return;
+			}
+			/*Cerco di annullare la prenotazione*/
+			try {
+				bookingsDAO.updateBooking(booking_id, state);
+				request.setAttribute("info", "La prenotazione è stata annullata con successo.");
+				
+			} catch(SQLException e) {
+				e.printStackTrace();
+				request.setAttribute("error", "Errore: l'annullamento della prenotazione non è andato buon fine");
+			}
+			
+			ArrayList<BookingsBean> bookings = bookingsDAO.getUserBookings(email);
+			if(bookings != null)
+				session.setAttribute("bookings", bookings);
+			request.getRequestDispatcher("profile.jsp").forward(request, response);
+			return;
 		}
 		
-		int start_day = Integer.parseInt(request.getParameter("start_day"));
-		int start_month = Integer.parseInt(request.getParameter("start_month"));
-		int start_year = Integer.parseInt(request.getParameter("start_year"));
-		LocalDate start_date = LocalDate.of(start_year, start_month, start_day);
-		int end_day = Integer.parseInt(request.getParameter("end_day"));
-		int end_month = Integer.parseInt(request.getParameter("end_month"));
-		int end_year = Integer.parseInt(request.getParameter("end_year"));
-		LocalDate end_date = LocalDate.of(end_year, end_month, end_day);
 		UsersBean user = (UsersBean) session.getAttribute("user");
 		String email = user.getEmail();
 
+		/*Il libro non esiste*/
 		if(request.getParameter("book_id") == null || request.getParameter("book_id").equals("")) {
 			response.sendError(404);
 	    	return;
 		}
-		int book_id = Integer.parseInt(request.getParameter("book_id"));
-		BookingsDAO dao = new BookingsDAO();
-		CardsDAO cardsDAO = new CardsDAO();
-		Integer card_id = null;
+		
+		int book_id = 0;
 		try {
-			card_id = cardsDAO.getCardByEmail(email).getCard_id();
-		}
-		catch(NullPointerException e) {
+			book_id = Integer.parseInt(request.getParameter("book_id"));
+		
+			SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy", Locale.ITALIAN);
+			Date tmp_date;
+			LocalDate start_date, end_date;
+		
+			tmp_date = formatter.parse(request.getParameter("start_date"));
+			start_date = tmp_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			tmp_date = formatter.parse(request.getParameter("end_date"));
+			end_date = tmp_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			
+			if(start_date.isAfter(end_date)) {
+				request.setAttribute("error", "La data di inizio deve precedere la data di fine!");
+				request.getRequestDispatcher("book?id="+book_id).forward(request, response);
+				return;
+			}
+			
+			CardsBean user_card = cardsDAO.getCardByEmail(email);
+			Integer card_id = user_card.getCard_id();
+			/*Controllo che la tessera dell'utente che sta prenotando sia associata*/
+			if(!user_card.isAssociated()) {
+				request.setAttribute("error", "Attenzione! La tua tessera non risulta associata, pertanto "
+						+ "non puoi effettuare alcuna prenotazione. Per eventuali problemi, puoi contattare la biblioteca.");
+				request.getRequestDispatcher("book?id="+book_id).forward(request, response);
+				return;
+			}
+			/*Tutto in regola, procedo con la prenotazione. Se newBooking restituisce 0
+			 * - il database non risponde
+			 * - libro, tessera o utente, non esistono nel database*/
+			if(bookingsDAO.newBooking(email, start_date.toString(), end_date.toString(), "Non ancora ritirato", card_id, book_id) != 0) {
+				ArrayList<BookingsBean> bookings = bookingsDAO.getUserBookings(email);
+				if(bookings != null)
+					session.setAttribute("bookings", bookings);
+				request.setAttribute("info", "Prenotazione effettuata! Controlla lo Storico Prenotazioni.");
+				request.getRequestDispatcher("profile.jsp").forward(request, response);
+				return;
+			}
+			else {
+				request.setAttribute("error", "Si è verificato un errore durante la prenotazione. "
+						+ "Assicurarsi che il libro sia ancora disponibile e riprovare più tardi.");
+				request.getRequestDispatcher("book?id="+book_id).forward(request, response);
+				return;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Formato delle date non valido.");
+			request.getRequestDispatcher("book?id="+book_id).forward(request, response);
+			return;
+		} catch(NumberFormatException e) {
+			e.printStackTrace();
+			response.sendError(404);
+			return;
+		} catch(NullPointerException e) {
 			request.setAttribute("error", "Abbiamo rilevato un problema con la tua tessera. Per favore contatta la biblioteca.");
 			request.getRequestDispatcher("book?id="+book_id).forward(request, response);
 			return;
-		}
-		if(start_date.isAfter(end_date)) {
-			request.setAttribute("error", "La data di inizio deve precedere la data di fine!");
+		} catch(SQLException e) {
+			request.setAttribute("error", "Il sistema non è al momento disponibile. Riprovare più tardi.");
 			request.getRequestDispatcher("book?id="+book_id).forward(request, response);
 			return;
 		}
-		/*Prenotazione avvenuta con successo*/
-		if(dao.newBooking(email, start_date.toString(), end_date.toString(), "Non ancora ritirato", card_id, book_id) > 0) {
-			ArrayList<BookingsBean> bookings = dao.getUserBookings(email);
-			if(bookings != null)
-				session.setAttribute("bookings", bookings);
-			response.sendRedirect("profile.jsp");
-		}
-		else {
-			request.setAttribute("error", "Errore imprevisto durante la prenotazione.");
-			request.getRequestDispatcher(request.getHeader("referer")).forward(request, response);
-			return;
-		}
+		
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

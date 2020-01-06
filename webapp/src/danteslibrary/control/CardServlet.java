@@ -92,7 +92,7 @@ public class CardServlet extends HttpServlet {
 						session.setAttribute("card", cdao.getCardById(card_id));
 					}
 					else {
-						request.setAttribute("error", "Questa tessera non esiste oppure � gi� associata a qualche cliente."
+						request.setAttribute("error", "Questa tessera non esiste oppure è già associata a qualche cliente."
 								+ " Se non ti risulta, per favore contatta la biblioteca.");
 						request.getRequestDispatcher("card.jsp").forward(request, response);
 						return;

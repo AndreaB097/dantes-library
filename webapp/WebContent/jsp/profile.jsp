@@ -24,6 +24,14 @@
 <div class="container">
 	<div class="profile-container">		
 		<div id="name"><h1>${user.name} ${user.surname }</h1></div>
+		
+		<% if(request.getAttribute("info") != null) { %>
+			<div class="info"><%=request.getAttribute("info") %></div>
+		<% } %>
+		<% if(request.getAttribute("error") != null) { %>
+			<div class="error"><%=request.getAttribute("error") %></div>
+		<% } %>
+				
 		<button class="dropdown-btn"><i class="fas fa-id-card fa"></i>&nbsp;&nbsp;Tessera</button>
 		<div class="dropdown-content">
 			<div id="card">
@@ -125,7 +133,7 @@
 			</table>
 		</div>
 		<button class="dropdown-btn"><i class="fas fa-user"></i>&nbsp;&nbsp;Dati personali</button>
-		<div id="user-info" class="dropdown-content section-container">
+		<div class="dropdown-content section-container" style="margin: 0; text-align: left;">
 			<form method ="post" action="login?edit_user">
 			<label for="email">Email</label>
 			<input id="email" name="email" class="editable" type="text" value="${user.email}" readonly>

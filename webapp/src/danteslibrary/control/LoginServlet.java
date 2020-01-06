@@ -4,6 +4,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import danteslibrary.model.UsersBean;
 import danteslibrary.model.BookingsBean;
@@ -43,9 +44,15 @@ public class LoginServlet extends HttpServlet {
 				if (address != null && !address.equals("")) {
 					user.setAddress(address);
 				}
-				dao.updateUser(user, old_email);
-			request.setAttribute("info","Il tuo profilo è stato aggiornato");
-			session.setAttribute("user", user);
+				try {
+					dao.updateUser(user, old_email);
+					request.setAttribute("info","Il tuo profilo è stato aggiornato correttamente.");
+					session.setAttribute("user", user);
+				} catch (SQLException e) {
+					request.setAttribute("error","Impossibile aggiornare il profile. Si prega di riprovare più tardi.");
+					e.printStackTrace();
+				}
+			
 			request.getRequestDispatcher("profile.jsp").forward(request, response);
 			return;	
 			}
