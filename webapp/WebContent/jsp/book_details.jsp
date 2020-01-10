@@ -22,7 +22,7 @@ java.time.format.*, java.util.*"%>
 	}
 	BooksBean book = (BooksBean) request.getAttribute("book"); %>
 		<div class="cover">
-			<img src="<%=book.getCover() %>" alt="Impossibile caricare l'immagine">
+			<img src="<%=book.getCover() %>" alt="Impossibile caricare l'immagine" onerror="this.onerror=null; this.src='./images/no_image.png'">
 		</div>
 		<div class="details">
 			<h1><%=book.getTitle() %></h1>

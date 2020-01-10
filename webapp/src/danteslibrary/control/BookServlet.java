@@ -17,7 +17,7 @@ public class BookServlet extends HttpServlet {
 		String book_id = request.getParameter("id");
 		
 		if(book_id != null && !book_id.equals("")) {
-			request.setAttribute("book", dao.findBookById(book_id));
+			request.setAttribute("book", dao.getBookById(Integer.parseInt(book_id)));
 			request.getRequestDispatcher("book_details.jsp").forward(request, response);
 			return;
 		}

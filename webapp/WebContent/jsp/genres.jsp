@@ -32,7 +32,7 @@ if(request.getAttribute("list") == null) {
 		<h3><%=key %></h3>
 			<%for(BooksBean book : books) { %>
 				<a class="card" href="book?id=<%=book.getBook_id() %>">
-					<img src="<%=book.getCover() %>" alt="Impossibile caricare l'immagine" />
+					<img src="<%=book.getCover() %>" alt="Impossibile caricare l'immagine" onerror="this.onerror=null; this.src='./images/no_image.png'"/>
 					<span class="card-title"><%=book.getTitle() %></span>
 				</a>
 			<%} %>

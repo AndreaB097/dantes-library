@@ -49,6 +49,10 @@ public class UsersDAO {
 		catch(SQLException e) {
 			System.out.println("Errore Database metodo login: " + e.getMessage());
 		}
+		catch(IllegalArgumentException e) {
+			System.out.println("Invalid salt version!");
+			return null;
+		}
 		
 		return null;
 	}
@@ -62,7 +66,7 @@ public class UsersDAO {
 			ps.setString(1, user.getName());
 			ps.setString(2, user.getSurname());
 			ps.setString(3, user.getEmail());
-			ps.setString(4, user.getPassword());
+			ps.setString(4, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
 			ps.setString(5,	user.getCodice_fiscale());
 			ps.setString(6, user.getAddress());
 			
@@ -297,7 +301,7 @@ public class UsersDAO {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("UPDATE users SET password = ? WHERE email = ? ");
-			ps.setString(1, new_password);
+			ps.setString(1, BCrypt.hashpw(new_password, BCrypt.gensalt()));
 			ps.setString(2, email);
 			result = ps.executeUpdate();
 			conn.close();

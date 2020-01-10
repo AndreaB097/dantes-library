@@ -2,7 +2,8 @@
     pageEncoding="UTF-8"
     import="java.util.ArrayList,
     danteslibrary.model.UsersBean, danteslibrary.model.BookingsBean,
-    danteslibrary.model.CardsBean, java.text.SimpleDateFormat, java.time.LocalDate"%>
+    danteslibrary.model.CardsBean, java.util.Locale, java.time.LocalDate,
+    java.time.format.DateTimeFormatter"%>
 
 <!doctype html>
 <html>
@@ -54,7 +55,13 @@
 					possibile effettuare alcuna prenotazione. Per favore contatta la biblioteca.
 			  <%} %>
 				</p>
-			<%} %>
+			<%}
+			  else { %>
+				  <p><b>ATTENZIONE!</b> Non riusciamo a rilevare la tua tessera.
+				  In questo stato non potrai effettuare prenotazioni. Contatta la
+				  biblioteca per maggiori informazioni.
+				  </p>
+			<%}%>
 			</div>
 		</div>
 		<button class="dropdown-btn"><i class="fas fa-address-book fa"></i>&nbsp;&nbsp;Storico prenotazioni</button>
@@ -76,16 +83,12 @@
 				</tr>
 			<% 
 				for(int i = 0; i < bookings.size(); i++) {
-					BookingsBean booking = bookings.get(i);
-					SimpleDateFormat parsedFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					SimpleDateFormat desiredFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-					/*TODO Parsing delle date per formattarle meglio*/
-				%>
+					BookingsBean booking = bookings.get(i); %>
 					<tr>
 						<td><%=booking.getBooking_id() %></td>
-						<td><%=booking.getBook_id() %></td>
-						<td><%=booking.getStart_date()%></td>
-						<td><%=booking.getEnd_date()%></td>
+						<td><%=booking.getTitle() %></td>
+						<td><%=booking.getStart_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN))%></td>
+						<td><%=booking.getEnd_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN))%></td>
 						<td><i><%=booking.getState_name() %></i></td>
 						<%if(booking.getState_name().equals("Non ancora ritirato"))  {%>
 						<td>
@@ -118,7 +121,7 @@
 				%>
 					<tr class="striped">
 						<td><%=bookings.get(i).getBooking_id() %></td>
-						<td><%=bookings.get(i).getBook_id() %></td>
+						<td><%=bookings.get(i).getTitle() %></td>
 					</tr>
 					<tr class="striped">
 						<td colspan="2"><strong>Stato: </strong><i><%=bookings.get(i).getState_name() %></i></td>

@@ -13,7 +13,7 @@
 
 <div class="container">
 	<h2>Contattaci</h2>
-	<p>${applicationScope.library.contacts}</p>
+	<p style="white-space: pre-line">${applicationScope.library.contacts}</p>
 </div>
 
 <%@ include file="./jsp/layout/footer.jsp" %>

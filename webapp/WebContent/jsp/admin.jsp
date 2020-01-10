@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"
-import="java.util.ArrayList, danteslibrary.model.*, java.text.SimpleDateFormat,
-java.time.LocalDate, java.util.Calendar, java.util.Date"%>
+import="java.util.ArrayList, danteslibrary.model.*,
+java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 
 <!doctype html>
 <html>
@@ -15,7 +15,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 	
 <% if(session.getAttribute("admin") == null) { %>
 <!-- Sezione LOGIN Gestori -->
-<div id="form-container">
+<div id="form-container" style="margin-top: 75px">
 	<h2>Accedi come Gestore</h2>
 	<form id="sign-form" class="box" action="admin" method="post">
 		<label for="email">Email</label>
@@ -253,7 +253,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<form id="update-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
 				<h3>Modifica Libro</h3>
 				<div style="float:left" id="update-book-image-preview" class="image-preview">
-					<img src="<%=book.getCover() %>" alt="Nessun immagine">
+					<img src="<%=book.getCover() %>" alt="Nessun immagine" onerror="this.onerror=null; this.src='./images/no_image.png'">
 				</div>
 				
 				<label id="btn-upload" for="update-book-image"><i class="far fa-images"></i></label>
@@ -276,7 +276,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$(document).ready(function() {
 						$('#authors').val($('#update-authors-select').val());
 					    $('#update-authors-select').select2({
-					    	tags: true
+					    	tags: true,
+					    	maximumSelectionLength: 5,
+					    	maximumInputLength: 100,
+					    	language: "it"
 					    });
 					    $('#update-authors-select').change(function() {
 					    	$('#authors').val($('#update-authors-select').val());
@@ -307,7 +310,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<script>
 					$(document).ready(function() {
 						$('#genres').val($('#update-genres-select').val());
-					    $('#update-genres-select').select2();
+					    $('#update-genres-select').select2({
+					    	maximumSelectionLength: 5,
+					    	language: "it"
+					    });
 					    $('#update-genres-select').change(function() {
 					    	$('#genres').val($('#update-genres-select').val());
 					    });
@@ -318,13 +324,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<input id="quantity" name="quantity" type="text" value="<%=book.getQuantity() %>">
 				<input type="hidden" name="book_id" value="<%=book.getBook_id() %>"/>
 				<button type="submit" class="save" formaction="admin?books&save_book"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
-				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
-				<script>
-                    $(".cancel").click(function() {
-                        $("#update-book-image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
-                        $("#update-book-image").val('');
-                    });
-                </script>
+				
 				<script>
 				/*Script per il caricamento delle immagini e preview*/
 				var updated_image = document.getElementById("update-book-image");
@@ -333,7 +333,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					if(updated_image.files[0].type !== 'image/jpeg' && updated_image.files[0].type !== 'image/jpg' && updated_image.files[0].type !== 'image/png') {
 						return false;
 					}
-					else if(updated_image.files[0].size <= 0 || updated_image.files[0].size > 1048576 /*1MB*/) {
+					else if(updated_image.files[0].size <= 0 || updated_image.files[0].size > 2097152 /*2MB*/) {
 						return false;
 					}
 					var img = new Image();
@@ -379,7 +379,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<form id="new-book-form" method="post" class="overflow-container" onsubmit="return validateBook()" enctype="multipart/form-data">
 				<h3>Inserimento Libro</h3>
 				<div style="float:left" id="new-book-image-preview" class="image-preview">
-					<img src="images/no_image.png" alt="Nessun immagine">
+					<img src="images/no_image.png" alt="Nessun immagine" onerror="this.onerror=null; this.src='./images/no_image.png'">
 				</div>
 				<label id="btn-upload" for="new-book-image"><i class="far fa-images"></i></label>
 				<input id="new-book-image" class="image" type="file" name="file" accept=".jpg, .jpeg, .png">
@@ -395,7 +395,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<script>
 					$(document).ready(function() {
 					    $('#authors-select').select2({
-					    	tags: true
+					    	tags: true,
+					    	maximumSelectionLength: 5,
+					    	maximumInputLength: 100,
+					    	language: "it"
 					    });
 					    $('#authors-select').change(function() {
 					    	$('#authors').val($('#authors-select').val());
@@ -418,7 +421,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 						}
 					});
 					$(document).ready(function() {
-					    $('#genres-select').select2();
+					    $('#genres-select').select2({
+					    	maximumSelectionLength: 5,
+					    	language: "it"
+					    });
 					    $('#genres-select').change(function() {
 					    	$('#genres').val($('#genres-select').val());
 					    });
@@ -429,13 +435,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<label for="quantity">Quantità</label>
 				<input id="quantity" name="quantity" type="text">
 				<button type="submit" class="save" formaction="admin?books&new_book"><i class="fas fa-plus fa-lg"></i> Aggiungi libro</button>
-				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
-				<script>
-                    $(".cancel").click(function() {
-                        $("#new-book-image-preview").html('<img src="images/no_image.png" alt="Nessun immagine">');
-                        $("#new-book-image").val('');
-                    });
-                </script>
 				<script>
 				/*Script per il caricamento delle immagini e preview*/
 				var book_image = document.getElementById("new-book-image");
@@ -445,7 +444,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					if(book_image.files[0].type !== 'image/jpeg' && book_image.files[0].type !== 'image/jpg' && book_image.files[0].type !== 'image/png') {
 						return false;
 					}
-					else if(book_image.files[0].size <= 0 || book_image.files[0].size > 1048576 /*1MB*/) {
+					else if(book_image.files[0].size <= 0 || book_image.files[0].size > 2097152 /*2MB*/) {
 						return false;
 					}
 					var img = new Image();
@@ -473,6 +472,22 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			var quantity = document.getElementById("quantity").value;
 			var genres = document.getElementById("genres").value;
 				
+			if(!title.match(/^[A-Za-z0-9 _.:]{1,100}$/) && title) {
+				errors.push("Il titolo può contenere solo caratteri alfanumerici. Lunghezza massima: 100.");
+			}
+			
+			if(!description.match(/^[\s\S]{1,1000}$/) && description) {
+				errors.push("La descrizione non può superare i 1000 caratteri.");
+			}
+			
+			if(!publisher.match(/^[A-Za-z0-9 _.:]{1,100}$/) && publisher) {
+				errors.push("La casa editrice può contenere solo caratteri alfanumerici. Lunghezza massima: 100.");
+			}
+			
+			if(!quantity.match(/^[0-9]+$/) && quantity) {
+				errors.push("La quantità deve essere espressa con un numero.");
+			}
+			
 			if(!title || !description || !authors || !publisher || !quantity || !genres) {
 				errors.push("Non tutti i campi sono stati compilati.");
 			}
@@ -500,8 +515,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				$(errors_div).fadeIn(300);
 				errors = [];
 				errors_div.focus();
-				$("#error-list").fadeOut(2500);
-				console.log(errors);
 				return false;
 			}
 			
@@ -678,7 +691,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					$(errors_div).fadeIn(300);
 					errors = [];
 					errors_div.focus();
-					$("#error-list").fadeOut(2500);
 					return false;
 				}
 				
@@ -750,11 +762,12 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<tr>
 						<th>Codice prenotazione</th>
 						<th>Codice Libro</th>
+						<th>Titolo</th>
 						<th>Codice Tessera</th>
 						<th>Codice fiscale</th>
-						<th>Stato</th>
 						<th>Data inizio</th>
 						<th>Data fine</th>
+						<th>Stato</th>						
 						<th></th>
 						<th></th>
 					</tr>
@@ -764,16 +777,19 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					<tr>
 						<td><%=booking.getBooking_id() %></td>
 						<td><%=booking.getBook_id() %></td>
+						<td><%=booking.getTitle() %></td>
 						<td><%=booking.getCard_id() %></td>
 						<td><%=booking.getCodice_fiscale() %></td>
+						<td><%=booking.getStart_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN)) %></td>
+						<td><%=booking.getEnd_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN)) %></td>
 						<td><%=booking.getState_name() %></td>
-						<td><%=booking.getStart_date() %></td>
-						<td><%=booking.getEnd_date() %></td>
 						<td>
+						<%if(!booking.getState_name().equals("Annullata") && !booking.getState_name().equals("Riconsegnato")) {%>
 							<form action="admin?bookings" method="post">
 								<input type="hidden" name="edit_booking" value="<%=booking.getBooking_id()%>">
 								<button id="btn-edit" type="submit"><i style="color: #404040;" class="fas fa-pencil-alt fa-lg"></i></button>
 							</form>
+						<%} %>
 						</td>
 						<td>	
 							<form action="admin?bookings" method="post">
@@ -810,15 +826,29 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<label for="booking_book_id">Codice Libro</label>
 				<input id="booking_book_id"   type="text" value="<%=booking.getBook_id() %>" readonly> 
 				<label for="booking_start_date">Data inizio</label>
-				<input id="booking_start_date"   type="text" value="<%=booking.getStart_date() %>" readonly> 
+				<input id="booking_start_date"   type="text" value="<%=booking.getStart_date().format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ITALIAN)) %>" readonly> 
 				<label for="booking_end_date">Data fine</label>
-				<input id="booking_end_date" type="text" value="<%=booking.getEnd_date() %>" readonly> 
+				<input id="booking_end_date" type="text" value="<%=booking.getEnd_date().format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ITALIAN)) %>" readonly> 
 					<label for="booking_state">Stato</label>
 					<select id="booking_state" class="booking_state" name="state">
-						<option value="Non ancora ritirato">Non ancora ritirato</option>
-						<option value="Ritirato">Ritirato</option>
-						<option value="Riconsegnato">Riconsegnato</option>
-						<option value="Annullata">Annullata</option>
+						<%if(booking.getState_name().equals("Annullata")) {%>
+							<option value="Annullata" selected>Annullata</option>
+						<%} 
+						if(booking.getState_name().equals("Non ancora ritirato")) {%>
+							<option value="Annullata">Annullata</option>
+							<option value="Non ancora ritirato" selected>Non ancora ritirato</option>
+							<option value="Ritirato">Ritirato</option>
+							<option value="Riconsegnato" disabled>Riconsegnato</option>
+						<%} 
+						if(booking.getState_name().equals("Ritirato")) {%>
+							<option value="Annullata" disabled>Annullata</option>
+							<option value="Non ancora ritirato" disabled>Non ancora ritirato</option>
+							<option value="Ritirato" selected>Ritirato</option>
+							<option value="Riconsegnato">Riconsegnato</option>
+						<%}
+						if(booking.getState_name().equals("Riconsegnato")) {%>
+							<option value="Riconsegnato" selected>Riconsegnato</option>
+						<%} %>
 					</select>
 				<button type="submit" class="save" formaction="admin?bookings&save_booking"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
 			</form>
@@ -834,10 +864,49 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<input id="booking_card_id" name="card_id"  type="text"> 
 				<label for="booking_book_id">Codice Libro</label>
 				<input id="booking_book_id" name="book_id"  type="text"> 
-				<label for="booking_start_date">Data inizio</label>
-				<input id="booking_start_date" name="start_date"  type="text"> 
-				<label for="booking_end_date">Data fine</label>
-				<input id="booking_end_date" name="end_date"  type="text"> 
+				<label for="start-date">Data inizio prestito</label> 
+				<input type="text" id="start-date" name="start_date" value="" required>
+				<label for="end-date">Data fine prestito</label>
+				<input type="text" id="end-date" name="end_date" value="" required>
+				<script>
+				$(document).ready(function() {
+					$("#start-date, #end-date").datepicker({
+						maxDate: "+4m",
+						autoSize: true,
+						dateFormat: "d MM yy",
+						monthNames: [ "Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
+							"Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre" ],
+					});
+					$('#start-date').datepicker("setDate", "0");
+					
+					var start_date = $('#start-date').datepicker("getDate");
+					var end_date = $('#end-date').datepicker("getDate");
+					
+					/*Se la data di fine e' stata settata, allora aggiorno l'attributo value,
+					altrimenti value=""*/
+					if(end_date)
+						$('#end-date').attr("value", end_date.getFullYear() + "-" + (end_date.getMonth()+1) + "-" + end_date.getDate());
+					
+					$('#start-date').attr("value", start_date.getFullYear() + "-" + (start_date.getMonth()+1) + "-" + start_date.getDate());
+					
+					/*Ogni volta che cambia la data di inizio, ottengo l'oggetto Date con getDate
+					e aggiorno l'attribute value di start-date.
+					Inoltre, reimposto la data minima selezionabile di end-date in base a quella
+					selezionata in start-date.*/
+					$('#start-date').change(function() {
+						start_date = $('#start-date').datepicker("getDate");
+						end_date = $('#end-date').datepicker("getDate");
+						$('#start-date').attr("value", start_date.getFullYear() + "-" + (start_date.getMonth()+1) + "-" + start_date.getDate());
+						$('#end-date').datepicker("option", "minDate" , $("#start-date").datepicker("getDate"));
+					});
+					/*Ogni volta che cambia la data di fine, ottengo l'oggetto Date con getDate
+					e aggiorno l'attribute value di end-date.*/
+					$('#end-date').change(function() {
+						end_date = $('#end-date').datepicker("getDate");
+						$('#end-date').attr("value", end_date.getFullYear() + "-" + (end_date.getMonth()+1) + "-" + end_date.getDate());
+					});
+				});
+				</script>
 				<label for="booking_state">Stato prenotazione</label>
 				<select id="booking_state" class="booking_state" name="state">
 					<option value="Non ancora ritirato">Non ancora ritirato</option>
@@ -858,16 +927,32 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 		$("#error-list").hide();
 		var errors = [];
 	  	function validateBooking() {
+	  		var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+			var codice_fiscale_regex = /[a-zA-Z]{6}\d\d[a-zA-Z]\d\d[a-zA-Z]\d\d\d[a-zA-Z]/;
+
+			var email = document.getElementById("booking_email").value;
 			var codice_fiscale = document.getElementById("booking_codice_fiscale").value;
 			var card_id = document.getElementById("booking_card_id").value;
 			var book_id = document.getElementById("booking_book_id").value;
-			var start_date = document.getElementById("booking_start_date").value;
-			var end_date = document.getElementById("booking_end_date").value;
-			console.log(codice_fiscale);
-			if(!codice_fiscale || !card_id || !book_id || !start_date || !end_date) {
+			var start_date = $('#start-date').datepicker("getDate");
+			var end_date = $('#end-date').datepicker("getDate");
+			
+			if(!codice_fiscale || !card_id || !book_id)
 				errors.push("Non tutti i campi sono stati compilati.");
-			}
-		
+			
+			if(!codice_fiscale.match(codice_fiscale_regex) && codice_fiscale)
+				errors.push("Inserire un codice fiscale valido.");
+			
+			
+			if(!email.match(mailformat) && email)
+				errors.push("Indirizzo email non valido.");
+			
+			if(!book_id.match(/^[0-9]*$/) && book_id)
+				errors.push("Il codice libro può contenere solo numeri!");
+			
+			if(!card_id.match(/^[0-9]{5}$/) && card_id)
+				errors.push("Inserire un codice tessera valido.");
+			
 			if(errors.length != 0) {
 				if(!document.getElementById("error-list")) {
 					var errors_div = document.createElement("div");
@@ -878,7 +963,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					var errors_div = document.getElementById("error-list");
 				}
 				var txt = "<ul>";
-				$("#bookings-section h3").before(errors_div);
+				$("#bookings-section h2").after(errors_div);
 				errors_div.className = "error";
 				errors.forEach(showErrors);
 				errors_div.innerHTML = txt;
@@ -891,7 +976,6 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				$(errors_div).fadeIn(300);
 				errors = [];
 				errors_div.focus();
-				$("#error-list").fadeOut(2500);
 				return false;
 			}
 			
@@ -1012,15 +1096,15 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				$("#update-manager-form").slideDown();
 			});
 			</script>
-			<form id="update-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
+			<form id="update-manager-form" method="post" class="overflow-container" onsubmit="return validateUpdateManager()">
 				<h3>Modifica Gestore</h3>
 				<input type="hidden" id="original_email" name="original_email" value="<%=manager.getEmail() %>">
 				<label for="email">Email</label>
 				<input id="email" name="email" type="text" value="<%=manager.getEmail() %>">
 				<label for="password">Password</label>
-				<input id="password" name="password" type="password" value="<%=manager.getPassword() %>">
+				<input id="password" name="password" type="password" placeholder="Lasciare vuoto per non cambiare">
 				<label for="repeat_password">Ripeti Password</label>
-				<input id="repeat_password" name="repeat_password" type="password" value="<%=manager.getPassword() %>">
+				<input id="repeat_password" name="repeat_password" type="password" placeholder="Lasciare vuoto per non cambiare">
 				<label for="name">Nome</label>
 				<input id="name" name="name"  type="text" value="<%=manager.getName() %>"> 
 				<label for="surname">Cognome</label>
@@ -1068,10 +1152,64 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<button type="submit" class="save" formaction="admin?managers&save_manager"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 			</form>
+			<script>
+		    $("#error-list").hide();
+		    var errors = [];
+		    function validateUpdateManager() {
+				var email = document.getElementById("email").value;
+				var name = document.getElementById("name").value;
+				var surname = document.getElementById("surname").value;
+				var password = document.getElementById("password").value;
+				var repeat_password = document.getElementById("repeat_password").value;
+				var address = document.getElementById("address").value;
+				var phone = document.getElementById("phone").value;
+				
+				//TODO fare controllo anche sui checkbox
+				
+				if(!email || !name || !surname || !address || !phone ) {
+				  errors.push("Non tutti i campi sono stati compilati.");
+				}
+				if((password.length < 6 || !(/\d/.test(password))) && password) {
+					errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
+				}
+				if(password != repeat_password && password && repeat_password){
+				  errors.push("Le password non corrispondono");
+				}
+				
+				if(errors.length != 0) {
+				  if(!document.getElementById("error-list")) {
+				    var errors_div = document.createElement("div");
+				    errors_div.setAttribute("id", "error-list");
+				    errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
+				  }
+				  else {
+				    var errors_div = document.getElementById("error-list");
+				  }
+				  var txt = "<ul>";
+				  $("#update-manager-form h3").before(errors_div);
+				  errors_div.className = "error";
+				  errors.forEach(showErrors);
+				  errors_div.innerHTML = txt;
+				
+				  function showErrors(value, index, array) {
+				    txt = txt + "<li>" + value + "</li>";
+				  }
+				
+				  errors_div.innerHTML = txt + "</ul>";
+				  $(errors_div).fadeIn(300);
+				  errors = [];
+				  errors_div.focus();
+				  return false;
+				}
+				
+				$("#error-list").hide();
+				return true;
+		    }
+		    </script>
 			<%} %>
 				
 			
-			<form id="new-manager-form" method="post" class="overflow-container" onsubmit="return validateManager()">
+			<form id="new-manager-form" method="post" class="overflow-container" onsubmit="return validateNewManager()">
 			<h3>Inserimento Gestore</h3>
 
 				<label for="email">Email</label>
@@ -1103,55 +1241,55 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 	<script>
     $("#error-list").hide();
     var errors = [];
-    function validateManager() {
-      var email = document.getElementById("email").value;
-      var name = document.getElementById("name").value;
-      var surname = document.getElementById("surname").value;
-      var password = document.getElementById("password").value;
-      var repeat_password = document.getElementById("repeat_password").value;
-      var address = document.getElementById("address").value;
-      var phone = document.getElementById("phone").value;
-
-      //TODO fare controllo anche sui checkbox
-
-      if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
-        errors.push("Non tutti i campi sono stati compilati.");
-      }
-
-      if(password != repeat_password){
-        errors.push("Le password non corrispondono");
-      }
-
-
-      if(errors.length != 0) {
-        if(!document.getElementById("error-list")) {
-          var errors_div = document.createElement("div");
-          errors_div.setAttribute("id", "error-list");
-          errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
-        }
-        else {
-          var errors_div = document.getElementById("error-list");
-        }
-        var txt = "<ul>";
-        $("#managers-section h2").after(errors_div);
-        errors_div.className = "error";
-        errors.forEach(showErrors);
-        errors_div.innerHTML = txt;
-
-        function showErrors(value, index, array) {
-          txt = txt + "<li>" + value + "</li>";
-        }
-
-        errors_div.innerHTML = txt + "</ul>";
-        $(errors_div).fadeIn(300);
-        errors = [];
-        errors_div.focus();
-        $("#error-list").fadeOut(2500);
-        return false;
-      }
-
-      $("#error-list").hide();
-      return true;
+    function validateNewManager() {
+		var email = document.getElementById("email").value;
+		var name = document.getElementById("name").value;
+		var surname = document.getElementById("surname").value;
+		var password = document.getElementById("password").value;
+		var repeat_password = document.getElementById("repeat_password").value;
+		var address = document.getElementById("address").value;
+		var phone = document.getElementById("phone").value;
+		
+		//TODO fare controllo anche sui checkbox
+		
+		if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
+		  errors.push("Non tutti i campi sono stati compilati.");
+		}
+		if((password.length < 6 || !(/\d/.test(password))) && password) {
+			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
+		}
+		if(password != repeat_password && password && repeat_password){
+		  errors.push("Le password non corrispondono");
+		}
+		
+		if(errors.length != 0) {
+		  if(!document.getElementById("error-list")) {
+		    var errors_div = document.createElement("div");
+		    errors_div.setAttribute("id", "error-list");
+		    errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
+		  }
+		  else {
+		    var errors_div = document.getElementById("error-list");
+		  }
+		  var txt = "<ul>";
+		  $("#new-manager-form h3").before(errors_div);
+		  errors_div.className = "error";
+		  errors.forEach(showErrors);
+		  errors_div.innerHTML = txt;
+		
+		  function showErrors(value, index, array) {
+		    txt = txt + "<li>" + value + "</li>";
+		  }
+		
+		  errors_div.innerHTML = txt + "</ul>";
+		  $(errors_div).fadeIn(300);
+		  errors = [];
+		  errors_div.focus();
+		  return false;
+		}
+		
+		$("#error-list").hide();
+		return true;
     }
     </script>
     <script>
@@ -1186,7 +1324,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 			<form method="post" enctype="multipart/form-data">
 				<label for="image-preview">Logo Biblioteca</label>
 				<div style="float:left; width: 200px; height: 200px;" id="image-preview" class="image-preview" >
-						<img src="${applicationScope.library.logo}" alt="Nessun immagine">
+						<img src="${applicationScope.library.logo}" alt="Nessun immagine" onerror="this.onerror=null; this.src='./images/default_logo.png'">
 				</div>
 				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
 				<input id="image" class="image" type="file" name="file" accept=".jpg, .jpeg, .png">
@@ -1195,10 +1333,10 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 				<label for="contacts">Contatti</label>
 				<textarea id="contacts" name="contacts" rows="6" cols="60">${applicationScope.library.contacts}</textarea>
 				<button type="submit" class="save" formaction="admin?library&save_library"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
-				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
+				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Annulla modifiche</button>
 				<script>
                     $(".cancel").click(function() {
-                        $("#image-preview").html('<img src="images/logo.png" alt="Nessun immagine">');
+                        $("#image-preview").html('<img src="${applicationScope.library.logo}" alt="Nessun immagine">');
                     });
                 </script>
 				<script>
@@ -1211,7 +1349,7 @@ java.time.LocalDate, java.util.Calendar, java.util.Date"%>
 					if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
 						return false;
 					}
-					else if(file.files[0].size <= 0 || file.files[0].size > 1048576 /*1MB*/) {
+					else if(file.files[0].size <= 0 || file.files[0].size > 2097152 /*2MB*/) {
 						return false;
 					}
 					var img = new Image();

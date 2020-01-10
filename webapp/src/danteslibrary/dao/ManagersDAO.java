@@ -8,32 +8,32 @@ import java.util.ArrayList;
 
 
 import danteslibrary.model.ManagersBean;
+import danteslibrary.util.BCrypt;
 import danteslibrary.util.DBConnection;
 
 public class ManagersDAO {
 	public ManagersBean login(String email, String password) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(
-					"SELECT managers.email, managers.name, managers.surname, managers.address, managers.phone "
-					+ "FROM managers WHERE email = ? AND password = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM managers WHERE email = ?");
 			ps.setString(1, email);
-			ps.setString(2,	password);
 			ResultSet result = ps.executeQuery();
 			
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 				return null;
 			
 			if(result.first()) {
+				String hashed_password = result.getString("password");
+				if(!BCrypt.checkpw(password, hashed_password))
+					return null;
 				/*Ottengo i dati dell'amministratore dal DB*/
-
 				ManagersBean admin = new ManagersBean();
 				admin.setEmail(result.getString("email"));
 				admin.setName(result.getString("name"));
 				admin.setSurname(result.getString("surname"));
 				admin.setAddress(result.getString("address"));
 				admin.setPhone(result.getString("phone"));
-				admin.setRoles(retrieveManagerRoles(email));
+				admin.setRoles(getManagerRoles(email));
 				conn.close();
 				
 				return admin;
@@ -45,6 +45,10 @@ public class ManagersDAO {
 		}
 		catch(SQLException e) {
 			System.out.println("Errore Database: " + e.getMessage());
+		}
+		catch(IllegalArgumentException e) {
+			System.out.println("Invalid salt version!");
+			return null;
 		}
 		
 		return null;
@@ -69,7 +73,7 @@ public class ManagersDAO {
 				String surname = result.getString("surname");
 				String address = result.getString("address");
 				String phone = result.getString("phone");
-				ArrayList<String> roles = retrieveManagerRoles(email);
+				ArrayList<String> roles = getManagerRoles(email);
 				
 				ManagersBean manager = new ManagersBean();
 				manager.setEmail(email);
@@ -93,14 +97,14 @@ public class ManagersDAO {
 		return null;
 	}
 	
-	public ArrayList<String> retrieveManagerRoles(String email) {
+	public ArrayList<String> getManagerRoles(String email) {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT roles.role_name FROM roles, managers_roles WHERE roles.role_name = managers_roles.role_name AND managers_roles.email = ?");
 			ps.setString(1, email);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> roles = new ArrayList<String>();
@@ -137,7 +141,7 @@ public class ManagersDAO {
 					String surname = result.getString("surname");
 					String address = result.getString("address");
 					String phone = result.getString("phone");
-					ArrayList<String> roles = retrieveManagerRoles(email);
+					ArrayList<String> roles = getManagerRoles(email);
 					
 					ManagersBean manager = new ManagersBean();
 					manager.setEmail(email);
@@ -184,7 +188,7 @@ public class ManagersDAO {
 					+ "VALUES(?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, manager.getEmail());
-			ps.setString(2, manager.getPassword());
+			ps.setString(2, BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt()));
 			ps.setString(3, manager.getName());
 			ps.setString(4, manager.getSurname());
 			ps.setString(5, manager.getAddress());
@@ -205,26 +209,25 @@ public class ManagersDAO {
 	}
 	
 	
-	public ManagersBean findManagerByEmail(String email) {
+	public ManagersBean getManagerByEmail(String email) {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM managers WHERE managers.email = ?");
 			ps.setString(1, email);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ManagersBean manager = new ManagersBean();
 			
 			while(result.next()) {
 				manager.setEmail(result.getString("email"));
-				manager.setPassword(result.getString("password"));
 				manager.setName(result.getString("name"));
 				manager.setSurname(result.getString("surname"));
 				manager.setPhone(result.getString("phone"));
 				manager.setAddress(result.getString("address"));
-				ArrayList<String> roles = retrieveManagerRoles(email);
+				ArrayList<String> roles = getManagerRoles(email);
 				manager.setRoles(roles);
 			}
 
@@ -232,7 +235,7 @@ public class ManagersDAO {
 			return manager;
 		}
 		catch(SQLException e) {
-			System.out.println("Errore Database metodo findBookById: " + e.getMessage());
+			System.out.println("Errore Database metodo getManagerByEmail: " + e.getMessage());
 		}
 		
 		return null;
@@ -245,15 +248,29 @@ public class ManagersDAO {
 		try {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
-			String query = "UPDATE managers SET email= ?, password= ?, name = ?, surname = ?, phone = ?, address = ? WHERE managers.email = ?";
-			PreparedStatement ps = conn.prepareStatement(query);
-			ps.setString(1, manager.getEmail());
-			ps.setString(2, manager.getPassword());
-			ps.setString(3, manager.getName());
-			ps.setString(4, manager.getSurname());
-			ps.setString(5, manager.getPhone());
-			ps.setString(6, manager.getAddress());
-			ps.setString(7, email);
+			String query = "";
+			PreparedStatement ps;
+			if(manager.getPassword() != null && !manager.getPassword().equals("")) {
+				query = "UPDATE managers SET email= ?, password= ?, name = ?, surname = ?, phone = ?, address = ? WHERE managers.email = ?";
+				ps = conn.prepareStatement(query);
+				ps.setString(1, manager.getEmail());
+				ps.setString(2, BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt()));
+				ps.setString(3, manager.getName());
+				ps.setString(4, manager.getSurname());
+				ps.setString(5, manager.getPhone());
+				ps.setString(6, manager.getAddress());
+				ps.setString(7, email);
+			}
+			else {
+				query = "UPDATE managers SET email= ?, name = ?, surname = ?, phone = ?, address = ? WHERE managers.email = ?";
+				ps = conn.prepareStatement(query);
+				ps.setString(1, manager.getEmail());
+				ps.setString(2, manager.getName());
+				ps.setString(3, manager.getSurname());
+				ps.setString(4, manager.getPhone());
+				ps.setString(5, manager.getAddress());
+				ps.setString(6, email);
+			}
 			ps.executeUpdate();
 
 			query ="DELETE FROM managers_roles WHERE email = ?";

@@ -3,7 +3,8 @@
     import="danteslibrary.model.LibraryBean"%>
 <header>
   <div class="container">
-	<a id="logo" href="./index.jsp"><img title="HOMEPAGE" src="${applicationScope.library.logo }" />&nbsp;<span>${applicationScope.library.name}</span></a>
+	<a id="logo" href="./index.jsp"><img class="backup-image" title="HOMEPAGE" src="${applicationScope.library.logo}" onerror="this.onerror=null; this.src='./images/default_logo.png'"/>&nbsp;<span>${applicationScope.library.name}</span></a>
+
 	<nav id="menu">
 	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp" title="LOGOUT"><i class="fas fa-sign-out-alt fa-lg"></i></a>

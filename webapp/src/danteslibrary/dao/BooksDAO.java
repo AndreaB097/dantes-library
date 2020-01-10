@@ -84,12 +84,12 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;
 	}
 	
-	public BooksBean findBookById(String id) {
+	public BooksBean getBookById(int id) {
 		
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM books WHERE books.book_id = ?");
-			ps.setString(1, id);
+			ps.setInt(1, id);
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
@@ -127,7 +127,7 @@ public ArrayList<BooksBean> getAllBooks() {
 					+ "WHERE genres.genre_name = books_genres.genre_name AND book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> genres = new ArrayList<String>();
@@ -154,7 +154,7 @@ public ArrayList<BooksBean> getAllBooks() {
 					+ "WHERE authors.author_id = books_authors.author_id AND book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> authors = new ArrayList<String>();
@@ -179,7 +179,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres;");
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			JSONArray genres = new JSONArray();
@@ -203,7 +203,7 @@ public ArrayList<BooksBean> getAllBooks() {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT genre_name FROM genres ORDER BY genre_name ASC;");
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet è vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			
 			ArrayList<String> genres = new ArrayList<String>();
@@ -460,7 +460,7 @@ public ArrayList<BooksBean> getAllBooks() {
 					+ "WHERE books.book_id = ?");
 			ps.setInt(1, book_id);
 			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Se il ResultSet � vuoto, allora la query non ha prodotto risultati*/
+			if(!result.isBeforeFirst()) /*Se il ResultSet e' vuoto, allora la query non ha prodotto risultati*/
 				return null;
 			result.first();
 			String cover = result.getString("cover");

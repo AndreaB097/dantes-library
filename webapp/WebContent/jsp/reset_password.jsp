@@ -78,6 +78,7 @@ pageEncoding="UTF-8"%>
 			<div class="error"><%=request.getAttribute("error") %></div>
 		<% } %>
 			<form id="sign-form" class="box" method="post">
+				<p>Inserisci l'indirizzo email che di solito utilizzi per autenticarti.</p>
 				<label for="email">Email</label>
 				<input id="email" type="text" name="email" required/>
 				<button type="submit" formaction="reset_password">Invia</button>

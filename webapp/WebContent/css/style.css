@@ -743,6 +743,7 @@ div.section-container input[type='checkbox'] {
 	margin-bottom: 20px;
 	display: block;
 	resize: none;
+	white-space: pre-wrap;
 }
 .section-container #search-bar {
 	max-width: 650px;

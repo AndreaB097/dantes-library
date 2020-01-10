@@ -11,3 +11,4 @@
 <script src="./scripts/jquery-ui.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/i18n/it.js"></script>

@@ -98,10 +98,10 @@ var errors = [];
 		if(!name || !surname || !email || !password || !repeat || !codice_fiscale || !address) {
 			errors.push("Non tutti i campi sono stati compilati.");
 		}
-		if(password.length < 6 || !(/\d/.test(password))) {
+		if((password.length < 6 || !(/\d/.test(password))) && password) {
 			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
 		}
-		if(password != repeat) {
+		if(password != repeat && password && repeat) {
 			errors.push("Le password non corrispondono.");
 		}
 	

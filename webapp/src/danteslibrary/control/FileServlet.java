@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 import javax.servlet.ServletException;
 
@@ -24,7 +25,14 @@ public class FileServlet extends HttpServlet {
         response.setHeader("Content-Type", getServletContext().getMimeType(filename));
         response.setHeader("Content-Length", String.valueOf(file.length()));
         response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
-        Files.copy(file.toPath(), response.getOutputStream());
+        
+        try {
+        	Files.copy(file.toPath(), response.getOutputStream());
+        }
+        catch(NoSuchFileException e) {
+        	System.out.println("Impossibile caricare il file specificato.");
+        	e.printStackTrace();
+        }
     }
 
 }

@@ -7,8 +7,15 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
+import java.util.regex.*;
 
 import danteslibrary.dao.*;
 import danteslibrary.model.*;
@@ -17,11 +24,17 @@ import org.json.*;
 
 @WebServlet("/admin")
 @MultipartConfig /*Necessario perché nella pagina admin.jsp abbiamo una form
-//con enctype="multipart/form-data"*/
+					con enctype="multipart/form-data"*/
 public class ManagerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
+	private CardsDAO cardsDAO = new CardsDAO();
+	private UsersDAO usersDAO = new UsersDAO();
+	private BooksDAO booksDAO = new BooksDAO();
+	private BookingsDAO bookingsDAO = new BookingsDAO();
+	private ManagersDAO managersDAO = new ManagersDAO();
+	private LibraryDAO libraryDAO = new LibraryDAO();
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
@@ -50,21 +63,18 @@ public class ManagerServlet extends HttpServlet {
 					return;
 				} 
 				else {
-					UsersDAO dao = new UsersDAO();
-					ArrayList<UsersBean> users = dao.getUsersByFilter(filter, keyword);
+					ArrayList<UsersBean> users = usersDAO.getUsersByFilter(filter, keyword);
 					request.setAttribute("users", users);
 				}
 			}
 			/* - Mostra tutti gli utenti presenti nel database*/
 			else if(request.getParameter("all_users") != null) {
-				UsersDAO dao = new UsersDAO();
-				ArrayList<UsersBean> users = dao.getAllUsers();
+				ArrayList<UsersBean> users = usersDAO.getAllUsers();
 				request.setAttribute("users", users);
 			}
 			/* - Rimozione utente dal database (data la mail in input)*/
 			else if(request.getParameter("remove_user") != null) {
-				UsersDAO dao = new UsersDAO();
-				dao.removeUser(request.getParameter("remove_user"));
+				usersDAO.removeUser(request.getParameter("remove_user"));
 				request.setAttribute("info_user", "L'utente " + request.getParameter("remove_user") + " è stato rimosso.");
 			}
 		
@@ -83,25 +93,22 @@ public class ManagerServlet extends HttpServlet {
 					return;
 				} 
 				else {
-					BooksDAO dao_books = new BooksDAO();
-					ArrayList<BooksBean> books = dao_books.getBooksByFilter(filter, keyword);
+					ArrayList<BooksBean> books = booksDAO.getBooksByFilter(filter, keyword);
 					request.setAttribute("books", books);
 				}
 			}
 			else if(request.getParameter("edit_book") != null) {
-				BooksDAO dao = new BooksDAO();
-				BooksBean book = dao.findBookById(request.getParameter("edit_book"));
+				BooksBean book = booksDAO.getBookById(Integer.parseInt(request.getParameter("edit_book")));
 				request.setAttribute("edit_book", book);
 				request.getRequestDispatcher("admin.jsp?books").forward(request, response);
 				return;
 			}
 			else if(request.getParameter("save_book") != null || request.getParameter("new_book") != null) {
-				BooksDAO dao = new BooksDAO();
 				/*Prelevo tutti i parametri che sono stati passati*/
 				Part filePart = request.getPart("file"); /*Serve per prelevare dal campo <input type="file">*/
 				String link;
 				if(request.getParameter("save_book") != null)
-					link = dao.getBookCoverById(Integer.parseInt(request.getParameter("book_id")));
+					link = booksDAO.getBookCoverById(Integer.parseInt(request.getParameter("book_id")));
 				else
 					link = null;
 				/*Salvo la nuova immagine SOLO se l'admin ha cambiata, quindi
@@ -121,17 +128,13 @@ public class ManagerServlet extends HttpServlet {
 					 * nome, viene sovrascritto.
 					 * L'immagine precedente invece, viene cancellata.*/
 					if(request.getParameter("save_book") != null) {
-						String oldFileName = dao.getBookCoverById(Integer.parseInt(request.getParameter("book_id")));
+						String oldFileName = booksDAO.getBookCoverById(Integer.parseInt(request.getParameter("book_id")));
 						Files.deleteIfExists(new File(absolute_path + path + oldFileName.substring(oldFileName.lastIndexOf("/") + 1)).toPath());
 					}
 					Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 					link = "./files" + path + randomFileName;
 				}
-				/*Se non ricevo il filename dalla form, vuol dire che ho cliccato su
-				 * Pulisci Campi, e quindi rimuovo l'immagine mettendone una di default.*/
-				else if(filePart.getSubmittedFileName().equals("")) {
-					link = "./images/no_image.png";
-				}
+
 				try {
 					String title = request.getParameter("title");
 					int quantity = Integer.parseInt(request.getParameter("quantity"));
@@ -189,13 +192,13 @@ public class ManagerServlet extends HttpServlet {
 					book.setCover(link);
 					if(request.getParameter("save_book") != null) {
 						/*Aggiorno il libro nel DB*/
-						if(dao.updateBook(book) != 0)
+						if(booksDAO.updateBook(book) != 0)
 							request.setAttribute("info_book", "Il libro " + book.getTitle() + " è stato aggiornato.");
 						else
 							request.setAttribute("error", "Si è verificato un errore.");
 					}
 					else {
-						if(dao.newBook(book) != 0)
+						if(booksDAO.newBook(book) != 0)
 							request.setAttribute("info_book", "Il libro " + book.getTitle() + " è stato aggiunto.");
 						else
 							request.setAttribute("error", "Si è verificato un errore.");
@@ -209,20 +212,17 @@ public class ManagerServlet extends HttpServlet {
 				
 			}
 			else if(request.getParameter("all_books") != null) {
-				BooksDAO dao = new BooksDAO();
-				ArrayList<BooksBean> books = dao.getAllBooks();
+				ArrayList<BooksBean> books = booksDAO.getAllBooks();
 				request.setAttribute("books", books);
 			}
 			else if(request.getParameter("remove_book") != null) {
-				BooksDAO dao = new BooksDAO();
-				dao.removeBook(request.getParameter("remove_book"));
+				booksDAO.removeBook(request.getParameter("remove_book"));
 				request.setAttribute("info_book", "Il libro " + request.getParameter("remove_book") + " è stato rimosso.");
 			}
 			else if(request.getParameter("new_genre") != null) {
-				BooksDAO dao = new BooksDAO();
 				String genre_name = request.getParameter("genre_name");
 				if(genre_name != null && !genre_name.equals("")) {
-					if(dao.newGenre(genre_name) != 0)
+					if(booksDAO.newGenre(genre_name) != 0)
 						request.setAttribute("info_book", "Il genere " + genre_name + " è stato aggiunto.");
 					else
 						request.setAttribute("error", "Il genere " + genre_name + " è già presente nel sistema!");
@@ -232,8 +232,7 @@ public class ManagerServlet extends HttpServlet {
 			 * presenti nel database. Rispondo alla jsp mandando un array in formato json
 			 * contenenti i generi*/
 			else if(request.getParameter("json_genres") != null) {
-				BooksDAO dao = new BooksDAO();
-				JSONArray genres = dao.getJSONAllGenres();
+				JSONArray genres = booksDAO.getJSONAllGenres();
 				response.setContentType("application/json");
 				PrintWriter pw = response.getWriter();
 				pw.write(genres.toString());
@@ -241,12 +240,10 @@ public class ManagerServlet extends HttpServlet {
 				return;
 			}
 			else if(request.getParameter("all_genres") != null) {
-				BooksDAO dao = new BooksDAO();
-				request.setAttribute("all_genres", dao.getAllGenres());
+				request.setAttribute("all_genres", booksDAO.getAllGenres());
 			}
 			else if(request.getParameter("remove_genre") != null) {
-				BooksDAO dao = new BooksDAO();
-				dao.removeGenre(request.getParameter("remove_genre"));
+				booksDAO.removeGenre(request.getParameter("remove_genre"));
 				request.setAttribute("info_book", "Il genere " + request.getParameter("remove_genre") + " è stato rimosso.");
 			}
 				
@@ -266,16 +263,13 @@ public class ManagerServlet extends HttpServlet {
 					return;
 				}
 				else {
-					CardsDAO dao_cards = new CardsDAO();
-					ArrayList<CardsBean> cards = dao_cards.getCardsByFilter(filter, keyword);
+					ArrayList<CardsBean> cards = cardsDAO.getCardsByFilter(filter, keyword);
 					if(!cards.isEmpty())
 						request.setAttribute("cards", cards);
 				}
 			}
 			else if(request.getParameter("new_card") != null) {
-		        CardsDAO dao = new CardsDAO();
 		        CardsBean card = new CardsBean();
-		        UsersDAO udao = new UsersDAO();
 		        String codice_fiscale = request.getParameter("codice_fiscale");
 		        boolean associated = request.getParameter("associated") != null;
 		        if((request.getParameter("card_id")!=null) && !(request.getParameter("card_id").equals(""))) {
@@ -290,7 +284,7 @@ public class ManagerServlet extends HttpServlet {
 		          }
 		        }
 		        
-		        if(associated && !udao.checkExistingCodiceFiscale(codice_fiscale)) {
+		        if(associated && !usersDAO.checkExistingCodiceFiscale(codice_fiscale)) {
 		        	request.setAttribute("error", "L'utente con il codice fiscale: " + codice_fiscale
 		        			+ " non è presente nel sistema. Non puoi associare una tessera di un utente non registrato.");
 		        	request.getRequestDispatcher("admin.jsp?cards").forward(request, response);
@@ -299,7 +293,7 @@ public class ManagerServlet extends HttpServlet {
 		        else {
 		        	card.setCodice_fiscale(codice_fiscale);
 			        card.setAssociated(associated);
-			        if(dao.newCardAdmin(card) != 0)
+			        if(cardsDAO.newCardAdmin(card) != 0)
 			        	request.setAttribute("info_card", "La tessera è stata aggiunta con il codice fiscale: " + codice_fiscale);
 			        else
 			        	request.setAttribute("error", "Non è stato possibile aggiungere la tessera. "
@@ -311,14 +305,12 @@ public class ManagerServlet extends HttpServlet {
 		        
 			}
 			else if(request.getParameter("all_cards") != null) {
-				CardsDAO dao = new CardsDAO();
-				ArrayList<CardsBean> cards = dao.getAllCards();
+				ArrayList<CardsBean> cards = cardsDAO.getAllCards();
 				if(!cards.isEmpty())
 					request.setAttribute("cards", cards);
 			}
 			else if(request.getParameter("remove_card") != null) {
-				CardsDAO dao = new CardsDAO();
-				dao.removeCard(request.getParameter("remove_card"));
+				cardsDAO.removeCard(request.getParameter("remove_card"));
 				request.setAttribute("info_card", "La tessera con codice: " 
 				+ request.getParameter("remove_card") + " è stata rimossa.");
 			}
@@ -343,58 +335,133 @@ public class ManagerServlet extends HttpServlet {
           return;
         } 
         else {
-          BookingsDAO dao_bookings = new BookingsDAO();
-          ArrayList<BookingsBean> bookings = dao_bookings.getBookingsByFilter(filter, keyword);
+          ArrayList<BookingsBean> bookings = bookingsDAO.getBookingsByFilter(filter, keyword);
           request.setAttribute("bookings", bookings);
         }
       }
       else if(request.getParameter("new_booking") != null) {
-        BookingsDAO dao = new BookingsDAO();
-        // TODO cod. fiscale facoltativo String codice_fiscale = request.getParameter("codice_fiscale");
-        int book_id = Integer.parseInt(request.getParameter("book_id"));
-        int card_id = Integer.parseInt(request.getParameter("card_id"));
-        String start_date = request.getParameter("start_date");
-        String end_date = request.getParameter("end_date");
-        String state = request.getParameter("state");
-        String email_booking;
-        if((request.getParameter("email")!=null) && !(request.getParameter("email").equals(""))) {
-        	email_booking = request.getParameter("email");
+        String codice_fiscale = request.getParameter("codice_fiscale");
+        /*Controllo formato codice fiscale*/
+        if(codice_fiscale != null && !codice_fiscale.equals("")) {
+        	String regex = "[a-zA-Z]{6}\\d\\d[a-zA-Z]\\d\\d[a-zA-Z]\\d\\d\\d[a-zA-Z]";
+        	if(!Pattern.matches(regex, codice_fiscale)) {
+        		request.setAttribute("error", "Inserire un codice fiscale valido.");
+        		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+        		return;
+        	}
         }
-        else {
-        	email_booking = null;
-        }
+        /*Il codice fiscale è corretto. Mi assicuro che esiste una tessera con il codice fiscale.*/
+    	if(cardsDAO.getCardByCodice_fiscale(codice_fiscale) == null) {
+    		request.setAttribute("error", "Non esiste alcuna tessera legata al codice fiscale inserito.");
+    		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+    		return;
+    	}
         try {
-			dao.newBooking(email_booking, start_date, end_date, state, card_id, book_id);
-			request.setAttribute("info_booking", "La prenotazione è stata aggiunta con successo.");
-				
-		} catch (SQLException e) {
+        	int book_id = Integer.parseInt(request.getParameter("book_id"));
+            int card_id = Integer.parseInt(request.getParameter("card_id"));
+            /*Controllo formato codice tessera (5 numeri)*/
+            if(!Pattern.matches("[0-9]{5}", request.getParameter("card_id"))) {
+            	request.setAttribute("error", "Inserire un codice tessera valido.");
+        		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+        		return;
+            }
+            /*Il codice tessera ha un formato valido. Mi assicuro che il codice tessera sia lo stesso 
+             * di quello memorizzato nella tessera (in base al codice fiscale inserito).*/
+            else {
+            	if(cardsDAO.getCardByCodice_fiscale(codice_fiscale).getCard_id() != card_id) {
+            		request.setAttribute("error", "Non c'è una corrispondenza tra il codice tessera e il codice fiscale inseriti."
+            				+ " Assicurarsi che la tessera con codice: "+card_id+ " appartenga effettivamente a: "+codice_fiscale+".");
+            		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+            		return;
+            	}
+            }
+            /*Controllo correttezza delle date*/
+            SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy", Locale.ITALIAN);
+			Date tmp_date;
+			LocalDate start_date, end_date;
+		
+			tmp_date = formatter.parse(request.getParameter("start_date"));
+			start_date = tmp_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			tmp_date = formatter.parse(request.getParameter("end_date"));
+			end_date = tmp_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			if(start_date.isAfter(end_date)) {
+				request.setAttribute("error", "La data di inizio deve precedere la data di fine!");
+				request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+				return;
+			}
+			
+            String state = request.getParameter("state");
+            
+            String email_booking = request.getParameter("email");
+            if(email_booking != null && !email_booking.equals("")) {
+            	/*Se viene inserita l'email(facoltativa) controllo l'esistenza
+            	 * di un utente registrato con quella email nel sistema.*/
+            	if(!usersDAO.checkExistingEmail(email_booking)) {
+	            	request.setAttribute("error", "Non esiste un utente registrato con l'indirizzo email: "+email_booking+".");
+					request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+					return;
+            	}
+            }
+            else {
+            	email_booking = null;
+            }
+            if(booksDAO.getBookById(book_id) == null) {
+            	request.setAttribute("error", "Il libro con codice: "+book_id+" non esiste.");
+				request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+				return;
+            }
+            if(bookingsDAO.newBooking(email_booking, start_date.toString(), end_date.toString(), state, card_id, book_id) != 0)
+            	request.setAttribute("info_booking", "La prenotazione è stata aggiunta con successo.");
+            else
+            	request.setAttribute("error", "Errore imprevisto. Impossibile aggiungere la prenotazione.");
+        } catch (ParseException e) {
 			e.printStackTrace();
-			request.setAttribute("error", "Non è stato possibile aggiungere la prenotazione.");
+			request.setAttribute("error", "Formato delle date non valido.");
+			request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+			return;
+		} catch(NumberFormatException e) {
+        	e.printStackTrace();
+			request.setAttribute("error", "Errore imprevisto. Impossibile aggiungere la prenotazione.");
+        } catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("error", "Servizio non disponibile. Riprovare più tardi.");
 		}
       }
       /*Mostra tutte le prenotazioni*/
       else if(request.getParameter("all_bookings") != null) {
-		BookingsDAO dao = new BookingsDAO();
-		ArrayList<BookingsBean> bookings = dao.getAllBookings();
+		ArrayList<BookingsBean> bookings = bookingsDAO.getAllBookings();
 		request.setAttribute("bookings", bookings);
       }
       /*Pulsante di modifca prenotazione premuto*/
       else if(request.getParameter("edit_booking") != null) {
-		BookingsDAO dao = new BookingsDAO();
-		BookingsBean booking = dao.getBookingById(Integer.parseInt(request.getParameter("edit_booking")));
+		BookingsBean booking = bookingsDAO.getBookingById(Integer.parseInt(request.getParameter("edit_booking")));
 		request.setAttribute("edit_booking", booking);
 		request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
 		return;
       }
       /*Modifica stato prenotazione*/
       else if(request.getParameter("save_booking") != null) {
-		BookingsDAO dao = new BookingsDAO();
 		int booking_id = Integer.parseInt(request.getParameter("booking_id"));
 		String state = request.getParameter("state");
+		
+		/*Controllo se posso modificare lo stato della prenotazione:
+		Se lo stato e' gia' Annullata o Riconsegnato non posso modificare lo stato
+		e quindi mostro un errore.*/
+		BookingsBean bean = bookingsDAO.getBookingById(booking_id);
+		if(state.equals(bean.getState_name()) && 
+			(bean.getState_name().equals("Annullata") || bean.getState_name().equals("Riconsegnato"))) {
+			request.setAttribute("error", "Non è stato possibile aggiornare la prenotazione.");
+			request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+			return;
+		}
+		/*Modifico lo stato poiche' e' diverso da Annullata o Riconsegnato.
+		 * Nel caso in cui la stringa (stato) ricevuta sia sconosciuta, mostro un errore.*/
 		try {
-			dao.updateBooking(booking_id, state);
-			request.setAttribute("info_booking", "La prenotazione con codice: " + booking_id
+			if(bookingsDAO.updateBooking(booking_id, state) != 0)
+				request.setAttribute("info_booking", "La prenotazione con codice: " + booking_id
 					+ " è stata aggiornata.");
+			else
+				request.setAttribute("error", "Stato prenotazione non valido.");
 		} catch(SQLException e) {
 			e.printStackTrace();
 			request.setAttribute("error", "Non è stato possibile aggiornare la prenotazione.");
@@ -402,9 +469,8 @@ public class ManagerServlet extends HttpServlet {
       }
       /*Cancellazione prenotazione*/
       else if(request.getParameter("remove_booking") != null) {
-		BookingsDAO dao = new BookingsDAO();
 		try {
-			dao.removeBooking(Integer.parseInt(request.getParameter("remove_booking")));
+			bookingsDAO.removeBooking(Integer.parseInt(request.getParameter("remove_booking")));
 			request.setAttribute("info_booking", "La prenotazione con codice: "
 			+ request.getParameter("remove_booking") + " è stata rimossa.");
 		} catch(SQLException e) {
@@ -428,20 +494,17 @@ public class ManagerServlet extends HttpServlet {
           return;
         } 
         else {
-          ManagersDAO dao = new ManagersDAO();
-          ArrayList<ManagersBean> managers = dao.getManagersByFilter(filter, keyword);
+          ArrayList<ManagersBean> managers = managersDAO.getManagersByFilter(filter, keyword);
           request.setAttribute("managers", managers);
         }
       }
       else if(request.getParameter("edit_manager") != null) {
-		ManagersDAO dao = new ManagersDAO();
-		ManagersBean manager = dao.findManagerByEmail(request.getParameter("edit_manager"));
+		ManagersBean manager = managersDAO.getManagerByEmail(request.getParameter("edit_manager"));
 		request.setAttribute("edit_manager", manager);
 		request.getRequestDispatcher("admin.jsp?managers").forward(request, response);
 		return;
       }
       else if(request.getParameter("new_manager") != null || request.getParameter("save_manager") != null) {
-        ManagersDAO dao = new ManagersDAO();
         ManagersBean manager = new ManagersBean();
 		try {
 			String original_email = request.getParameter("original_email");
@@ -472,13 +535,13 @@ public class ManagerServlet extends HttpServlet {
 			
 			if(request.getParameter("save_manager") != null) {
 				/*Aggiorno il manager nel DB*/
-				if(dao.updateManager(manager, original_email) != 0)
+				if(managersDAO.updateManager(manager, original_email) != 0)
 					request.setAttribute("info_manager", "Il gestore " + manager.getName() +" "+ manager.getSurname() +" è stato aggiornato.");
 				else
 					request.setAttribute("error", "Si è verificato un errore.");
 			}
 			else {
-				if(dao.newManager(manager) != 0)
+				if(managersDAO.newManager(manager) != 0)
 					request.setAttribute("info_manager", "Il gestore " + manager.getName() +" "+ manager.getSurname() +" è stato aggiunto.");
 					else
 						request.setAttribute("error", "Si è verificato un errore.");
@@ -492,26 +555,26 @@ public class ManagerServlet extends HttpServlet {
       }
       /* - Mostra tutti i gestori presenti nel database*/
       else if(request.getParameter("all_managers") != null) {
-		ManagersDAO dao = new ManagersDAO();
-		ArrayList<ManagersBean> managers = dao.getAllManagers();
+		ArrayList<ManagersBean> managers = managersDAO.getAllManagers();
 		request.setAttribute("managers", managers);
       }
       else if(request.getParameter("remove_manager") != null) {
-		ManagersDAO dao = new ManagersDAO();
-		dao.removeManager(request.getParameter("remove_manager"));
+		managersDAO.removeManager(request.getParameter("remove_manager"));
 		request.setAttribute("info_manager", "Il Gestore:  "
 		+ request.getParameter("remove_manager") + " è stato rimosso.");
       }
       
-      /*TODO -- Sezione Biblioteca -- */	
+      /*-- Sezione Biblioteca -- */	
       if(request.getParameter("save_library") != null) {
     	  Part filePart = request.getPart("file"); /*Serve per prelevare dal campo <input type="file" name="file">*/
     	  String name = request.getParameter("name");
-    	  String fileName = null;
     	  String contacts = request.getParameter("contacts");
     	  long fileSize = filePart.getSize();
-    	  LibraryBean library = new LibraryBean();
-    	  
+    	  LibraryBean library = libraryDAO.getLibraryInfo();
+    	  String fileName = filePart.getSubmittedFileName();
+    	  System.out.println("filename: " + fileName);
+    	  if(fileName.equals("default_logo.png"))
+    		  library.setLogo("./images/default_logo.png");
     	  if(name.equals("") || contacts.equals("") || name == null || contacts == null) {
     		  request.setAttribute("error", "Assicurati di aver compilato correttamente il nome e i contatti "
     		  		+ "della biblioteca");
@@ -532,15 +595,13 @@ public class ManagerServlet extends HttpServlet {
 				/*L'immagine viene copiata nel percorso sopra specificato e se esiste un file con lo stesso
 				 * nome, viene sovrascritto.*/
 				Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				library.setLogo("./files/" + fileName);
+				library.setLogo("./files" + fileName);
 			}
-
-		LibraryDAO dao = new LibraryDAO();
 		
 		library.setName(name);
 		
 		library.setContacts(contacts);
-		if(dao.updateLibraryInfo(library) != 0) {
+		if(libraryDAO.updateLibraryInfo(library) != 0) {
 			request.setAttribute("info_library", "Le informazioni della biblioteca sono state salvate.");
 			getServletContext().setAttribute("library", library);
 		}
@@ -560,8 +621,7 @@ public class ManagerServlet extends HttpServlet {
 		
 		/*Autenticazione*/
 		else {
-			ManagersDAO dao = new ManagersDAO();
-			ManagersBean admin = dao.login(email, password);
+			ManagersBean admin = managersDAO.login(email, password);
 			
 			if(admin != null) {
 				session.setAttribute("admin", admin);

@@ -16,14 +16,21 @@ public class BookingsDAO {
 		try {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO bookings(email, start_date, end_date, state_name, card_id, book_id) "
-					+ "VALUES(?, ?, ?, ?, ?, ?)");
+			PreparedStatement ps = conn.prepareStatement("SELECT books.title FROM books WHERE book_id = ?");
+			ps.setInt(1, book_id);
+			ResultSet rs = ps.executeQuery();
+			rs.first();
+			String title = rs.getString("title");
+			
+			ps = conn.prepareStatement("INSERT INTO bookings(email, start_date, end_date, state_name, card_id, book_id, title) "
+					+ "VALUES(?, ?, ?, ?, ?, ?, ?)");
 			ps.setString(1, email);
 			ps.setString(2, start_date);
 			ps.setString(3, end_date);
 			ps.setString(4, state_name);
 			ps.setInt(5, card_id);
 			ps.setInt(6, book_id);
+			ps.setString(7, title);
 			
 			result =  ps.executeUpdate();
 			
@@ -50,7 +57,7 @@ public class BookingsDAO {
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT bookings.booking_id, bookings.card_id, bookings.book_id, cards.codice_fiscale, bookings.state_name, bookings.start_date, bookings.end_date  FROM bookings, cards WHERE "+filters[filter]+"= ? AND cards.card_id = bookings.card_id");
+			PreparedStatement ps = conn.prepareStatement("SELECT bookings.booking_id, bookings.card_id, bookings.book_id, cards.codice_fiscale, bookings.state_name, bookings.start_date, bookings.end_date, bookings.title  FROM bookings, cards WHERE "+filters[filter]+"= ? AND cards.card_id = bookings.card_id");
 			ps.setString(1, keyword);
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
@@ -60,6 +67,7 @@ public class BookingsDAO {
 				int booking_id = result.getInt("booking_id");
 				int card_id = result.getInt("card_id");
 				int book_id = result.getInt("book_id");
+				String title = result.getString("title");
 				String codice_fiscale = result.getString("codice_fiscale");
 				String state_name = result.getString("state_name");
 				LocalDate start_date = result.getDate("start_date").toLocalDate();
@@ -69,6 +77,7 @@ public class BookingsDAO {
 				booking.setBooking_id(booking_id);
 				booking.setCard_id(card_id);
 				booking.setBook_id(book_id);
+				booking.setTitle(title);
 				booking.setCodice_fiscale(codice_fiscale);
 				booking.setState_name(state_name);
 				booking.setStart_date(start_date);
@@ -90,7 +99,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT bookings.booking_id, bookings.card_id, bookings.book_id, cards.codice_fiscale, bookings.state_name, bookings.start_date, bookings.end_date  FROM bookings, cards WHERE  cards.card_id = bookings.card_id");
+			PreparedStatement ps = conn.prepareStatement("SELECT bookings.booking_id, bookings.card_id, bookings.book_id, cards.codice_fiscale, bookings.state_name, bookings.start_date, bookings.end_date, bookings.title  FROM bookings, cards WHERE  cards.card_id = bookings.card_id");
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 				return null;
@@ -99,6 +108,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 				int booking_id = result.getInt("booking_id");
 				int card_id = result.getInt("card_id");
 				int book_id = result.getInt("book_id");
+				String title = result.getString("title");
 				String codice_fiscale = result.getString("codice_fiscale");
 				String state_name = result.getString("state_name");
 				LocalDate start_date = result.getDate("start_date").toLocalDate();
@@ -108,6 +118,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 				booking.setBooking_id(booking_id);
 				booking.setCard_id(card_id);
 				booking.setBook_id(book_id);
+				booking.setTitle(title);
 				booking.setCodice_fiscale(codice_fiscale);
 				booking.setState_name(state_name);
 				booking.setStart_date(start_date);
@@ -134,7 +145,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 			ps.setInt(1, booking_id);
 			ResultSet rs = ps.executeQuery();
 			rs.first();
-			String booking_state = rs.getString("booking_state");
+			String booking_state = rs.getString("state_name");
 			int book_id = rs.getInt("book_id");
 			if(!booking_state.equals("Annullata") && !booking_state.equals("Riconsegnato")) {
 				ps = conn.prepareStatement("UPDATE books SET quantity = quantity + 1 WHERE book_id = ?");
@@ -173,6 +184,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 				int booking_id = result.getInt("booking_id");
 				int card_id = result.getInt("card_id");
 				int book_id = result.getInt("book_id");
+				String title = result.getString("title");
 				String state_name = result.getString("state_name");
 				LocalDate start_date = result.getDate("start_date").toLocalDate();
 				LocalDate end_date = result.getDate("end_date").toLocalDate();
@@ -181,6 +193,7 @@ public ArrayList<BookingsBean> getAllBookings() {
 				booking.setBooking_id(booking_id);
 				booking.setCard_id(card_id);
 				booking.setBook_id(book_id);
+				booking.setTitle(title);
 				booking.setState_name(state_name);
 				booking.setStart_date(start_date);
 				booking.setEnd_date(end_date);
@@ -209,11 +222,13 @@ public ArrayList<BookingsBean> getAllBookings() {
 			int card_id = result.getInt("card_id");
 			String email = result.getString("email");
 			int book_id = result.getInt("book_id");
+			String title = result.getString("title");
 			String state_name = result.getString("state_name");
 			LocalDate start_date = result.getDate("start_date").toLocalDate();
 			LocalDate end_date = result.getDate("end_date").toLocalDate();
 			booking.setCard_id(card_id);
 			booking.setBook_id(book_id);
+			booking.setTitle(title);
 			booking.setEmail(email);
 			booking.setState_name(state_name);
 			booking.setStart_date(start_date);

@@ -12,6 +12,7 @@ public class BookingsBean {
 	private int card_id;
 	private int book_id;
 	private String codice_fiscale;
+	private String title;
 	
 	public int getBooking_id() {
 		return booking_id;
@@ -61,5 +62,11 @@ public class BookingsBean {
 	public void setCodice_fiscale(String codice_fiscale) {
 		this.codice_fiscale = codice_fiscale;
 	}
-
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
 }
