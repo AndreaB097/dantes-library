@@ -16,7 +16,7 @@ else if(session.getAttribute("user_incomplete") == null) {
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Tessera</title>
 </head>
 <body>

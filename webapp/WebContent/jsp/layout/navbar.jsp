@@ -18,14 +18,14 @@
 			<a href="./login.jsp" title="ACCEDI"><i class="fas fa-user fa-lg"></i></a>
 		<%} %>
 	  <a id="search-icon" type="submit" title="CERCA"><i class="fas fa-search fa-lg"></i></a>
-	  <form id="search" action="./search">
+	  <form id="search" action="./book?search" method="post">
 			<select id="search-filters" class="dropdownFilters" name="filter">
   				<option value="0">Titolo</option>
   				<option value="1">Autore</option>
   				<option value="2">Casa Editrice</option>
   				<option value="3">Genere</option>
 			</select>
-		<input type="text" name="q" placeholder="Seleziona il filtro ed effettua la ricerca" required pattern=".*\S+.*"/>
+		<input type="text" name="query" placeholder="Seleziona il filtro ed effettua la ricerca" required pattern=".*\S+.*"/>
 	  </form>
 	
 	<script>

@@ -6,8 +6,25 @@ import danteslibrary.model.CardsBean;
 
 import java.util.ArrayList;
 
+/**
+ * Classe che si occupa dell’interfacciamento con il database per l’esecuzione
+ * di query riguardanti oggetti Tessera.
+ * 
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ * 
+ */
 public class CardsDAO {
 
+	/**
+	 * Cerca all'interno del database i le tessere in base al filtro selezionato e 
+	 * alle parole chiave passate come parametro.
+	 * @param filter Filtro di ricerca. Vedere i filtri all'interno della pagina
+	 * admin.jsp (Sezione Tessere).
+	 * @param keyword Stringa che rappresenta le parole chiave.
+	 * @return Restituisce una lista di tessere che rispettino filter e keyword.
+	 * Restituisce null nel caso in cui non vi sono corrispondenze.
+	 */
 	public ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
 		String[] filters = {"users.name", "users.surname", "users.email", "cards.codice_fiscale", "card_id"};
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
@@ -99,6 +116,10 @@ public class CardsDAO {
 		}
 	}
 	
+	/**
+	 * Ottiene una lista di tutte le tessere presenti nel database.
+	 * @return Restituisce una lista di tutte le tessere presenti nel database.
+	 */
 	public ArrayList<CardsBean> getAllCards() {
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;
@@ -146,13 +167,18 @@ public class CardsDAO {
 		}
 		return null;	
 	}
-
-	public int removeCard(String card_id) {
+	
+	/**
+	 * Cancella la tessera avente come codice quello passato come parametro.
+	 * @param card_id Codice della tessera da cancellare.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
+	public int removeCard(int card_id) {
 		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("DELETE FROM cards WHERE card_id = ?");
-			ps.setString(1, card_id);
+			ps.setInt(1, card_id);
 			result = ps.executeUpdate();
 			conn.close();
 			return result;
@@ -163,6 +189,12 @@ public class CardsDAO {
 		}
 	}
 	
+	/**
+	 * Ottiene la tessera in base all'email passata come parametro.
+	 * @param email Email dell'utente di cui si vuole ottenere la tessera.
+	 * @return Restituisce la tessera dell'utente avente come email quella 
+	 * passata come parametro.
+	 */
 	public CardsBean getCardByEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -187,6 +219,12 @@ public class CardsDAO {
 		}
 	}
 	
+	/**
+	 * Ottiene la tessera in base al codice fiscale passato come parametro.
+	 * @param codice_fiscale Codice fiscale dell'utente di cui si vuole ottenere la tessera.
+	 * @return Restituisce la tessera dell'utente avente come codice fiscale quello
+	 * passato come parametro.
+	 */
 	public CardsBean getCardByCodice_fiscale(String codice_fiscale) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -211,6 +249,11 @@ public class CardsDAO {
 		}
 	}
 	
+	/**
+	 * Ottiene la tessera in base al codice tessera passata come parametro.
+	 * @param card_id Codice tessera della tessera da ottenere.
+	 * @return Restituisce la tessera in base al codice passato come parametro.
+	 */
 	public CardsBean getCardById(int card_id) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -234,6 +277,12 @@ public class CardsDAO {
 		}
 	}
 	
+	/**
+	 * Imposta a true il valore associated della tessera avente come codice
+	 * quello passato come parametro.
+	 * @param card_id Codice della tessera che si vuole associare.
+	 * @return Restituisce 1 se la tessera viene associata, 0 altrimenti.
+	 */
 	public int associateCard(int card_id) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -250,14 +299,20 @@ public class CardsDAO {
 		}
 	}
 
-	public int newCard(String codice_fiscale, boolean associated) {
+	/**
+	 * Inserisce una nuova tessera con un codice auto generato dal database (auto_increment)
+	 * e il codice fiscale designato.
+	 * @param codice_fiscale Codice fiscale per l'inserimento della nuova tessera.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
+	public int newCard(String codice_fiscale) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			String query = "INSERT INTO cards(codice_fiscale, associated) "
 					+ "VALUES(?, ?)";
 			PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, codice_fiscale);
-			ps.setBoolean(2, associated);
+			ps.setBoolean(2, true);
 	        ps.executeUpdate();
 	        ResultSet rs = ps.getGeneratedKeys();
 	        rs.first();
@@ -270,7 +325,13 @@ public class CardsDAO {
 		}
 	}
 	
-	
+	/**
+	 * Inserisce una nuova tessera prelevando i valori dal Bean Tessera passato
+	 * come parametro. Se nel bean è stato specificato un codice tessera != 0
+	 * allora il codice tessera non verrà auto generato dal database, altrimenti sì.
+	 * @param card Bean contenente le informazioni sulla nuova tessera.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int newCardAdmin(CardsBean card) {
 		int result = 0;
 		try {

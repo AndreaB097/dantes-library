@@ -1,5 +1,10 @@
 package danteslibrary.model;
 
+/**
+ * Bean che definisce l'entità Biblioteca
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ */
 public class LibraryBean {
 	
 	private String name;

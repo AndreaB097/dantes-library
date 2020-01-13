@@ -1,5 +1,10 @@
 package danteslibrary.model;
 
+/**
+ * Bean che definisce l'entità Tessera
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ */
 public class CardsBean {
 	
 	private int card_id;

@@ -2,6 +2,11 @@ package danteslibrary.model;
 
 import java.time.LocalDate;
 
+/**
+ * Bean che definisce l'entità Prenotazione
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ */
 public class BookingsBean {
 	
 	private int booking_id;

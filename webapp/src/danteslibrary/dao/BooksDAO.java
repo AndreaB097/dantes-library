@@ -7,9 +7,21 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.json.*;
 
+/**
+ * Classe che si occupa dell’interfacciamento con il database per l’esecuzione 
+ * di query riguardanti oggetti Libro.
+ * 
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ * 
+ */
 public class BooksDAO {
 	
-public ArrayList<BooksBean> getAllBooks() {
+	/**
+	 * Ottiene tutti i libri presenti nel database.
+	 * @return Restituisce una lista di tutti i libri.
+	 */
+	public ArrayList<BooksBean> getAllBooks() {
 		
 		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
 		try {
@@ -46,6 +58,13 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;
 	}
 
+	/**
+	 * Ottiene tutti i libri presenti nel database, suddivisi in base al genere
+	 * e disposti in ordine alfabetico.
+	 * a cui appartengono.
+	 * @return Restituisce una LinkedHashMap contenente tutti i generi e libri. 
+	 * Per ogni genere (ordinati in ordine alfabetico), vi è una lista di libri appartenenti a quel genere.
+	 */
 	public LinkedHashMap<String, ArrayList<BooksBean>> getBookList() {
 		LinkedHashMap<String, ArrayList<BooksBean>> list = new LinkedHashMap<String, ArrayList<BooksBean>>();
 		try {
@@ -84,6 +103,11 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;
 	}
 	
+	/**
+	 * Ottiene il libro in base al codice passato come parametro.
+	 * @param id Codice del libro da ottenere.
+	 * @return Restituisce il Libro se esiste, null altrimenti. 
+	 */
 	public BooksBean getBookById(int id) {
 		
 		try {
@@ -119,6 +143,11 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;
 	}
 	
+	/**
+	 * Ottiene la lista dei generi ai quali un libro appartiene.
+	 * @param book_id Codice del libro del quale si vogliono ottenere i generi.
+	 * @return Lista di generi ai quali un libro appartiene.
+	 */
 	public ArrayList<String> getBookGenres(int book_id) {
 		
 		try {
@@ -146,6 +175,11 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;	
 	}
 	
+	/**
+	 * Ottiene la lista degli autori di un libro.
+	 * @param book_id Codice del libro del quale si vogliono ottenere gli autori.
+	 * @return Lista di autori che hanno scritto il libro.
+	 */
 	public ArrayList<String> getBookAuthors(int book_id) {
 		
 		try {
@@ -173,6 +207,11 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;	
 	}
 	
+	/**
+	 * Ottiene la lista di tutti i generi che un libro può avere (prelevati dal database).
+	 * @return Restituisce un JSONArray, utilizzato nel pannello amministratore (file: admin.jsp)
+	 * per ottenere la lista dei generi selezionabili nei casi di Aggiunta libro e Modifca libro.
+	 */
 	public JSONArray getJSONAllGenres() {
 		
 		try {
@@ -197,6 +236,10 @@ public ArrayList<BooksBean> getAllBooks() {
 		}
 	}
 	
+	/**
+	 * Ottiene la lista di tutti i generi che un libro può avere (prelevati dal database).
+	 * @return Restituisce una lista contenente tutti i generi che un libro può avere.
+	 */
 	public ArrayList<String> getAllGenres() {
 		
 		try {
@@ -221,6 +264,15 @@ public ArrayList<BooksBean> getAllBooks() {
 		}
 	}
 	
+	/**
+	 * Cerca all'interno del database i libri in base al filtro selezionato e 
+	 * alle parole chiave passate come parametro.
+	 * @param filter Filtro di ricerca. Vedere i filtri all'interno delle pagine
+	 * jsp navbar.jsp e admin.jsp (Sezione Libri).
+	 * @param keyword Stringa che rappresenta le parole chiave.
+	 * @return Restituisce una lista di libri che rispettino filter e keyword.
+	 * Restituisce null nel caso in cui non vi sono corrispondenze.
+	 */
 	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) {
 		
 		String[] filters = {"title", "authors.name", "publisher", "genres.genre_name"};
@@ -273,6 +325,10 @@ public ArrayList<BooksBean> getAllBooks() {
 		return null;
 	}
 	
+	/**
+	 * Ottiene il codice libro di un libro dal database in maniera casuale.
+	 * @return Restituisce un codice libro casuale, 0 in caso di fallimento.
+	 */
 	public int getRandomBookId() {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -291,12 +347,18 @@ public ArrayList<BooksBean> getAllBooks() {
 		}
 	}
 	
-	public int removeBook(String book_id) {
+	/**
+	 * Cancella un libro dal database.
+	 * @param book_id Codice del libro da cancellare.
+	 * @return 0 in caso di fallimento, altrimenti il numero di libri
+	 * cancellati (1).
+	 */
+	public int removeBook(int book_id) {
 		int result = 0;
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("DELETE FROM books WHERE book_id = ?");
-			ps.setString(1, book_id);
+			ps.setInt(1, book_id);
 			result = ps.executeUpdate();
 			conn.close();
 			return result;
@@ -307,7 +369,14 @@ public ArrayList<BooksBean> getAllBooks() {
 		return result;
 	}
 	
-	
+	/**
+	 * Aggiorna un libro già presente nel database.
+	 * @param book Il libro da modificare. Il bean contiene tutti i valori da 
+	 * sovrascrivere (tranne l'id che viene utilizzato per riconoscere il libro
+	 * da aggiornare).
+	 * @return 0 in caso di fallimento. Altrimenti il numero di righe modifcate.
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int updateBook(BooksBean book) throws SQLException {
 		int result = 0;
 		Connection conn = null;
@@ -390,6 +459,15 @@ public ArrayList<BooksBean> getAllBooks() {
 		return result;
 	}
 	
+	/**
+	 * 
+	 * Inserisce un nuovo libro nel database.
+	 * 
+	 * @param book Il libro da aggiungere al database.
+	 * @return Restituisce 0 nel caso in cui non ci sono stati cambiamenti, 
+	 * altrimenti il numero di righe cambiate.
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int newBook(BooksBean book) throws SQLException {
 		int result = 0;	
 		Connection conn = null;
@@ -453,6 +531,12 @@ public ArrayList<BooksBean> getAllBooks() {
 		return result;
 	}
 	
+	/**
+	 * Ottiene il percorso dove dovrebbe risiedere l'immagine di copertina del libro.
+	 * @param book_id Il codice del libro di cui si vuole ottenere il percorso dell'immagine.
+	 * @return Restituisce il percorso dove dovrebbe risiedere l'immagine di copertina
+	 * del libro.
+	 */
 	public String getBookCoverById(int book_id) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -473,6 +557,11 @@ public ArrayList<BooksBean> getAllBooks() {
 		}	
 	}
 	
+	/**
+	 * Aggiunge un nuovo genere di libri al database.
+	 * @param genre_name Il nome del nuovo genere.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int newGenre(String genre_name) {
 		int result = 0;
 		try {
@@ -489,6 +578,11 @@ public ArrayList<BooksBean> getAllBooks() {
 		}
 	}
 	
+	/**
+	 * Cancella il genere passato come parametro dal database.
+	 * @param genre_name Nome del genere da cancellare.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti
+	 */
 	public int removeGenre(String genre_name) {
 		int result = 0;
 		try {

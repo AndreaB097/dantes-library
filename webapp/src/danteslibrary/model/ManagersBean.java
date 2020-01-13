@@ -2,6 +2,11 @@ package danteslibrary.model;
 
 import java.util.ArrayList;
 
+/**
+ * Bean che definisce l'entità Gestore
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ */
 public class ManagersBean {
 	
 	private String email;

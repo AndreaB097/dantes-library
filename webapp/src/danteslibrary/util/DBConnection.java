@@ -6,6 +6,13 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Classe responsabile della gestione delle connessioni con il DBMS MySQL
+ * facendo uso del driver JDBC.
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ *
+ */
 public class DBConnection  {
 
 	private static List<Connection> freeDbConnections;

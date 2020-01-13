@@ -5,7 +5,7 @@
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Lista Generi</title>
 </head>
 <body>

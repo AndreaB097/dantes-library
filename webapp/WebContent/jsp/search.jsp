@@ -4,7 +4,7 @@
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Risultati ricerca</title>
 </head>
 <body>
@@ -15,7 +15,7 @@
 	<% if(request.getAttribute("search") != null) {
 		@SuppressWarnings("unchecked")
 		ArrayList<BooksBean> rows = (ArrayList<BooksBean>) request.getAttribute("search"); %> 
-		<h2>Risultati trovati per: "<%=request.getParameter("q") %>"</h2>
+		<h2>Risultati trovati per: "<%=request.getParameter("query") %>"</h2>
 	 <hr>
 	 <% for(int i = 0; i < rows.size(); i++) { 
 	 %>

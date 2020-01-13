@@ -11,7 +11,7 @@
   </welcome-file-list>
   <servlet>  
   	<servlet-name>library</servlet-name>  
-  	<servlet-class>danteslibrary.control.LibraryServlet</servlet-class>  
+  	<servlet-class>danteslibrary.controller.LibraryServlet</servlet-class>  
   	<load-on-startup>1</load-on-startup>
   </servlet>
   <!-- SMTP settings -->

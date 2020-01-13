@@ -4,7 +4,7 @@ pageEncoding="UTF-8"%>
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Registrazione</title>
 </head>
 <body>
@@ -49,7 +49,8 @@ pageEncoding="UTF-8"%>
 var errors = [];
 	function validateSubmit() {
 		var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-		var codice_fiscale_regex = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i;
+		var codice_fiscale_regex = /[a-zA-Z]{6}\d\d[a-zA-Z]\d\d[a-zA-Z]\d\d\d[a-zA-Z]/;
+		var password_regex = /^\w{6,20}$/;
 		
 		var name = document.getElementById("name").value;
 		var surname = document.getElementById("surname").value;
@@ -59,10 +60,8 @@ var errors = [];
 		var codice_fiscale = document.getElementById("codice_fiscale").value;
 		var address = document.getElementById("address").value;
 		
-		/* COMMENTATA PER TESTING. BISOGNA RIMUOVERE I COMMENTI AL TERMINE
 		if(!codice_fiscale.match(codice_fiscale_regex))
 			errors.push("Inserire un codice fiscale valido.");
-		*/
 		if(!email.match(mailformat)) {
 			errors.push("Indirizzo email non valido.");
 		}
@@ -98,7 +97,7 @@ var errors = [];
 		if(!name || !surname || !email || !password || !repeat || !codice_fiscale || !address) {
 			errors.push("Non tutti i campi sono stati compilati.");
 		}
-		if((password.length < 6 || !(/\d/.test(password))) && password) {
+		if(!password.match(password_regex) && password) {
 			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
 		}
 		if(password != repeat && password && repeat) {

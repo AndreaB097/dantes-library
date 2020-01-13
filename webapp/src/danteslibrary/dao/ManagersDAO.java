@@ -11,7 +11,22 @@ import danteslibrary.model.ManagersBean;
 import danteslibrary.util.BCrypt;
 import danteslibrary.util.DBConnection;
 
+/**
+ * Classe che si occupa dell’interfacciamento con il database per l’esecuzione
+ * di query riguardanti oggetti Gestore.
+ * 
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ * 
+ */
 public class ManagersDAO {
+	
+	/**
+	 * Ottiene il Gestore in base alle credenziali passate come parametro.
+	 * @param email Email del Gestore da autenticare.
+	 * @param password Password del Gestore da autenticare.
+	 * @return Restituisce il Gestore se sono state trovate corrispondenze, altrimenti null.
+	 */
 	public ManagersBean login(String email, String password) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -54,6 +69,15 @@ public class ManagersDAO {
 		return null;
 	}
 	
+	/**
+	 * Cerca all'interno del database i Gestori in base al filtro selezionato e 
+	 * alle parole chiave passate come parametro.
+	 * @param filter Filtro di ricerca. Vedere i filtri all'interno della pagina
+	 * admin.jsp (Sezione Gestori).
+	 * @param keyword Stringa che rappresenta le parole chiave.
+	 * @return Restituisce una lista di Gestori che rispettino filter e keyword.
+	 * Restituisce null nel caso in cui non vi sono corrispondenze.
+	 */
 	public ArrayList<ManagersBean> getManagersByFilter(int filter, String keyword) {
 		String[] filters = {"managers.email", "managers.name", "managers.surname", "roles.role_name"};
 		ArrayList<ManagersBean> managers = new ArrayList<ManagersBean>();
@@ -97,6 +121,11 @@ public class ManagersDAO {
 		return null;
 	}
 	
+	/**
+	 * Ottiene tutti i ruoli di un Gestore
+	 * @param email Email del Gesotre di cui si vogliono ottenere i ruoli.
+	 * @return Restituisce tutti i ruoli di un Gestore, null altrimenti.
+	 */
 	public ArrayList<String> getManagerRoles(String email) {
 		
 		try {
@@ -123,7 +152,10 @@ public class ManagersDAO {
 		return null;	
 	}
 	
-	
+	/**
+	 * Ottiene tutti i Gestori presenti nel database.
+	 * @return Restituisce la lista di tutti i Gestori presenti nel database, null altrimenti.
+	 */
 	public ArrayList<ManagersBean> getAllManagers() {
 			
 			ArrayList<ManagersBean> managers = new ArrayList<ManagersBean>();
@@ -162,7 +194,11 @@ public class ManagersDAO {
 			return null;
 		}
 	
-	
+	/**
+	 * Cancella dal database il Gestore avente l'email passata come parametro.
+	 * @param email Email del Gestore da cancellare.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int removeManager(String email) {
 		int result = 0;
 		try {
@@ -177,9 +213,13 @@ public class ManagersDAO {
 			System.out.println("Errore Database: " + e.getMessage());
 		}
 		return result;
-}
+	}
 	
-	
+	/**
+	 * Aggiunge il Gestore passato come parametro al database.
+	 * @param manager Il nuovo Gestore da memorizzare.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int newManager(ManagersBean manager) {
 		int result = 0;
 		try {
@@ -208,7 +248,11 @@ public class ManagersDAO {
 		}
 	}
 	
-	
+	/**
+	 * Ottiene dal database il Gestore avente l'email passata come parametro.
+	 * @param email Email del Gestore che si vuole ottenere.
+	 * @return Restituisce il Gestore se esiste, null altrimenti.
+	 */
 	public ManagersBean getManagerByEmail(String email) {
 		
 		try {
@@ -241,7 +285,18 @@ public class ManagersDAO {
 		return null;
 	}
 	
-	
+	/**
+	 * Aggiorna il Gestore avente come email quella passata come parametro con i
+	 * dati contenuti all'interno del bean Gestore passato come parametro.
+	 * L'email viene passata in quanto il bean potrebbe avere un'email diversa.
+	 * Infatti se il Gestore cambia indirizzo email, ho la necessità di conoscere
+	 * quello vecchio (parametro email) e rimpiazzarlo con quello nuovo (contenuto nel
+	 * bean, manager.getEmail()). 
+	 * @param manager Bean contenente i nuovi dati del Gestore.
+	 * @param email Email attuale del Gestore.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int updateManager(ManagersBean manager, String email) throws SQLException {
 		int result = 0;
 		Connection conn = null;
@@ -301,6 +356,5 @@ public class ManagersDAO {
 		}
 		return result;
 	}
-
 
 }

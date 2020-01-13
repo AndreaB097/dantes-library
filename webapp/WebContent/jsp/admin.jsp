@@ -6,7 +6,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Area Gestori</title>
 </head>
 <body>

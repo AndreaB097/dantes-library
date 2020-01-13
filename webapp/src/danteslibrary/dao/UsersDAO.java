@@ -7,9 +7,22 @@ import danteslibrary.util.DBConnection;
 import java.util.ArrayList;
 import danteslibrary.util.BCrypt;
 
-
+/**
+ * Classe che si occupa dell’interfacciamento con il database per l’esecuzione
+ * di query riguardanti oggetti Utente.
+ * 
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ * 
+ */
 public class UsersDAO {
 	
+	/**
+	 * Ottiene l'Utente in base alle credenziali passate come parametro.
+	 * @param email Email dell'Utente da autenticare.
+	 * @param password Password dell'Utente da autenticare.
+	 * @return Restituisce l'Utente se sono state trovate corrispondenze, altrimenti null.
+	 */
 	public UsersBean login(String email, String password) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -56,7 +69,14 @@ public class UsersDAO {
 		
 		return null;
 	}
-
+	
+	/**
+	 * Inserisce l 'Utente passato come parametro nel database.
+	 * La password viene cifrata con la funzione di hashing BCrypt.
+	 * @param user Bean che contiene le informazioni dell'Utente da memorizzare.
+	 * @return Restituisce true se l'inserimento è andato a buon fine,
+	 * false altrimenti.
+	 */
 	public boolean register(UsersBean user) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -84,8 +104,12 @@ public class UsersDAO {
 	}
 	
 	/**
-	 * @return true = Esiste una corrispondenza, false altrimenti
-	 **/
+	 * Controlla se l'email passata come parametro è memorizzata nel database
+	 * nella tabella users.
+	 * @param email Email da verificare.
+	 * @return Restituisce true se esiste una corrispondenza nel database nella,
+	 * tabella users, false altrimenti.
+	 */
 	public boolean checkExistingEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -105,7 +129,14 @@ public class UsersDAO {
 		return true;
 	}
 	
-	public boolean checkExistingCodiceFiscale(String codice_fiscale) {
+	/**
+	 * Controlla se il codice fiscale passato come parametro è memorizzato nel database
+	 * nella tabella users.
+	 * @param codice_fiscale Codice fiscale da verificare.
+	 * @return Restituisce true se esiste una corrispondenza nel database nella
+	 * tabella users, false altrimenti.
+	 */
+	public boolean checkExistingCodice_fiscale(String codice_fiscale) {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT users.codice_fiscale FROM users WHERE codice_fiscale = ?");
@@ -124,6 +155,12 @@ public class UsersDAO {
 		return true;
 	}
 	
+	/**
+	 * Ottiene l'Utente avente email uguale a quella passata come parametro. 
+	 * @param user_email Email per identificare l'Utente da prelevare.
+	 * @return Restituisce un Bean Utente avente l'indirizzo email passato come
+	 * parametro, null se non esiste.
+	 */
 	public UsersBean getUserByEmail(String user_email) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -163,6 +200,15 @@ public class UsersDAO {
 		return null;
 	}
 	
+	/**
+	 * Cerca all'interno del database gli Utenti in base al filtro selezionato e 
+	 * alle parole chiave passate come parametro.
+	 * @param filter Filtro di ricerca. Vedere i filtri all'interno della
+	 * pagina admin.jsp (Sezione Utenti).
+	 * @param keyword Stringa che rappresenta le parole chiave.
+	 * @return Restituisce una lista di utenti che rispettino filter e keyword.
+	 * Restituisce null nel caso in cui non vi sono corrispondenze.
+	 */
 	public ArrayList<UsersBean> getUsersByFilter(int filter, String keyword) {
 		String[] filters = {"name", "surname", "email", "codice_fiscale"};
 		ArrayList<UsersBean> users = new ArrayList<UsersBean>();
@@ -204,7 +250,10 @@ public class UsersDAO {
 		return null;
 	}
 	
-	
+	/**
+	 * Ottiene tutte gli utenti presenti nel database.
+	 * @return Restituisce una lista di tutti gli utenti.
+	 */
 	public ArrayList<UsersBean> getAllUsers() {
 		
 		ArrayList<UsersBean> users = new ArrayList<UsersBean>();
@@ -242,6 +291,12 @@ public class UsersDAO {
 		return null;
 	}
 	
+	/**
+	 * Cancella un utente dal database.
+	 * @param email Email dell'utente da cancellare.
+	 * @return Restituisce 0 in caso di fallimento, altrimenti il numero di utenti
+	 * cancellati (1).
+	 */
 	public int removeUser(String email) {
 		int result = 0;
 		try {
@@ -258,6 +313,14 @@ public class UsersDAO {
 		return result;
 	}
 	
+	/**
+	 * Memorizza nel database il link temporaneo (tmp_link) per il recupero 
+	 * password associandolo all'utente avente come email quella passata come 
+	 * parametro.
+	 * @param email Email dell'utente al quale associare il link temporaneo.
+	 * @param tmp_link Il link temporaneo da associare all'utente.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int setTemporaryLink(String email, String tmp_link) {
 		int result = 0;
 		try {
@@ -275,6 +338,35 @@ public class UsersDAO {
 		return result;
 	}
 	
+	/**
+	 * Cancella il link temporaneo associato all'Utente avente come email quella
+	 * passata come parametro.
+	 * @param email Email dell'Utente al quale si vuole rimuovere il link temporaneo.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
+	public int deleteTemporaryLink(String email) {
+		int result = 0;
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE users SET tmp_link = NULL WHERE email = ? ");
+			ps.setString(1, email);
+			result = ps.executeUpdate();
+			conn.close();
+			return result;
+		}
+		catch(SQLException e) {
+			System.out.println("Errore Database metodo deleteTemporaryLink: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	/**
+	 * Ottiene l'email dell'utente al quale è stato associato il link temporaneo
+	 * passato come parametro. Vedere anche il metodo setTemporaryLink.
+	 * @param tmp_link Il link temporaneo con il quale si vuole ottenere l'email.
+	 * @return Restituisce l'email dell'utente al quale è stato associato il link
+	 * temporaneo in caso di successo, altrimenti null.
+	 */
 	public String getEmailByTemporaryLink(String tmp_link) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -296,6 +388,13 @@ public class UsersDAO {
 		}	
 	}
 	
+	/**
+	 * Aggiorna la password dell'utente avente come email quella passata come
+	 * parametro con la nuova password (new_password).
+	 * @param email Email dell'utente al quale si vuole cambiare la password.
+	 * @param new_password La nuova password dell'utente.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int updateUserPassword(String email, String new_password) {
 		int result = 0;
 		try {
@@ -313,22 +412,19 @@ public class UsersDAO {
 		return result;
 	}
 	
-	public int deleteTemporaryLink(String email) {
-		int result = 0;
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("UPDATE users SET tmp_link = NULL WHERE email = ? ");
-			ps.setString(1, email);
-			result = ps.executeUpdate();
-			conn.close();
-			return result;
-		}
-		catch(SQLException e) {
-			System.out.println("Errore Database metodo deleteTemporaryLink: " + e.getMessage());
-		}
-		return result;
-	}
-	
+	/**
+	 * Aggiorna le informazioni dell'Utente passato come parametro (il bean user).
+	 * Il parametro old_email rappresenta il vecchio indirizzo email nel caso in
+	 * cui l'utente abbia modificato anche la sua email. Se l'ha modificata, questa
+	 * verrà sovrascritta con quella presente nel bean. La vecchia email mi serve
+	 * per identificare l'utente al quale apportare le modifiche.
+	 * @param user Contiene le informazioni dell'utente da aggiornare (compreso l'eventuale
+	 * nuovo indirizzo email).
+	 * @param old_email Email dell'utente da aggiornare. Verrà sovrascritto con
+	 * l'indirizzo email contenuto nel bean.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int updateUser (UsersBean user, String old_email) throws SQLException {
 		Connection conn = null;
 		int result = 0;

@@ -8,7 +8,19 @@ import java.sql.SQLException;
 import danteslibrary.util.DBConnection;
 import danteslibrary.model.LibraryBean;
 
+/**
+ * Classe che si occupa dell’interfacciamento con il database per l’esecuzione
+ * di query riguardanti oggetti Biblioteca.
+ * 
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ * 
+ */
 public class LibraryDAO {
+	/**
+	 * Ottiene le informazioni della biblioteca (salvandole in un bean Biblioteca).
+	 * @return Restituisce un bean contenente le informazioni della biblioteca
+	 */
 	public LibraryBean getLibraryInfo() {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -33,6 +45,12 @@ public class LibraryDAO {
 		return null;
 	}
 	
+	/**
+	 * Aggiorna le informazioni della biblioteca con quelle contenute nel bean
+	 * passato come parametro.
+	 * @param library Bean contenente informazioni sulla Biblioteca.
+	 * @return Restituisce 1 in caso di successo, 0 altrimenti.
+	 */
 	public int updateLibraryInfo(LibraryBean library) {
 		int result = 0;
 		PreparedStatement ps;

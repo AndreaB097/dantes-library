@@ -7,7 +7,7 @@ java.time.format.*, java.util.*"%>
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Dettagli libro</title>
 </head>
 <body>

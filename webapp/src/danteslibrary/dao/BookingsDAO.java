@@ -8,8 +8,30 @@ import danteslibrary.model.BookingsBean;
 
 import java.util.ArrayList;
 
+/**
+ * Classe che si occupa dell’interfacciamento con il database per l’esecuzione
+ * di query riguardanti oggetti Prenotazione.
+ * 
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ * 
+ */
 public class BookingsDAO {
-	
+	/**
+	 * 
+	 * Inserisce una nuova prenotazione nel database.
+	 * 
+	 * @param email Email dell'utente che fa la prenotazione.
+	 * @param start_date Data d'inizio prenotazione.
+	 * @param end_date Data di fine prenotazione.
+	 * @param state_name Stato della nuova prenotazione. Nel caso la prenotazione la stia creando un utente, il valore
+	 * sarà "Non ancora ritirato".
+	 * @param card_id Codice della tessera con cui si vuole prenotare il libro.
+	 * @param book_id Il libro da prenotare.
+	 * @return Restituisce 0 nel caso in cui non ci sono stati cambiamenti,
+	 * altrimenti il numero di righe cambiate.
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int newBooking(String email, String start_date, String end_date, String state_name, int card_id, int book_id) throws SQLException {
 		int result = 0;
 		Connection conn = null;
@@ -52,6 +74,15 @@ public class BookingsDAO {
 		return result;
 	}
 	
+	/**
+	 * Cerca all'interno del database le prenotazioni in base al filtro selezionato e 
+	 * alle parole chiave passate come parametro.
+	 * @param filter Filtro di ricerca. Vedere i filtri all'interno della
+	 * pagina admin.jsp (Sezione Prenotazioni).
+	 * @param keyword Stringa che rappresenta le parole chiave.
+	 * @return Restituisce una lista di prenotazioni che rispettino filter e keyword.
+	 * Restituisce null nel caso in cui non vi sono corrispondenze.
+	 */
 	public ArrayList<BookingsBean> getBookingsByFilter(int filter, String keyword) {
 		String[] filters = {"booking_id", "book_id", "bookings.card_id", "cards.codice_fiscale", "state_name", "email", "start_date", "end_date"};
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
@@ -82,7 +113,7 @@ public class BookingsDAO {
 				booking.setState_name(state_name);
 				booking.setStart_date(start_date);
 				booking.setEnd_date(end_date);
-
+	
 				bookings.add(booking);
 			}
 			conn.close();
@@ -94,7 +125,11 @@ public class BookingsDAO {
 		return null;
 	}
 	
-public ArrayList<BookingsBean> getAllBookings() {
+	/**
+	 * Ottiene tutte le prenotazioni presenti nel database.
+	 * @return Restituisce una lista di tutte le prenotazioni.
+	 */
+	public ArrayList<BookingsBean> getAllBookings() {
 		
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
@@ -134,7 +169,14 @@ public ArrayList<BookingsBean> getAllBookings() {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Cancella una prenotazione dal database.
+	 * @param booking_id Codice della prenotazione da cancellare.
+	 * @return Restituisce 0 in caso di fallimento, altrimenti il numero di prenotazioni
+	 * cancellate (1).
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int removeBooking(int booking_id) throws SQLException {
 		int result = 0;
 		Connection conn = null;
@@ -170,6 +212,11 @@ public ArrayList<BookingsBean> getAllBookings() {
 		return result;
 	}
 	
+	/**
+	 * Ottiene le prenotazioni effettuate da un Utente data la sua email.
+	 * @param email Email dell'utente del quale si vogliono ottenere le prenotazioni.
+	 * @return Restituisce la lista delle prenotazioni effettuate da un utente.
+	 */
 	public ArrayList<BookingsBean> getUserBookings(String email) {
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
@@ -209,6 +256,13 @@ public ArrayList<BookingsBean> getAllBookings() {
 		return null;
 	}
 	
+	/**
+	 * Ottiene la prenotazione in base al codice prenotazione (booking_id) 
+	 * passato come parametro.
+	 * @param booking_id Codice della prenotazione da ottenere.
+	 * @return Restituisce la prenotazione avente come id booking_id, 
+	 * null altrimenti.
+	 */
 	public BookingsBean getBookingById(int booking_id) {
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -252,6 +306,13 @@ public ArrayList<BookingsBean> getAllBookings() {
 		return null;
 	}
 	
+	/**
+	 * Aggiorna lo stato di una prenotazione.
+	 * @param booking_id Il codice prenotazione della prenotazione da modificare.
+	 * @param state Il nuovo stato da assegnare alla prenotazione.
+	 * @return 0 in caso di fallimento. Altrimenti il numero di righe modifcate.
+	 * @throws SQLException Lanciata in caso di malfunzionamento, problemi di connessione.
+	 */
 	public int updateBooking(int booking_id, String state) throws SQLException {
 		int result = 0;
 		Connection conn = null;

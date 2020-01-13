@@ -2,6 +2,11 @@ package danteslibrary.model;
 
 import java.util.ArrayList;
 
+/**
+ * Bean che definisce l'entità Libro
+ * @author Andrea Buongusto
+ * @author Marco Salierno
+ */
 public class BooksBean {
 	
 	private int book_id;

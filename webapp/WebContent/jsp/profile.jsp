@@ -8,7 +8,7 @@
 <!doctype html>
 <html>
 <head>
-<%@include file="./jsp/layout/head.jsp" %>
+<%@include file="./jsp/layout/header.jsp" %>
 	<title>Dante's Library | Area Utente</title>
 </head>
 <body>
@@ -40,8 +40,8 @@
 				<p id="card-date">Puoi ritirare la tua tessera a partire dal: <strong><%=session.getAttribute("card_date") %></strong></p>
 				<p>Puoi già effettuare prenotazioni. Quando ti recherai in biblioteca per ritirare il libro,
 				assicurati di ritirare anche la tua tessera!</p>
-			<%}%>
-			<%if(session.getAttribute("card") != null) { %>
+			<%}
+			else if(session.getAttribute("card") != null) { %>
 				<p>Codice Tessera: <b>${card.card_id }</b><br/>
 				<%CardsBean card = (CardsBean) session.getAttribute("card");
 				if(card.isAssociated()) { %>
