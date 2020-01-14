@@ -74,7 +74,7 @@
 			if(bookings != null)  {
 				if(!bookings.isEmpty()) { %>
 				<tr>
-					<th>#Prenotazione</th>
+					<th>Codice</th>
 					<th>Libro</th>
 					<th>Data Inizio</th>
 					<th>Data Fine</th>
@@ -136,14 +136,15 @@
 			</table>
 		</div>
 		<button class="dropdown-btn"><i class="fas fa-user"></i>&nbsp;&nbsp;Dati personali</button>
-		<div class="dropdown-content section-container" style="margin: 0; text-align: left;">
+		<div class="dropdown-content" style="margin: 0; text-align: left;">
+			<div class="box">
 			<form method ="post" action="login?edit_user">
 			<label for="email">Email</label>
 			<input id="email" name="email" class="editable" type="text" value="${user.email}" readonly>
 			<input id="old_email" name="old_email" class="editable" type="hidden" value="${user.email}" readonly> 
 			
 			<label id="lbl_password" for="password">Password</label>
-			<input id="password" name="password" placeholder="Scrivi qui la nuova password" class="editable" type="password" value="" readonly>  
+			<input id="password" name="password" placeholder="Lascia vuoto per non cambiare" class="editable" type="password" value="" readonly>  
 		
 			<label for="address">Indirizzo</label>
 			<input id="address" name="address" class="editable" type="text" value="${user.address}" readonly>
@@ -163,7 +164,8 @@
 				$("#btn-user").hide();
 				});
 			</script>
-		</form>	
+		</form>
+		</div>
 		</div>
 	</div>
 </div>

@@ -16,7 +16,9 @@ pageEncoding="UTF-8"%>
 	<h2>1. Creazione account</h2>
 	
 	<div id="error-list" tabindex="-1"></div>
-	
+	<% if(request.getAttribute("error") != null) { %>
+		<div class="error"><%=request.getAttribute("error") %></div>
+	<% } %>
 	<form id="sign-form" class="box" action="register" method="post" onsubmit="return validateSubmit()">
 	  <small>(Attenzione! TUTTI i campi sono obbligatori.)</small>
 	  <div class="col-50">

@@ -12,8 +12,10 @@
 <%@ include file="./jsp/layout/navbar.jsp" %>
 
 <div class="container">
-	<h2>Contattaci</h2>
-	<p style="white-space: pre-line">${applicationScope.library.contacts}</p>
+	<div class="contacts-container">
+		<h2>Contattaci</h2>
+		<p style="white-space: pre-line">${applicationScope.library.contacts}</p>
+	</div>
 </div>
 
 <%@ include file="./jsp/layout/footer.jsp" %>

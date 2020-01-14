@@ -2,7 +2,7 @@
 pageEncoding="UTF-8"
 import="java.util.ArrayList, danteslibrary.model.*,
 java.time.LocalDate, java.time.format.*, java.util.Locale"%>
-
+<%@ page trimDirectiveWhitespaces="true" %>
 <!doctype html>
 <html>
 <head>
@@ -70,8 +70,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		<div class="sidebar-responsive">
 			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
 				<section id="sidebar-users" class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Utenti<p></section>
-			<%}
-			if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
+			<%} if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
 				<section id="sidebar-books"><i class="fas fa-book fa-lg"></i><br><p>Libri</p></section>
 			<%}
 			if(roles.contains("Gestore Tessere") || roles.contains("Gestore Biblioteca")) {%>

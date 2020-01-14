@@ -125,6 +125,12 @@ button#btn-remove {
 }
 input {
 	background-color: #ffffff;
+	border: 1px solid #d9d9d9;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 16px;
+	margin-bottom: 20px;
+	display: block;
 }
 input:focus {
 	box-shadow: 0px 0px 2px 2px #3aafa9 inset;
@@ -460,6 +466,18 @@ div.section-genre .card:hover img {
 	filter: brightness(105%);
 }
 
+/**************************
+* Sezione pagina contatti *
+***************************/
+div.contacts-container {
+	width: 100%;
+	padding: 20px;
+	font-size: 18px;
+}
+div.contacts-container h2 {
+	border-bottom: 1px solid #ccc;
+}
+
 /***********************
 * Sezione pagina libro *
 ************************/
@@ -590,10 +608,13 @@ div.dropdown-content {
 }
 div.dropdown-content table {
 	border-collapse: collapse;
+	max-width: 100%;
+	padding: 5px;
+	margin: auto;
 }
 div.dropdown-content table td {
 	width: 20%;
-	padding: 15px;
+	padding: 5px;
 	border-top: 1px solid #aabbcc;
 	border-bottom: 1px solid #aabbcc;
 }
@@ -972,10 +993,9 @@ div.section-container input[type='checkbox'] {
 		overflow: hidden;
 	}
 	div.sidebar-responsive section {
-		width: 25%;
+		width: 32%;
 		height: 80px;
-		display: block;
-		float: left;
+		display: inline-block;
 		border: none;
 		text-align: center;
 		margin: 0 auto;
@@ -1036,7 +1056,7 @@ div.section-container input[type='checkbox'] {
 		width: 30px;
 		height: 30px;
 	}
-	div.section-container .overflow-container label#btn-upload {
+	div.section-container label#btn-upload {
 		margin: 80px 5px;
 		font-size: 30px;
 		display: inline-block;
