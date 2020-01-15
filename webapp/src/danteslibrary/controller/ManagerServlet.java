@@ -579,7 +579,6 @@ public class ManagerServlet extends HttpServlet {
     	  long fileSize = filePart.getSize();
     	  LibraryBean library = libraryDAO.getLibraryInfo();
     	  String fileName = filePart.getSubmittedFileName();
-    	  System.out.println("filename: " + fileName);
     	  if(fileName.equals("default_logo.png"))
     		  library.setLogo("./images/default_logo.png");
     	  if(name.equals("") || contacts.equals("") || name == null || contacts == null) {
@@ -621,25 +620,24 @@ public class ManagerServlet extends HttpServlet {
 			return;
 	} //chiusura if(session.getAttribute("admin") != null)
 
-		if(email == null || password == null) {
-			response.sendRedirect("admin.jsp");
+	else if(email == null || password == null) {
+		response.sendRedirect("admin.jsp");
+		return;
+	}
+	else {
+		/*Autenticazione*/
+		ManagersBean admin = managersDAO.login(email, password);
+		
+		if(admin != null) {
+			session.setAttribute("admin", admin);
+			session.removeAttribute("user"); /*Distruggo la sessione per l'utente(nel caso in cui sia collegato)*/
+		}
+		else {
+			request.setAttribute("login_error", true);
+			request.getRequestDispatcher("admin.jsp").forward(request, response);
 			return;
 		}
-		
-		/*Autenticazione*/
-		else {
-			ManagersBean admin = managersDAO.login(email, password);
-			
-			if(admin != null) {
-				session.setAttribute("admin", admin);
-				session.removeAttribute("user"); /*Distruggo la sessione per l'utente(nel caso in cui sia collegato)*/
-			}
-			else {
-				request.setAttribute("login_error", true);
-				request.getRequestDispatcher("admin.jsp").forward(request, response);
-				return;
-			}
-		}
+	}
 		/*Se l'autenticazione va a buon fine, l'utente viene reindirizzato all'
 		 * homepage*/
 		response.sendRedirect("admin.jsp");

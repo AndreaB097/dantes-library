@@ -464,6 +464,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		$("#error-list").hide();
 		var errors = [];
 		function validateBook() {
+			var title_regex = /^[A-zÀ-ú0-9 _.,:?!]{1,100}$/;
+			var description_regex = /^[\s\S]{1,1000}$/;
+			var publisher_regex = /^[A-zÀ-ú0-9 _.,:?!]{1,100}$/;
+			var quantity_regex = /^[0-9]{1,3}$/;
+			
 			var title = document.getElementById("title").value;
 			var description = document.getElementById("description").value;
 			var authors = document.getElementById("authors").value;
@@ -471,20 +476,20 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			var quantity = document.getElementById("quantity").value;
 			var genres = document.getElementById("genres").value;
 				
-			if(!title.match(/^[A-Za-z0-9 _.:]{1,100}$/) && title) {
-				errors.push("Il titolo può contenere solo caratteri alfanumerici. Lunghezza massima: 100.");
+			if(!title.match(title_regex) && title) {
+				errors.push("Il titolo può contenere solo caratteri alfanumerici. Lunghezza massima: 100 caratteri.");
 			}
 			
-			if(!description.match(/^[\s\S]{1,1000}$/) && description) {
+			if(!description.match(description_regex) && description) {
 				errors.push("La descrizione non può superare i 1000 caratteri.");
 			}
 			
-			if(!publisher.match(/^[A-Za-z0-9 _.:]{1,100}$/) && publisher) {
-				errors.push("La casa editrice può contenere solo caratteri alfanumerici. Lunghezza massima: 100.");
+			if(!publisher.match(publisher_regex) && publisher) {
+				errors.push("La casa editrice può contenere solo caratteri alfanumerici. Lunghezza massima: 100 caratteri.");
 			}
 			
-			if(!quantity.match(/^[0-9]+$/) && quantity) {
-				errors.push("La quantità deve essere espressa con un numero.");
+			if(!quantity.match(quantity_regex) && quantity) {
+				errors.push("La quantità deve essere espressa con un numero (massimo 3 cifre).");
 			}
 			
 			if(!title || !description || !authors || !publisher || !quantity || !genres) {
@@ -523,12 +528,57 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		</script>
 		
 		<!-- Aggiungi Genere -->
-		<form id="new-genre-form" method="post" class="overflow-container">
+		<form id="new-genre-form" method="post" class="overflow-container" onsubmit="return validateGenre()">
 			<h3>Aggiunta Genere</h3>
 			<label for="genre">Nome del nuovo genere</label>
-			<input id="genre" name="genre_name" type="text" required>
+			<input id="genre" name="genre_name" type="text">
 			<button type="submit" class="save" formaction="admin?books&new_genre"><i class="fas fa-plus fa-lg"></i> Aggiungi genere</button>
 		</form>
+		<script>
+		$("#error-list").hide();
+		var errors = [];
+		function validateGenre() {
+			var genre_name_regex = /^[A-zÀ-ú]{1,30}$/;
+			var genre_name = document.getElementById("genre").value;
+				
+			if(!genre_name) {
+				errors.push("Non tutti i campi sono stati compilati.");
+			}
+			
+			if(!genre_name.match(genre_name_regex) && genre_name) {
+				errors.push("Il nome del genere può contenere solo lettere e spazi. Lunghezza massima: 30.");
+			}
+		
+			if(errors.length != 0) {
+				if(!document.getElementById("error-list")) {
+					var errors_div = document.createElement("div");
+					errors_div.setAttribute("id", "error-list");
+					errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
+				}
+				else {
+					var errors_div = document.getElementById("error-list");
+				}
+				var txt = "<ul>";
+				$("#new-genre-form h3").before(errors_div);
+				errors_div.className = "error";
+				errors.forEach(showErrors);
+				errors_div.innerHTML = txt;
+				
+				function showErrors(value, index, array) {
+					txt = txt + "<li>" + value + "</li>";
+				}
+				
+				errors_div.innerHTML = txt + "</ul>";
+				$(errors_div).fadeIn(300);
+				errors = [];
+				errors_div.focus();
+				return false;
+			}
+			
+			$("#error-list").hide();
+			return true;
+		}
+		</script>
 		
 			<script>
 			$(document).ready(function() {
@@ -659,13 +709,20 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			$("#error-list").hide();
 			var errors = [];
 			function validateCard() {
+				var codice_fiscale_regex = /[a-zA-Z]{6}\d\d[a-zA-Z]\d\d[a-zA-Z]\d\d\d[a-zA-Z]/;
+				var card_id_regex = /^[0-9]{5}$/;
+				
 				var codice_fiscale = document.getElementById("codice_fiscale").value;
 				var card_id = document.getElementById("card_id").value;
-
-					
-				if(!codice_fiscale) {
+				
+				if(!codice_fiscale)
 					errors.push("Non tutti i campi sono stati compilati.");
-				}
+				
+				if(!codice_fiscale.match(codice_fiscale_regex) && codice_fiscale)
+					errors.push("Inserire un codice fiscale valido.");
+				
+				if(!card_id.match(card_id_regex) && card_id)
+					errors.push("Inserire un codice tessera valido.");
 			
 				if(errors.length != 0) {
 					if(!document.getElementById("error-list")) {
@@ -926,9 +983,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		$("#error-list").hide();
 		var errors = [];
 	  	function validateBooking() {
-	  		var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+	  		var email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 			var codice_fiscale_regex = /[a-zA-Z]{6}\d\d[a-zA-Z]\d\d[a-zA-Z]\d\d\d[a-zA-Z]/;
-
+			var book_id_regex = /^[0-9]*$/;
+			var card_id_regex = /^[0-9]{5}$/;
+			
 			var email = document.getElementById("booking_email").value;
 			var codice_fiscale = document.getElementById("booking_codice_fiscale").value;
 			var card_id = document.getElementById("booking_card_id").value;
@@ -943,13 +1002,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				errors.push("Inserire un codice fiscale valido.");
 			
 			
-			if(!email.match(mailformat) && email)
+			if(!email.match(email_regex) && email)
 				errors.push("Indirizzo email non valido.");
 			
-			if(!book_id.match(/^[0-9]*$/) && book_id)
+			if(!book_id.match(book_id_regex) && book_id)
 				errors.push("Il codice libro può contenere solo numeri!");
 			
-			if(!card_id.match(/^[0-9]{5}$/) && card_id)
+			if(!card_id.match(card_id_regex) && card_id)
 				errors.push("Inserire un codice tessera valido.");
 			
 			if(errors.length != 0) {
@@ -1155,6 +1214,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		    $("#error-list").hide();
 		    var errors = [];
 		    function validateUpdateManager() {
+		    	var email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+		    	var name_regex = /^[A-zÀ-ú ]{1,30}$/;
+		    	var surname_regex = /^[A-zÀ-ú ]{1,30}$/;
+		    	var password_regex = /^\w{6,20}$/;
+		    	var address_regex = /^[A-zÀ-ú0-9 ,]{5,100}$/;
+		    	var phone_regex = /^[0-9]{7,10}$/;
+		    	
 				var email = document.getElementById("email").value;
 				var name = document.getElementById("name").value;
 				var surname = document.getElementById("surname").value;
@@ -1165,14 +1231,31 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				
 				//TODO fare controllo anche sui checkbox
 				
-				if(!email || !name || !surname || !address || !phone ) {
+				if(!email || !name || !surname || !address || !phone) {
 				  errors.push("Non tutti i campi sono stati compilati.");
 				}
-				if((password.length < 6 || !(/\d/.test(password))) && password) {
-					errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
+				
+				if(!email.match(email_regex) && email)
+					errors.push("Indirizzo email non valido.");
+				
+				if(!name.match(name_regex) && name)
+					errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30.");
+				
+				if(!surname.match(surname_regex) && surname)
+					errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30.");
+				
+				if(!address.match(address_regex) && address)
+					errors.push("L'indirizzo può contenere solo lettere e numeri. Lunghezza massima: 100.");
+				
+				if(!phone.match(phone_regex) && phone)
+					errors.push("Inserire un numero di telefono valido.");
+				
+				if(!password.match(password_regex) && password) {
+					errors.push("La password deve essere lunga almeno 6 caratteri alfanumerici.");
 				}
+				
 				if(password != repeat_password && password && repeat_password){
-				  errors.push("Le password non corrispondono");
+				  errors.push("Le password non corrispondono.");
 				}
 				
 				if(errors.length != 0) {
@@ -1241,6 +1324,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
     $("#error-list").hide();
     var errors = [];
     function validateNewManager() {
+    	var email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    	var name_regex = /^[A-zÀ-ú ]{1,30}$/;
+    	var surname_regex = /^[A-zÀ-ú ]{1,30}$/;
+    	var password_regex = /^\w{6,20}$/;
+    	var address_regex = /^[A-zÀ-ú0-9 ,]{5,100}$/;
+    	var phone_regex = /^[0-9]{7,10}$/;
+    	
 		var email = document.getElementById("email").value;
 		var name = document.getElementById("name").value;
 		var surname = document.getElementById("surname").value;
@@ -1254,9 +1344,26 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
 		  errors.push("Non tutti i campi sono stati compilati.");
 		}
-		if((password.length < 6 || !(/\d/.test(password))) && password) {
-			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
+		
+		if(!email.match(email_regex) && email)
+			errors.push("Indirizzo email non valido.");
+		
+		if(!name.match(name_regex) && name)
+			errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30.");
+		
+		if(!surname.match(surname_regex) && surname)
+			errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30.");
+		
+		if(!address.match(address_regex) && address)
+			errors.push("L'indirizzo può contenere solo lettere e numeri. Lunghezza massima: 100.");
+		
+		if(!phone.match(phone_regex) && phone)
+			errors.push("Inserire un numero di telefono valido.");
+		
+		if(!password.match(password_regex) && password) {
+			errors.push("La password deve essere lunga almeno 6 caratteri alfanumerici.");
 		}
+		
 		if(password != repeat_password && password && repeat_password){
 		  errors.push("Le password non corrispondono");
 		}
@@ -1320,15 +1427,15 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		  	<div class="error"><%=request.getAttribute("error") %></div>
 			<%} %>
 			
-			<form method="post" enctype="multipart/form-data">
+			<form method="post" enctype="multipart/form-data" onsubmit="return validateLibrary()">
 				<label for="image-preview">Logo Biblioteca</label>
 				<div style="float:left; width: 200px; height: 200px;" id="image-preview" class="image-preview" >
 						<img src="${applicationScope.library.logo}" alt="Nessun immagine" onerror="this.onerror=null; this.src='./images/default_logo.png'">
 				</div>
 				<label id="btn-upload" for="image"><i class="far fa-images"></i></label>
 				<input id="image" class="image" type="file" name="file" accept=".jpg, .jpeg, .png">
-				<label for="name">Nome biblioteca</label>
-				<input id="name" name="name" type="text" value="${applicationScope.library.name}">
+				<label for="library_name">Nome biblioteca</label>
+				<input id="library_name" name="name" type="text" value="${applicationScope.library.name}">
 				<label for="contacts">Contatti</label>
 				<textarea id="contacts" name="contacts" rows="6" cols="60">${applicationScope.library.contacts}</textarea>
 				<button type="submit" class="save" formaction="admin?library&save_library"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
@@ -1344,7 +1451,6 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				
 				file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
 				$("#image").change(function() {
-					console.log("biblioteca: " + file.files[0]);
 					if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
 						return false;
 					}
@@ -1365,6 +1471,56 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				});
 				</script>
 			</form>
+			<script>
+		    $("#error-list").hide();
+		    var errors = [];
+		    function validateLibrary() {
+		    	var library_regex = /^[A-zÀ-ú ]{1,100}$/;
+		    	var contacts_regex = /^[\s\S]{1,300}$/;
+		    	
+				var library_name = document.getElementById("library_name").value;
+				var contacts = document.getElementById("contacts").value;
+				
+				if(!library_name || !contacts) {
+				  errors.push("Non tutti i campi sono stati compilati.");
+				}
+				
+				if(!library_name.match(library_regex) && library_name)
+					errors.push("Il nome della biblioteca può contenere solo spazi e lettere. Lunghezza massima: 100 caratteri.");
+				
+				if(!contacts.match(contacts_regex) && contacts)
+					errors.push("Le informazioni sui contatti non possono superare i 300 caratteri.");
+				
+				if(errors.length != 0) {
+				  if(!document.getElementById("error-list")) {
+				    var errors_div = document.createElement("div");
+				    errors_div.setAttribute("id", "error-list");
+				    errors_div.setAttribute("tabindex", "-1"); //per ottenerne il focus
+				  }
+				  else {
+				    var errors_div = document.getElementById("error-list");
+				  }
+				  var txt = "<ul>";
+				  $("#library-section h2").after(errors_div);
+				  errors_div.className = "error";
+				  errors.forEach(showErrors);
+				  errors_div.innerHTML = txt;
+				
+				  function showErrors(value, index, array) {
+				    txt = txt + "<li>" + value + "</li>";
+				  }
+				
+				  errors_div.innerHTML = txt + "</ul>";
+				  $(errors_div).fadeIn(300);
+				  errors = [];
+				  errors_div.focus();
+				  return false;
+				}
+				
+				$("#error-list").hide();
+				return true;
+		    }
+		    </script>
 		</div> <!-- fine section-container sezione Biblioteca -->
 	<%} %>
 		

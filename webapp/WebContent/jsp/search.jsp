@@ -52,7 +52,7 @@
 		<%} %>
 		
 	<%} else { %>
-	<h2 id="search-title">Nessun risultato trovato per: "<%=request.getParameter("q") %>".</h2>
+	<h2 id="search-title">Nessun risultato trovato per: "<%=request.getParameter("query") %>".</h2>
 	<%} %>
 </div>
 

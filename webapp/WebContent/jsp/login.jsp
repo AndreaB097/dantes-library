@@ -16,7 +16,6 @@ pageEncoding="UTF-8"%>
 	Altrimenti alla pagina che stava visitando prima di fare il login*/
 	response.sendRedirect("profile.jsp"); 
    }
-	session.setAttribute("referer", request.getHeader("referer"));
 %>
 
 <div class="container" style="margin-top: 75px">

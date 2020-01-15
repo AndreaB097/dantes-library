@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 import danteslibrary.util.EmailUtility;
+import danteslibrary.util.InputChecker;
 import danteslibrary.dao.UsersDAO;
  
 /**
@@ -38,6 +39,7 @@ public class ResetPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
     	UsersDAO dao = new UsersDAO();
         String tmp_link = request.getParameter("link");
+        request.getSession().removeAttribute("user_email");
         if(tmp_link == null || tmp_link.equals("")) {
         	response.sendRedirect("reset_password.jsp");
         	return;
@@ -51,23 +53,25 @@ public class ResetPasswordServlet extends HttpServlet {
         		request.setAttribute("error", "Il link non è valido oppure è scaduto.");
         	}
         }
-        request.getRequestDispatcher("reset_password.jsp").forward(request, response);;
+        request.getRequestDispatcher("reset_password.jsp").forward(request, response);
         return; 
     }
  
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     	UsersDAO dao = new UsersDAO();
-    	HttpSession session = request.getSession();
     	
-    	if(session.getAttribute("user_email") != null && request.getParameter("new_password") != null
-    			&& !request.getParameter("new_password").equals("")) {
-    		String email = (String) session.getAttribute("user_email");
+    	if(request.getSession().getAttribute("user_email") != null && request.getParameter("new_password") != null) {
+    		String email = (String) request.getSession().getAttribute("user_email");
     		String new_password = request.getParameter("new_password");
-    		if(dao.updateUserPassword(email, new_password) != 0) {
+    		if(!InputChecker.checkPassword(new_password)) {
+    			request.setAttribute("error", "La password può contenere solo caratteri alfanumerici e deve avere tra i 6 e i 20 caratteri.");
+    			request.getRequestDispatcher("reset_password.jsp").forward(request, response);
+        		return;
+    		}
+    		else if(dao.updateUserPassword(email, new_password) != 0) {
     			request.setAttribute("info", "La password è stata reimpostata correttamente.");
     			dao.deleteTemporaryLink(email);
-    			session.invalidate();
     		}
     		else {
     			request.setAttribute("error", "Errore imprevisto. Riprovare l'operazione. Se il problema persiste, contattare la biblioteca.");
@@ -78,7 +82,7 @@ public class ResetPasswordServlet extends HttpServlet {
     	
         String recipient = request.getParameter("email");
         
-        if(recipient == null || recipient.equals("")) {
+        if(recipient == null || !InputChecker.checkEmail(recipient)) {
         	request.setAttribute("error", "Inserisci un indirizzo email valido.");
         	request.getRequestDispatcher("reset_password.jsp").forward(request, response);
         	return;

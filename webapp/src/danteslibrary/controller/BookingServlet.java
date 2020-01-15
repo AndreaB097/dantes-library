@@ -32,12 +32,14 @@ public class BookingServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		BookingsDAO bookingsDAO = new BookingsDAO();
 		CardsDAO cardsDAO = new CardsDAO();
 		
 		HttpSession session = request.getSession();
 			
 		if(session.getAttribute("user") == null) {
+			session.setAttribute("referer", request.getHeader("referer"));
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			return;
 		}

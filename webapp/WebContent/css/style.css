@@ -129,7 +129,6 @@ input {
 	border-radius: 5px;
 	font-size: 14px;
 	padding: 16px;
-	margin-bottom: 20px;
 	display: block;
 }
 input:focus {
@@ -295,7 +294,7 @@ a.menu-icon img {
 #sign-form button.disabled {
 	background-color: #cfcfcf;
 }
-div#register-card-div {
+#register-card-form {
 	clear: both;
 	padding: 50px;
 }

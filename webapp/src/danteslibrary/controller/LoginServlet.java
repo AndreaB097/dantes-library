@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import danteslibrary.model.UsersBean;
+import danteslibrary.util.InputChecker;
 import danteslibrary.model.BookingsBean;
 import danteslibrary.model.CardsBean;
 import danteslibrary.dao.UsersDAO;
@@ -25,38 +26,64 @@ import java.util.ArrayList;
 public class LoginServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	private UsersDAO usersDAO = new UsersDAO();
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-
+		response.setCharacterEncoding("UTF-8");
 		
 		HttpSession session = request.getSession();
 		
 		/*Controllo Utente già autenticato. */
 		if(session.getAttribute("user") != null) {
 			if(request.getParameter("edit_user") != null) {
-				UsersDAO dao = new UsersDAO();
 				UsersBean user = new UsersBean();
-				String email = request.getParameter("email");
+				String new_email = request.getParameter("new_email");
 				String old_email = request.getParameter("old_email");
 				String password = request.getParameter("password");
 				String address = request.getParameter("address");
-				user = dao.getUserByEmail(old_email);
-				if (email != null && !email.equals("")) {
-					user.setEmail(email);
+
+				user = usersDAO.getUserByEmail(old_email);
+				
+				if (new_email != null && old_email != null && !new_email.equals(old_email)) {
+					/*Controllo se la nuova email ha un formato valido e se è già presente nel sistema,
+					 *ossia se è già in uso da qualche altro utente.*/
+			        if(!InputChecker.checkEmail(new_email)) {
+			        	request.setAttribute("error", "Inserire un indirizzo email valido.");
+			    		request.getRequestDispatcher("profile.jsp").forward(request, response);
+			    		return;
+			        }
+			        else if(usersDAO.checkExistingEmail(new_email) == true) {
+			        	request.setAttribute("error", "Questo indirizzo email è già in uso da un altro utente. Sceglierne un altro.");
+			    		request.getRequestDispatcher("profile.jsp").forward(request, response);
+			    		return;
+					}
+			        else /*La nuova email è utilizzabile, quindi la sovrascrivo a quella vecchia.*/
+			        	user.setEmail(new_email);
 				}
-				if (password != null && !password.equals("")) {
-					dao.updateUserPassword(email, password);
+
+				if (password != null && !InputChecker.checkPassword(password) && !password.equals("")) {
+					request.setAttribute("error", "La password può contenere solo caratteri alfanumerici e deve avere tra i 6 e i 20 caratteri.");
+	        		request.getRequestDispatcher("profile.jsp").forward(request, response);
+	        		return;
 				}
-				if (address != null && !address.equals("")) {
+				else if(password != null && InputChecker.checkPassword(password))
+					usersDAO.updateUserPassword(old_email, password);
+				
+				if (address == null || !InputChecker.checkAddress(address)) {
+					request.setAttribute("error", "L'indirizzo può contenere solo lettere e numeri e non deve essere vuoto. Lunghezza massima: 100 caratteri.");
+	        		request.getRequestDispatcher("profile.jsp").forward(request, response);
+	        		return;
+				}
+				else
 					user.setAddress(address);
-				}
+				
 				try {
-					dao.updateUser(user, old_email);
+					usersDAO.updateUser(user, old_email);
 					request.setAttribute("info","Il tuo profilo è stato aggiornato correttamente.");
 					session.setAttribute("user", user);
 				} catch (SQLException e) {
-					request.setAttribute("error","Impossibile aggiornare il profile. Si prega di riprovare più tardi.");
+					request.setAttribute("error","Impossibile aggiornare il profilo. Si prega di riprovare più tardi.");
 					e.printStackTrace();
 				}
 			

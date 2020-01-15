@@ -30,6 +30,7 @@ public class CardServlet extends HttpServlet {
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 		
 		/*Controllo Utente già autenticato*/
@@ -42,7 +43,7 @@ public class CardServlet extends HttpServlet {
 		 * Registrazione - Passo 2: Associazione tessera *
 		 * ***********************************************/
 		/*Controllo se il passo 1 e' stato eseguito verificando l'esistenza 
-		 *dell' attributo user settato in RegistrationServlet.
+		 *dell' attributo user_incomplete settato in RegistrationServlet.
 		 *Se non esiste, reindirizzo alla pagina di registrazione in quanto si 
 		 *sta cercando di accedere a questa servlet senza aver eseguito il passo 1.*/
 		if(session.getAttribute("user_incomplete") == null) {
@@ -111,7 +112,6 @@ public class CardServlet extends HttpServlet {
 					request.getRequestDispatcher("card.jsp").forward(request, response);
 					return;
 				}
-				
 			}
 		}
 		response.sendRedirect("card.jsp");

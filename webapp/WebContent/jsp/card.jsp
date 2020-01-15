@@ -31,27 +31,26 @@ else if(session.getAttribute("user_incomplete") == null) {
 	<% if(request.getAttribute("error") != null) { %>
 		<div class="error" tabindex="-1"><%=request.getAttribute("error") %></div>
 	<% } %>
-	<form id="sign-form" class="box" method="post">
+	<div id="sign-form" class="box">
 	  <small>Per poter prenotare libri occorre associare una tessera bibliotecaria al tuo account.</small>
+	  <form class="col-50"  method="post">
+	  	  <button id="new-card-btn" formaction="card?new_card">Non ho una tessera bibliotecaria</button>
+	  </form>
 	  <div class="col-50">
-	    <button id="new-card-btn" formaction="card?new_card">Non ho una tessera bibliotecaria</button>
-		</div>
-		<div class="col-50">
-		  <button id="register-card-btn" type="button">Possiedo già una tessera bibliotecaria</button>
-		</div>
-		<div id="register-card-div">
-
-		  <input name="card_id" type="text" placeholder="Inserisci il codice della tua tessera" />
+	  	  <button id="register-card-btn" type="button">Possiedo già una tessera bibliotecaria</button>
+	  </div>
+	  <form id="register-card-form" method="post">
+		  <input name="card_id" type="text" placeholder="Inserisci il codice della tua tessera" required/>
 		  <button formaction="card" type="submit">Invia codice</button>
-		</div>
-	</form>
+	  </form>
+	</div>
 	<script>
-		$("#register-card-div").hide();
+		$("#register-card-form").hide();
 		$("#register-card-btn").click(function() {
 			$("#register-card-btn").toggleClass("active");
 			$("#new-card-btn").toggleClass("disabled");
 			document.getElementById("new-card-btn").toggleAttribute("disabled");
-			$("#register-card-div").slideToggle();
+			$("#register-card-form").slideToggle();
 		});
 	</script>
 	</div>

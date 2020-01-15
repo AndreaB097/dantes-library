@@ -34,11 +34,12 @@ pageEncoding="UTF-8"%>
 	<script>
 	var errors = [];
 	function validateSubmit() {
+		var password_regex = /^.{6,20}$/;
 		var password = document.getElementById("password").value;
 		var repeat = document.getElementById("repeat").value;
 		
-		if(password.length < 6 || !(/\d/.test(password))) {
-			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
+		if(!password || !password.match(password_regex)) {
+			errors.push("La password deve avere tra i 6 e i 20 caratteri.");
 		}
 		if(password != repeat) {
 			errors.push("Le password non corrispondono.");

@@ -33,7 +33,7 @@ pageEncoding="UTF-8"%>
 	  <input id="email" type="text" name="email" placeholder="Inserisci il tuo indirizzo email (es. mariorossi@gmail.com)"/>
 		<label for="password">Password</label>
 		<input id="password" type="password" name="password" placeholder="Inserisci una password"
-			title="La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero." />
+			title="La password deve essere lunga almeno 6 caratteri e massimo 20." />
 		<label for="repeat">Ripeti password</label>
 		<input id="repeat" type="password" name="password" placeholder="Conferma password" />
 		  <label for="codice_fiscale">Codice fiscale</label>
@@ -50,9 +50,12 @@ pageEncoding="UTF-8"%>
 <script>
 var errors = [];
 	function validateSubmit() {
-		var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+		var email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 		var codice_fiscale_regex = /[a-zA-Z]{6}\d\d[a-zA-Z]\d\d[a-zA-Z]\d\d\d[a-zA-Z]/;
-		var password_regex = /^\w{6,20}$/;
+		var name_regex = /^[A-zÀ-ú ]{1,30}$/;
+    	var surname_regex = /^[A-zÀ-ú ]{1,30}$/;
+    	var password_regex = /^.{6,20}$/;
+    	var address_regex = /^[A-zÀ-ú0-9 ,]{5,100}$/;
 		
 		var name = document.getElementById("name").value;
 		var surname = document.getElementById("surname").value;
@@ -62,11 +65,30 @@ var errors = [];
 		var codice_fiscale = document.getElementById("codice_fiscale").value;
 		var address = document.getElementById("address").value;
 		
-		if(!codice_fiscale.match(codice_fiscale_regex))
-			errors.push("Inserire un codice fiscale valido.");
-		if(!email.match(mailformat)) {
-			errors.push("Indirizzo email non valido.");
+		if(!name || !surname || !email || !password || !repeat || !codice_fiscale || !address) {
+			errors.push("Non tutti i campi sono stati compilati.");
 		}
+		
+		if(!codice_fiscale.match(codice_fiscale_regex) && codice_fiscale)
+			errors.push("Inserire un codice fiscale valido.");
+		
+		if((!email.match(email_regex) || (email.length < 5 || email.length > 100)) && email)
+			errors.push("Indirizzo email non valido. Lunghezza massima 100 caratteri.");
+		
+		if(!password.match(password_regex) && password)
+			errors.push("La password deve avere tra i 6 e i 20 caratteri.");
+		
+		if(!name.match(name_regex) && name)
+			errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30 caratteri.");
+		
+		if(!surname.match(surname_regex) && surname)
+			errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30 caratteri.");
+		
+		if(!address.match(address_regex) && address)
+			errors.push("L'indirizzo non è compilato correttamente.");
+		
+		if(password != repeat && password && repeat)
+			errors.push("Le password non corrispondono.");
 		
 		/*Se mi viene restituito true, vuol dire che esiste già un account con
 		questa email, quindi l'utente non si può registrare e stampo l'errore.*/
@@ -96,16 +118,6 @@ var errors = [];
 			}
 		});
 		
-		if(!name || !surname || !email || !password || !repeat || !codice_fiscale || !address) {
-			errors.push("Non tutti i campi sono stati compilati.");
-		}
-		if(!password.match(password_regex) && password) {
-			errors.push("La password deve essere lunga almeno 6 caratteri e deve contenere almeno un numero.");
-		}
-		if(password != repeat && password && repeat) {
-			errors.push("Le password non corrispondono.");
-		}
-	
 		if(errors.length != 0) {
 			var errors_div = document.getElementById("error-list");
 			var txt = "<ul>";

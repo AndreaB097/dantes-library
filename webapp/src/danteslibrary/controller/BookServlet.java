@@ -23,6 +23,7 @@ public class BookServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		BooksDAO dao = new BooksDAO();
 		String book_id = request.getParameter("id");
 		
