@@ -1,5 +1,4 @@
 package danteslibrary.util;
-
 import java.util.regex.Pattern;
 
 /**
@@ -18,8 +17,10 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkEmail(String email) {
+		if (email == null)
+			throw new NullPointerException("Errore: il campo email è null");
 		String regex = "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})";
-    	if(Pattern.matches(regex, email))
+    	if(Pattern.matches(regex, email) && email.length() <= 100 && email.length() >= 5)
     		return true;
     	
     	return false;
@@ -31,7 +32,9 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkPassword(String password) {
-		String regex = "\\w{6,20}";
+		if (password == null)
+			throw new NullPointerException("Errore: il campo password è null");
+		String regex = ".{6,20}";
     	if(Pattern.matches(regex, password))
     		return true;
     	
@@ -44,6 +47,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkName(String name) {
+		if (name == null)
+			throw new NullPointerException("Errore: il campo name è null");
 		String regex = "[A-zÀ-ú ]{1,30}";
     	if(Pattern.matches(regex, name))
     		return true;
@@ -57,6 +62,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkSurname(String surname) {
+		if (surname == null)
+			throw new NullPointerException("Errore: il campo surname è null");
 		String regex = "[A-zÀ-ú ]{1,30}";
     	if(Pattern.matches(regex, surname))
     		return true;
@@ -70,6 +77,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkAddress(String address) {
+		if (address == null)
+			throw new NullPointerException("Errore: il campo address è null");
 		String regex = "[A-zÀ-ú0-9 ,]{5,100}";
     	if(Pattern.matches(regex, address))
     		return true;
@@ -83,6 +92,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkPhone(String phone) {
+		if (phone == null)
+			throw new NullPointerException("Errore: il campo phone è null");
 		String regex = "[0-9]{7,10}";
     	if(Pattern.matches(regex, phone))
     		return true;
@@ -99,6 +110,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkCodice_fiscale(String codice_fiscale) {
+		if (codice_fiscale == null)
+			throw new NullPointerException("Errore: il campo codice_fiscale è null");
 		String regex = "[a-zA-Z]{6}\\d\\d[a-zA-Z]\\d\\d[a-zA-Z]\\d\\d\\d[a-zA-Z]";
     	if(Pattern.matches(regex, codice_fiscale))
     		return true;
@@ -112,6 +125,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkCard_id(String card_id) {
+		if (card_id == null)
+			throw new NullPointerException("Errore: il campo card_id è null");
 		String regex = "[0-9]{5}";
     	if(Pattern.matches(regex, card_id))
     		return true;
@@ -127,7 +142,9 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkBooking_id(String booking_id) {
-		String regex = "[0-9]{5}";
+		if (booking_id == null)
+			throw new NullPointerException("Errore: il campo booking_id è null");
+		String regex = "[0-9]*";
     	if(Pattern.matches(regex, booking_id))
     		return true;
     	
@@ -142,7 +159,9 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkBook_id(String book_id) {
-		String regex = "[A-zÀ-ú0-9 _.,:?!]{1,100}";
+		if (book_id == null)
+			throw new NullPointerException("Errore: il campo book_id è null");
+		String regex = "[0-9]*";
     	if(Pattern.matches(regex, book_id))
     		return true;
     	
@@ -155,7 +174,9 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkTitle(String title) {
-		String regex = "[.]{1,100}";
+		if (title == null)
+			throw new NullPointerException("Errore: il campo title è null");
+		String regex = ".{1,100}";
     	if(Pattern.matches(regex, title))
     		return true;
     	
@@ -169,6 +190,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkAuthor(String author) {
+		if (author == null)
+			throw new NullPointerException("Errore: il campo author è null");
 		String regex = "[A-zÀ-ú ]{1,100}";
     	if(Pattern.matches(regex, author))
     		return true;
@@ -182,7 +205,9 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkPublisher(String publisher) {
-		String regex = "[A-zÀ-ú0-9 _.,:?!]{1,100}";
+		if (publisher == null)
+			throw new NullPointerException("Errore: il campo publisher è null");
+		String regex = ".{1,100}";
     	if(Pattern.matches(regex, publisher))
     		return true;
     	
@@ -196,7 +221,9 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkGenre(String genre) {
-		String regex = "[A-zÀ-ú0-9 _.,:?!]{1,100}";
+		if (genre == null)
+			throw new NullPointerException("Errore: il campo genre è null");
+		String regex = "[A-zÀ-ú0-9 ]{1,30}";
     	if(Pattern.matches(regex, genre))
     		return true;
     	
@@ -209,6 +236,8 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkDescription(String description) {
+		if (description == null)
+			throw new NullPointerException("Errore: il campo description è null");
 		String regex = "[\\s\\S]{1,1000}";
     	if(Pattern.matches(regex, description))
     		return true;
@@ -222,12 +251,46 @@ public class InputChecker {
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkQuantity(String quantity) {
-		String regex = "[0-9]";
-    	if(Pattern.matches(regex, quantity))
+		if (quantity == null)
+			throw new NullPointerException("Errore: il campo quantity è null");
+		String regex = "[0-9]{1,3}";
+		int num_quantity = Integer.parseInt(quantity);
+    	if(Pattern.matches(regex, quantity) && num_quantity >= 0 && num_quantity < 1000)
     		return true;
     	
     	return false;
 	}
 	
+	/*Sezione Biblioteca*/
+	
+	/**
+	 * Controlla se il nome biblioteca passata come parametro ha un formato valido
+	 * @param library_name
+	 * @return Restituisce true se il formato è valido, false altrimenti.
+	 */
+	public static boolean checkLibraryName(String library_name) {
+		if (library_name == null)
+			throw new NullPointerException("Errore: il campo library_name è null");
+		String regex = "[A-zÀ-ú ]{1,100}";
+    	if(Pattern.matches(regex, library_name))
+    		return true;
+    	
+    	return false;
+	}
+	
+	/**
+	 * Controlla se contatti biblioteca passato come parametro ha un formato valido
+	 * @param contacts
+	 * @return Restituisce true se il formato è valido, false altrimenti.
+	 */
+	public static boolean checkContacts(String contacts) {
+		if (contacts == null)
+			throw new NullPointerException("Errore: il campo contacts è null");
+		String regex = "[\\s\\S]{0,300}";
+    	if(Pattern.matches(regex, contacts))
+    		return true;
+    	
+    	return false;
+	}
 	
 }
