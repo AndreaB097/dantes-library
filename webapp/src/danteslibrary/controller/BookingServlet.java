@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;
-import danteslibrary.model.UsersBean;
+import danteslibrary.model.CustomersBean;
 import danteslibrary.model.CardsBean;
 import danteslibrary.model.BookingsBean;
 import java.time.*;
@@ -38,15 +38,15 @@ public class BookingServlet extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 			
-		if(session.getAttribute("user") == null) {
+		if(session.getAttribute("customer") == null) {
 			session.setAttribute("referer", request.getHeader("referer"));
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			return;
 		}
 		/*Annulla prenotazione*/
 		else if(request.getParameter("cancel_booking") != null) {
-			UsersBean user = (UsersBean) session.getAttribute("user");
-			String email = user.getEmail();
+			CustomersBean customer = (CustomersBean) session.getAttribute("customer");
+			String email = customer.getEmail();
 			int booking_id = Integer.parseInt(request.getParameter("booking_id"));
 			BookingsBean booking = bookingsDAO.getBookingById(booking_id);
 			String state = "Annullata";
@@ -66,20 +66,21 @@ public class BookingServlet extends HttpServlet {
 				request.setAttribute("error", "Errore: l'annullamento della prenotazione non è andato buon fine");
 			}
 			
-			ArrayList<BookingsBean> bookings = bookingsDAO.getUserBookings(email);
+			ArrayList<BookingsBean> bookings = bookingsDAO.getCustomerBookings(email);
 			if(bookings != null)
 				session.setAttribute("bookings", bookings);
 			request.getRequestDispatcher("profile.jsp").forward(request, response);
 			return;
 		}
 		
-		UsersBean user = (UsersBean) session.getAttribute("user");
-		String email = user.getEmail();
+		CustomersBean customer = (CustomersBean) session.getAttribute("customer");
+		String email = customer.getEmail();
 
 		/*Il libro non esiste*/
 		if(request.getParameter("book_id") == null || request.getParameter("book_id").equals("")) {
-			response.sendError(404);
-	    	return;
+			request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+			return;
 		}
 		
 		int book_id = 0;
@@ -101,10 +102,15 @@ public class BookingServlet extends HttpServlet {
 				return;
 			}
 			
-			CardsBean user_card = cardsDAO.getCardByEmail(email);
-			Integer card_id = user_card.getCard_id();
-			/*Controllo che la tessera dell'utente che sta prenotando sia associata*/
-			if(!user_card.isAssociated()) {
+			CardsBean customer_card = cardsDAO.getCardByEmail(email);
+			if(customer_card == null) {
+				request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+				request.getRequestDispatcher("index.jsp").forward(request, response);
+				return;
+			}
+			Integer card_id = customer_card.getCard_id();
+			/*Controllo che la tessera del cliente che sta prenotando sia associata*/
+			if(!customer_card.isAssociated()) {
 				request.setAttribute("error", "Attenzione! La tua tessera non risulta associata, pertanto "
 						+ "non puoi effettuare alcuna prenotazione. Per eventuali problemi, puoi contattare la biblioteca.");
 				request.getRequestDispatcher("book?id="+book_id).forward(request, response);
@@ -112,9 +118,9 @@ public class BookingServlet extends HttpServlet {
 			}
 			/*Tutto in regola, procedo con la prenotazione. Se newBooking restituisce 0
 			 * - il database non risponde
-			 * - libro, tessera o utente, non esistono nel database*/
+			 * - libro, tessera o cliente, non esistono nel database*/
 			if(bookingsDAO.newBooking(email, start_date.toString(), end_date.toString(), "Non ancora ritirato", card_id, book_id) != 0) {
-				ArrayList<BookingsBean> bookings = bookingsDAO.getUserBookings(email);
+				ArrayList<BookingsBean> bookings = bookingsDAO.getCustomerBookings(email);
 				if(bookings != null)
 					session.setAttribute("bookings", bookings);
 				request.setAttribute("info", "Prenotazione effettuata! Controlla lo Storico Prenotazioni.");
@@ -141,8 +147,9 @@ public class BookingServlet extends HttpServlet {
 			request.getRequestDispatcher("book?id="+book_id).forward(request, response);
 			return;
 		} catch(SQLException e) {
-			request.setAttribute("error", "Il sistema non è al momento disponibile. Riprovare più tardi.");
-			request.getRequestDispatcher("book?id="+book_id).forward(request, response);
+			e.printStackTrace();
+			request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+			request.getRequestDispatcher("index.jsp").forward(request, response);
 			return;
 		}
 		

@@ -2,7 +2,6 @@
 pageEncoding="UTF-8"
 import="java.util.ArrayList, danteslibrary.model.*,
 java.time.LocalDate, java.time.format.*, java.util.Locale"%>
-<%@ page trimDirectiveWhitespaces="true" %>
 <!doctype html>
 <html>
 <head>
@@ -25,7 +24,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		<button type="submit">Accedi</button>
 	</form>
 	<% if(request.getAttribute("login_error") != null) { %>
-		<div class="error">Indirizzo e-mail o password non validi.</div>
+		<div class="error"><%=request.getAttribute("login_error") %></div>
 	<% } %>
 	<% if(request.getAttribute("no_roles_error") != null) { %>
 		<div class="error">
@@ -49,8 +48,8 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 	<div class="container">
 		<!-- Menu laterale -->
 		<div class="sidebar">
-			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
-				<section id="sidebar-users" class="active"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Utenti</section>
+			<%if(roles.contains("Gestore Clienti") || roles.contains("Gestore Biblioteca")) {%>
+				<section id="sidebar-customers" class="active"><i class="fas fa-user-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Clienti</section>
 			<%}
 			if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
 				<section id="sidebar-books"><i class="fas fa-book fa-lg"></i>&nbsp;&nbsp;&nbsp;&nbsp;Libri</section>
@@ -68,8 +67,8 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		</div>
 		
 		<div class="sidebar-responsive">
-			<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
-				<section id="sidebar-users" class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Utenti<p></section>
+			<%if(roles.contains("Gestore Clienti") || roles.contains("Gestore Biblioteca")) {%>
+				<section id="sidebar-customers" class="active"><i class="fas fa-user-circle fa-lg"></i><br><p>Clienti<p></section>
 			<%} if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
 				<section id="sidebar-books"><i class="fas fa-book fa-lg"></i><br><p>Libri</p></section>
 			<%}
@@ -85,10 +84,10 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			<%} %>
 		</div>
 		
-		<%if(roles.contains("Gestore Utenti") || roles.contains("Gestore Biblioteca")) {%>
-		<!-- Sezione Utenti -->
-		<div id="users-section" class="section-container">
-			<h2>Sezione Account Utenti</h2>
+		<%if(roles.contains("Gestore Clienti") || roles.contains("Gestore Biblioteca")) {%>
+		<!-- Sezione Clienti -->
+		<div id="customers-section" class="section-container">
+			<h2>Sezione Account Clienti</h2>
 			<form method="post">	
 				<p>Ricerca per: 
 				<select class="dropdownFilters" name="filter">
@@ -99,8 +98,8 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				</select>
 				</p>
 				<div id="search-bar">
-					<input class="search-field" type="text" name="keyword_users" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
-					<button class="search-button" type="submit" formaction="admin?users"><i class="fas fa-search"></i></button>
+					<input class="search-field" type="text" name="keyword_customers" placeholder="Seleziona il filtro ed effettua la ricerca" required/>
+					<button class="search-button" type="submit" formaction="admin?customers"><i class="fas fa-search"></i></button>
 				</div>
 				<script>
 				$(document).ready(function() {
@@ -108,14 +107,19 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				});
 				</script>
 			</form>
-			<button id="show-all-btn" onClick="window.location = 'admin?all_users'">Mostra tutti</button>
+			<button id="show-all-btn" onClick="window.location = 'admin?all_customers'">Mostra tutti</button>
 			
-			<% if(request.getAttribute("info_user") != null) { %>
-				<div class="info"><%=request.getAttribute("info_user") %></div>
+			<% if(request.getAttribute("info_customer") != null) { %>
+				<div class="info"><%=request.getAttribute("info_customer") %></div>
 			<% } %>
 			
-			<%if(request.getAttribute("users") != null) { %>	
-			<div class="overflow-container">
+			<%if(request.getAttribute("customers") != null) { %>
+			<script>
+			$(document).ready(function() {
+				$("#all-customers-div").slideDown();
+			});
+			</script>
+			<div id="all-customers-div" class="overflow-container">
 			<table>
 					<tr>
 						<th>Email</th>
@@ -124,18 +128,20 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 						<th>Codice fiscale</th>
 						<th>Indirizzo</th>
 					</tr>
-			<%	@SuppressWarnings("unchecked")
-				ArrayList<UsersBean> users = (ArrayList<UsersBean>) request.getAttribute("users");
-				for(UsersBean user : users)	{ %>
+			<%
+				@SuppressWarnings("unchecked")
+					ArrayList<CustomersBean> customers = (ArrayList<CustomersBean>) request.getAttribute("customers");
+					for(CustomersBean customer : customers)	{
+			%>
 					<tr>
-						<td><%=user.getEmail() %></td>
-						<td><%=user.getName() %></td>
-						<td><%=user.getSurname() %></td>
-						<td><%=user.getCodice_fiscale() %></td>
-						<td><%=user.getAddress() %></td>
+						<td><%=customer.getEmail() %></td>
+						<td><%=customer.getName() %></td>
+						<td><%=customer.getSurname() %></td>
+						<td><%=customer.getCodice_fiscale() %></td>
+						<td><%=customer.getAddress() %></td>
 						<td>
 							<form action="admin?account" method="post">
-								<input type="hidden" name="remove_user" value="<%=user.getEmail()%>">
+								<input type="hidden" name="remove_customer" value="<%=customer.getEmail()%>">
 								<button id="btn-remove" type="submit"><i style="color: #e64c4c;" class="fas fa-times fa-lg"></i></button>
 							</form>
 						</td>
@@ -144,7 +150,10 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			</table>
 			</div> 
 		 <%} %>
-		</div> <!-- fine section-container sezione Utenti -->
+		 <script>
+		 	$("#all-customers-div").hide();
+		 </script>
+		</div> <!-- fine section-container sezione Clienti -->
 		<%} %>
 		
 		<%if(roles.contains("Gestore Libri") || roles.contains("Gestore Biblioteca")) {%>
@@ -180,8 +189,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 
 			
 			<%if(request.getAttribute("books") != null) { %>
+			<script>
+			$(document).ready(function() {
+				$("#all-books-div").slideDown();
+			});
+			</script>
 			<div id="all-books-div" class="overflow-container">
-			<table>	
+			<table>
 					<tr>
 						<th>Id</th>
 						<th>Titolo</th>
@@ -276,7 +290,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 						$('#authors').val($('#update-authors-select').val());
 					    $('#update-authors-select').select2({
 					    	tags: true,
-					    	maximumSelectionLength: 5,
+					    	maximumSelectionLength: 1,
 					    	maximumInputLength: 100,
 					    	language: "it"
 					    });
@@ -329,10 +343,17 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				var updated_image = document.getElementById("update-book-image");
 				updated_image.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
 				$("#update-book-image").change(function() {
+					$("#error-list").hide();
 					if(updated_image.files[0].type !== 'image/jpeg' && updated_image.files[0].type !== 'image/jpg' && updated_image.files[0].type !== 'image/png') {
+						errors.push("L'immagine deve avere il formato: .png, .jpg, oppure .jpeg.");
+						validateBook();
+						updated_image.value = "";
 						return false;
 					}
 					else if(updated_image.files[0].size <= 0 || updated_image.files[0].size > 2097152 /*2MB*/) {
+						errors.push("Dimensione massima immagine consentita: 2MB.");
+						validateBook();
+						updated_image.value = "";
 						return false;
 					}
 					var img = new Image();
@@ -351,6 +372,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			</form>
 			<%}
 			else if(request.getParameter("all_genres") != null) {%>
+			<script>
+			$(document).ready(function() {
+				$("#all-genres-div").slideDown();
+			});
+			</script>
 			<div id="all-genres-div" class="overflow-container">
 			<table>
 				<tr>
@@ -395,7 +421,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 					$(document).ready(function() {
 					    $('#authors-select').select2({
 					    	tags: true,
-					    	maximumSelectionLength: 5,
+					    	maximumSelectionLength: 1,
 					    	maximumInputLength: 100,
 					    	language: "it"
 					    });
@@ -440,10 +466,15 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				
 				book_image.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
 				$("#new-book-image").change(function() {
+					$("#error-list").hide();
 					if(book_image.files[0].type !== 'image/jpeg' && book_image.files[0].type !== 'image/jpg' && book_image.files[0].type !== 'image/png') {
+						errors.push("L'immagine deve avere il formato: .png, .jpg, oppure .jpeg.");
+						validateBook();
 						return false;
 					}
 					else if(book_image.files[0].size <= 0 || book_image.files[0].size > 2097152 /*2MB*/) {
+						errors.push("Dimensione massima immagine consentita: 2MB.");
+						validateBook();
 						return false;
 					}
 					var img = new Image();
@@ -464,9 +495,9 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		$("#error-list").hide();
 		var errors = [];
 		function validateBook() {
-			var title_regex = /^[A-zÀ-ú0-9 _.,:?!]{1,100}$/;
+			var title_regex = /^.{1,100}$/;
 			var description_regex = /^[\s\S]{1,1000}$/;
-			var publisher_regex = /^[A-zÀ-ú0-9 _.,:?!]{1,100}$/;
+			var publisher_regex = /^.{1,100}$/;
 			var quantity_regex = /^[0-9]{1,3}$/;
 			
 			var title = document.getElementById("title").value;
@@ -475,9 +506,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			var publisher = document.getElementById("publisher").value;
 			var quantity = document.getElementById("quantity").value;
 			var genres = document.getElementById("genres").value;
-				
+			
+			if(!title || !description || !authors || !publisher || !quantity || !genres) {
+				errors.push("Non tutti i campi sono stati compilati.");
+			}
+			
 			if(!title.match(title_regex) && title) {
-				errors.push("Il titolo può contenere solo caratteri alfanumerici. Lunghezza massima: 100 caratteri.");
+				errors.push("Il titolo può contenere massimo 100 caratteri.");
 			}
 			
 			if(!description.match(description_regex) && description) {
@@ -485,17 +520,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			}
 			
 			if(!publisher.match(publisher_regex) && publisher) {
-				errors.push("La casa editrice può contenere solo caratteri alfanumerici. Lunghezza massima: 100 caratteri.");
+				errors.push("La casa editrice può contenere massimo 100 caratteri.");
 			}
 			
-			if(!quantity.match(quantity_regex) && quantity) {
-				errors.push("La quantità deve essere espressa con un numero (massimo 3 cifre).");
+			if((!quantity.match(quantity_regex) || (quantity < 0 || quantity > 999)) && quantity) {
+				errors.push("La quantità deve essere espressa con un numero positivo (massimo 3 cifre).");
 			}
 			
-			if(!title || !description || !authors || !publisher || !quantity || !genres) {
-				errors.push("Non tutti i campi sono stati compilati.");
-			}
-		
 			if(errors.length != 0) {
 				if(!document.getElementById("error-list")) {
 					var errors_div = document.createElement("div");
@@ -538,7 +569,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		$("#error-list").hide();
 		var errors = [];
 		function validateGenre() {
-			var genre_name_regex = /^[A-zÀ-ú]{1,30}$/;
+			var genre_name_regex = /^[A-zÀ-ú ]{1,30}$/;
 			var genre_name = document.getElementById("genre").value;
 				
 			if(!genre_name) {
@@ -546,7 +577,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			}
 			
 			if(!genre_name.match(genre_name_regex) && genre_name) {
-				errors.push("Il nome del genere può contenere solo lettere e spazi. Lunghezza massima: 30.");
+				errors.push("Il nome del genere può contenere solo lettere e spazi. Lunghezza massima: 30 caratteri.");
 			}
 		
 			if(errors.length != 0) {
@@ -588,6 +619,8 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			$("#new-genre-form").hide();
 			$("#update-book-form").hide();
 			$("#new-genre-form").hide();
+			$("#all-books-div").hide();
+			$("#all-genres-div").hide();
 			$(document).ready(function() {
 				$("#btn-book").click(function() {
 					$("#update-book-form").remove(); /*remove, altrimenti la funzione validateBook ottiene i dati di update-book-form
@@ -596,13 +629,6 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 					$("#all-books-div").hide();
 					$("#all-genres-div").hide();
 					$("#new-book-form").slideDown();
-				});
-				$("#btn-all-books").click(function() {
-					$("#new-book-form").hide();
-					$("#new-genre-form").hide();
-					$("#update-book-form").hide();
-					$("#all-genres-div").hide();
-					$("#all-books-div").slideDown();
 				});
 				$("#btn-genre").click(function() {
 					$("#update-book-form").hide();
@@ -647,6 +673,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			<%} %>
 			
 			<%if(request.getAttribute("cards") != null) { %>
+			<script>
+			$(document).ready(function() {
+				$("#all-cards-div").slideDown();
+			});
+			</script>
 			<div id="all-cards-div" class="overflow-container">
 			<table>		
 					<tr>
@@ -759,14 +790,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		    $('.dropdownFilters').selectmenu();
 		});
 		$("#new-card-form").hide();
+		$("#all-cards-div").hide();
 		$(document).ready(function() {
 			$("#btn-card").click(function() {
-				$("#new-card-form").slideDown();
 				$("#all-cards-div").hide();
-			});
-			$("#show-all-btn").click(function() {
-				$("#all-cards-div").slideDown();
-				$("#new-card-form").hide();
+				$("#new-card-form").slideDown();
 			});
 		});	
 		</script> 
@@ -813,6 +841,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			<%} %>
 			
 			<%if(request.getAttribute("bookings") != null) { %>
+			<script>
+			$(document).ready(function() {
+				$("#all-bookings-div").slideDown();
+			});
+			</script>
 			<div id="all-bookings-div" class="overflow-container">
 			<table>		
 					<tr>
@@ -863,8 +896,6 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			BookingsBean booking = (BookingsBean) request.getAttribute("edit_booking");%> 
 			<script>
 			$(document).ready(function() {
-				$("#new-booking-form").hide();
-				$("#all-bookings-div").hide();
 				$("#update-booking-form").slideDown();
 			});
 			</script>
@@ -994,16 +1025,15 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			var book_id = document.getElementById("booking_book_id").value;
 			var start_date = $('#start-date').datepicker("getDate");
 			var end_date = $('#end-date').datepicker("getDate");
-			
+
 			if(!codice_fiscale || !card_id || !book_id)
 				errors.push("Non tutti i campi sono stati compilati.");
 			
 			if(!codice_fiscale.match(codice_fiscale_regex) && codice_fiscale)
 				errors.push("Inserire un codice fiscale valido.");
 			
-			
-			if(!email.match(email_regex) && email)
-				errors.push("Indirizzo email non valido.");
+			if((!email.match(email_regex) || (email.length < 5 || email.length > 100)) && email)
+				errors.push("Indirizzo email non valido. Lunghezza massima 100 caratteri.");
 			
 			if(!book_id.match(book_id_regex) && book_id)
 				errors.push("Il codice libro può contenere solo numeri!");
@@ -1046,14 +1076,13 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		    $('.dropdownFilters').selectmenu();
 		});
 		$("#new-booking-form").hide();
+		$("#all-bookings-div").hide();
+		$("#update-booking-form").hide();
 		$(document).ready(function() {
 			$("#btn-booking").click(function() {
-				$("#new-booking-form").slideDown();
 				$("#all-bookings-div").hide();
-			});
-			$("#show-all-btn").click(function() {
-				$("#all-bookings-div").slideDown();
-				$("#new-booking-form").hide();
+				$("#update-booking-form").hide();
+				$("#new-booking-form").slideDown();
 			});
 		});	
 		</script>
@@ -1080,13 +1109,6 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			</form>
 			<button id="show-all-btn" onClick="window.location = 'admin?managers&all_managers'">Mostra tutti</button>
 			<button id="btn-manager">Aggiungi Gestore</button> 
-			<script>
-			$(document).ready(function() {
-				$("#btn-manager").click(function() {
-					$("#update-manager-form").remove();
-				});
-			});
-			</script>
 			
       		<%if(request.getAttribute("info_manager") != null) { %>
 				<div class="info"><%=request.getAttribute("info_manager") %></div>
@@ -1096,6 +1118,11 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			<%} %>
 			
 			<%if(request.getAttribute("managers") != null) { %>
+			<script>
+			$(document).ready(function() {
+				$("#all-managers-div").slideDown();
+			});
+			</script>
 			<div id="all-managers-div" class="overflow-container">
 			<table>	
 					<tr>
@@ -1147,7 +1174,6 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 			</div>
 			<%} 			
 			else if(request.getAttribute("edit_manager") != null) {
-		
 			ManagersBean manager = (ManagersBean) request.getAttribute("edit_manager"); %>
 			<script>
 			$(document).ready(function() {
@@ -1173,17 +1199,17 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				<input id="phone" name="phone"  type="text" value="<%=manager.getPhone() %>"> 
 				<label>Ruolo</label>
 				<br/>
-				<input type="checkbox" id ="users_manager" name="users_manager" value="Gestore Utenti">  Gestore Utenti<br>
-				<input type="checkbox" id ="books_manager" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
-				<input type="checkbox" id ="cards_manager" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
-				<input type="checkbox" id ="bookings_manager" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
-				<input type="checkbox" id ="library_manager" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
+				<input type="checkbox" id="customers_manager" name="customers_manager" value="Gestore Clienti">  Gestore Clienti<br>
+				<input type="checkbox" id="books_manager" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
+				<input type="checkbox" id="cards_manager" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
+				<input type="checkbox" id="bookings_manager" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
+				<input type="checkbox" id="library_manager" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
 				<br/><br/>
 						<% ArrayList <String> manager_roles = manager.getRoles();
 						if(manager_roles != null && !manager_roles.isEmpty()) {
-							if(manager_roles.contains("Gestore Utenti")) {%>
+							if(manager_roles.contains("Gestore Clienti")) {%>
 							<script>
-							$("#users_manager").attr("checked", true);
+							$("#customers_manager").attr("checked", true);
 							</script>
 							<%}%>
 							<%if(manager_roles.contains("Gestore Libri")) {%>
@@ -1203,10 +1229,35 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 							<%}%>
 							<%if(manager_roles.contains("Gestore Biblioteca")) {%>
 							<script>
-							$("#library_manager").attr("checked", true);
+							$("#library_manager").attr({
+								checked : "true",
+								disabled : "true"
+							});
+							$("#customers_manager").removeAttr("checked").attr("disabled", true);
+							$("#books_manager").removeAttr("checked").attr("disabled", true);
+							$("#cards_manager").removeAttr("checked").attr("disabled", true);
+							$("#bookings_manager").removeAttr("checked").attr("disabled", true);
 							</script>
 							<%}
 						}%>
+				<script>
+				$(document).ready(function() {
+					$("#library_manager").change(function() {
+						if(document.getElementById("library_manager").checked) {
+							$("#customers_manager").removeAttr("checked").attr("disabled", true);
+							$("#books_manager").removeAttr("checked").attr("disabled", true);
+							$("#cards_manager").removeAttr("checked").attr("disabled", true);
+							$("#bookings_manager").removeAttr("checked").attr("disabled", true);
+						}
+						else {
+							$("#customers_manager").removeAttr("disabled");
+							$("#books_manager").removeAttr("disabled");
+							$("#cards_manager").removeAttr("disabled");
+							$("#bookings_manager").removeAttr("disabled");
+						}
+					});
+				});
+				</script>
 				<button type="submit" class="save" formaction="admin?managers&save_manager"><i class="fas fa-save fa-lg"></i> Salva modifiche</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 			</form>
@@ -1217,7 +1268,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		    	var email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 		    	var name_regex = /^[A-zÀ-ú ]{1,30}$/;
 		    	var surname_regex = /^[A-zÀ-ú ]{1,30}$/;
-		    	var password_regex = /^\w{6,20}$/;
+		    	var password_regex = /^.{6,20}$/;
 		    	var address_regex = /^[A-zÀ-ú0-9 ,]{5,100}$/;
 		    	var phone_regex = /^[0-9]{7,10}$/;
 		    	
@@ -1229,34 +1280,37 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				var address = document.getElementById("address").value;
 				var phone = document.getElementById("phone").value;
 				
-				//TODO fare controllo anche sui checkbox
+				var customers_checkbox = document.getElementById("customers_manager");
+				var books_checkbox = document.getElementById("books_manager");
+				var cards_checkbox = document.getElementById("cards_manager");
+				var bookings_checkbox = document.getElementById("bookings_manager");
+				var library_checkbox = document.getElementById("library_manager");
 				
-				if(!email || !name || !surname || !address || !phone) {
+				if(!email || !name || !surname || !address || !phone || 
+						(!customers_checkbox.checked && !books_checkbox.checked && !cards_checkbox.checked && !bookings_checkbox.checked && !library_checkbox.checked)) {
 				  errors.push("Non tutti i campi sono stati compilati.");
 				}
-				
-				if(!email.match(email_regex) && email)
-					errors.push("Indirizzo email non valido.");
+
+				if((!email.match(email_regex) || (email.length < 5 || email.length > 100)) && email)
+					errors.push("Indirizzo email non valido. Lunghezza massima 100 caratteri.");
 				
 				if(!name.match(name_regex) && name)
-					errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30.");
+					errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30 caratteri.");
 				
 				if(!surname.match(surname_regex) && surname)
-					errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30.");
+					errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30 caratteri.");
 				
 				if(!address.match(address_regex) && address)
-					errors.push("L'indirizzo può contenere solo lettere e numeri. Lunghezza massima: 100.");
+					errors.push("L'indirizzo non è compilato correttamente.");
 				
 				if(!phone.match(phone_regex) && phone)
 					errors.push("Inserire un numero di telefono valido.");
 				
-				if(!password.match(password_regex) && password) {
-					errors.push("La password deve essere lunga almeno 6 caratteri alfanumerici.");
-				}
+				if(!password.match(password_regex) && password)
+					errors.push("La password deve avere tra i 6 e i 20 caratteri.");
 				
-				if(password != repeat_password && password && repeat_password){
+				if(password != repeat_password && password && repeat_password)
 				  errors.push("Le password non corrispondono.");
-				}
 				
 				if(errors.length != 0) {
 				  if(!document.getElementById("error-list")) {
@@ -1311,15 +1365,33 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				
 				<label>Ruolo</label>
 				<br/>
-					<input type="checkbox" name="users_manager" value="Gestore Utenti">  Gestore Utenti<br>
-					<input type="checkbox" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
-					<input type="checkbox" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
-					<input type="checkbox" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
-					<input type="checkbox" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
+				<input type="checkbox" id="customers_manager" name="customers_manager" value="Gestore Clienti">  Gestore Clienti<br>
+				<input type="checkbox" id="books_manager" name="books_manager" value="Gestore Libri">  Gestore Libri<br>
+				<input type="checkbox" id="cards_manager" name="cards_manager" value="Gestore Tessere">  Gestore Tessere<br>
+				<input type="checkbox" id="bookings_manager" name="bookings_manager" value="Gestore Prenotazioni">  Gestore Prenotazioni<br>
+				<input type="checkbox" id="library_manager" name="library_manager" value="Gestore Biblioteca">  Gestore Biblioteca<br>
+				
 				<button type="submit" class="save" formaction="admin?managers&new_manager"><i class="fas fa-plus fa-lg"></i>  Aggiungi Gestore</button>
 				<button type="reset" class="cancel"><i class="fas fa-times fa-lg"></i> Pulisci campi</button>
 		</form>
-		
+		<script>
+		$(document).ready(function() {
+			$("#library_manager").change(function() {
+				if(document.getElementById("library_manager").checked) {
+					$("#customers_manager").removeAttr("checked").attr("disabled", true);
+					$("#books_manager").removeAttr("checked").attr("disabled", true);
+					$("#cards_manager").removeAttr("checked").attr("disabled", true);
+					$("#bookings_manager").removeAttr("checked").attr("disabled", true);
+				}
+				else {
+					$("#customers_manager").removeAttr("disabled");
+					$("#books_manager").removeAttr("disabled");
+					$("#cards_manager").removeAttr("disabled");
+					$("#bookings_manager").removeAttr("disabled");
+				}
+			});
+		});
+		</script>
 	<script>
     $("#error-list").hide();
     var errors = [];
@@ -1327,7 +1399,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
     	var email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     	var name_regex = /^[A-zÀ-ú ]{1,30}$/;
     	var surname_regex = /^[A-zÀ-ú ]{1,30}$/;
-    	var password_regex = /^\w{6,20}$/;
+    	var password_regex = /^.{6,20}$/;
     	var address_regex = /^[A-zÀ-ú0-9 ,]{5,100}$/;
     	var phone_regex = /^[0-9]{7,10}$/;
     	
@@ -1339,34 +1411,37 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		var address = document.getElementById("address").value;
 		var phone = document.getElementById("phone").value;
 		
-		//TODO fare controllo anche sui checkbox
+		var customers_checkbox = document.getElementById("customers_manager");
+		var books_checkbox = document.getElementById("books_manager");
+		var cards_checkbox = document.getElementById("cards_manager");
+		var bookings_checkbox = document.getElementById("bookings_manager");
+		var library_checkbox = document.getElementById("library_manager");
 		
-		if(!email || !name || !surname || !password || !repeat_password || !address || !phone ) {
+		if(!email || !name || !surname || !address || !phone || 
+				(!customers_checkbox.checked && !books_checkbox.checked && !cards_checkbox.checked && !bookings_checkbox.checked && !library_checkbox.checked)) {
 		  errors.push("Non tutti i campi sono stati compilati.");
 		}
-		
-		if(!email.match(email_regex) && email)
-			errors.push("Indirizzo email non valido.");
+
+		if((!email.match(email_regex) || (email.length < 5 || email.length > 100)) && email)
+			errors.push("Indirizzo email non valido. Lunghezza massima 100 caratteri.");
 		
 		if(!name.match(name_regex) && name)
-			errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30.");
+			errors.push("Il nome può contenere solo lettere. Lunghezza massima: 30 caratteri.");
 		
 		if(!surname.match(surname_regex) && surname)
-			errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30.");
+			errors.push("Il cognome può contenere solo lettere. Lunghezza massima: 30 caratteri.");
 		
 		if(!address.match(address_regex) && address)
-			errors.push("L'indirizzo può contenere solo lettere e numeri. Lunghezza massima: 100.");
+			errors.push("L'indirizzo non è compilato correttamente.");
 		
 		if(!phone.match(phone_regex) && phone)
 			errors.push("Inserire un numero di telefono valido.");
 		
-		if(!password.match(password_regex) && password) {
-			errors.push("La password deve essere lunga almeno 6 caratteri alfanumerici.");
-		}
+		if(!password.match(password_regex) && password)
+			errors.push("La password deve avere tra i 6 e i 20 caratteri.");
 		
-		if(password != repeat_password && password && repeat_password){
-		  errors.push("Le password non corrispondono");
-		}
+		if(password != repeat_password && password && repeat_password)
+		  errors.push("Le password non corrispondono.");
 		
 		if(errors.length != 0) {
 		  if(!document.getElementById("error-list")) {
@@ -1402,15 +1477,16 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 	$(document).ready(function() {
 	    $('.dropdownFilters').selectmenu();
 	});
+	
 	$("#new-manager-form").hide();
+	$("#update-manager-form").hide();
+	$("#all-managers-div").hide();
+
 	$(document).ready(function() {
 		$("#btn-manager").click(function() {
-			$("#new-manager-form").slideDown();
+			$("#update-manager-form").remove();
 			$("#all-managers-div").hide();
-		});
-		$("#show-all-btn").click(function() {
-			$("#all-managers-div").slideDown();
-			$("#new-manager-form").hide();
+			$("#new-manager-form").slideDown();
 		});
 	});	
 	</script>   
@@ -1451,10 +1527,9 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				
 				file.style.opacity = 0; /*Nascondo il pulsante di default (pulsante Sfoglia...)*/
 				$("#image").change(function() {
+					$("#error-list").hide();
 					if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
-						return false;
-					}
-					else if(file.files[0].size <= 0 || file.files[0].size > 2097152 /*2MB*/) {
+						validateLibrary();
 						return false;
 					}
 					var img = new Image();
@@ -1478,6 +1553,7 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		    	var library_regex = /^[A-zÀ-ú ]{1,100}$/;
 		    	var contacts_regex = /^[\s\S]{1,300}$/;
 		    	
+		    	var file = document.getElementById("image");
 				var library_name = document.getElementById("library_name").value;
 				var contacts = document.getElementById("contacts").value;
 				
@@ -1485,6 +1561,14 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 				  errors.push("Non tutti i campi sono stati compilati.");
 				}
 				
+				if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/jpg' && file.files[0].type !== 'image/png') {
+					errors.push("L'immagine deve avere il formato: .png, .jpg, oppure .jpeg.");
+					$("#image-preview").html('<img src="${applicationScope.library.logo}" alt="Nessun immagine">');
+					file.value = ""; //reset immagine
+				}
+				else if(file.files[0].size <= 0 || file.files[0].size > 2097152 /*2MB*/)
+					errors.push("Dimensione massima immagine consentita: 2MB.");
+
 				if(!library_name.match(library_regex) && library_name)
 					errors.push("Il nome della biblioteca può contenere solo spazi e lettere. Lunghezza massima: 100 caratteri.");
 				
@@ -1530,9 +1614,9 @@ java.time.LocalDate, java.time.format.*, java.util.Locale"%>
 		$(".section-container").hide();
 		$(".sidebar section, .sidebar-responsive section").removeClass("active");
 		<%if(request.getParameter("account") != null) {%>
-			$("#users-section").show();
-			$("#sidebar-users").addClass("active");
-			$(".sidebar-responsive #sidebar-users").addClass("active");
+			$("#customers-section").show();
+			$("#sidebar-customers").addClass("active");
+			$(".sidebar-responsive #sidebar-customers").addClass("active");
 		<% } else if(request.getParameter("books") != null) {%>
 			$("#books-section").show();
 			$(".sidebar #sidebar-books").addClass("active");

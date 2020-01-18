@@ -72,6 +72,7 @@ html {
 	position: relative;
 }
 body {
+	min-height: 100%;
 	font-family: "Roboto-Light", Arial, sans-serif;
 	font-size: 100%;
 	color: #444;
@@ -197,6 +198,7 @@ all'altro se usati insieme)*/
 	color: #2b7a78;
 	padding: 20px;
 	background-color: #def2f1;
+	margin: 5px 0;
 }
 
 /*******************************************
@@ -406,6 +408,7 @@ header #menu-responsive a {
 	background-position: 10% 50%;
 	background-size: cover;
 	color: #ffffff;
+	padding-top: 15px;
 }
 #random {
 	background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(255,255,255,0)), 
@@ -572,7 +575,7 @@ button#booking-btn {
   float: right;
   margin-left: 5px;
 }
-div#user-info {
+div#customer-info {
 	text-align: left;
 	padding-left: 20px;
 }

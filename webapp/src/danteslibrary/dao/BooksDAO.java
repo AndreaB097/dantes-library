@@ -64,43 +64,38 @@ public class BooksDAO {
 	 * a cui appartengono.
 	 * @return Restituisce una LinkedHashMap contenente tutti i generi e libri. 
 	 * Per ogni genere (ordinati in ordine alfabetico), vi è una lista di libri appartenenti a quel genere.
+	 * @throws SQLException Se il servizio non è disponibile (es. mancata connessione con il database).
 	 */
-	public LinkedHashMap<String, ArrayList<BooksBean>> getBookList() {
+	public LinkedHashMap<String, ArrayList<BooksBean>> getBookList() throws SQLException {
 		LinkedHashMap<String, ArrayList<BooksBean>> list = new LinkedHashMap<String, ArrayList<BooksBean>>();
-		try {
-			ArrayList<String> genres = getAllGenres();
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps;
-			/*Per ogni genere nel DB seleziono al piu' 10 libri appartenenti
-			 * a quel genere*/
-			for(String genre : genres) {
-				ps = conn.prepareStatement("SELECT * FROM books, books_genres WHERE books.book_id = books_genres.book_id AND books_genres.genre_name = ? ORDER BY RAND() LIMIT 10");
-				ps.setString(1, genre);
-				ResultSet result = ps.executeQuery();
-				if(!result.isBeforeFirst()) /*Non ci sono libri per il genere 'genre', metto null nell'hashmap*/
-					list.put(genre, null);
-				else {
-					ArrayList<BooksBean> books = new ArrayList<BooksBean>();
-					while(result.next()) {
-						BooksBean book = new BooksBean();
-						book.setBook_id(result.getInt("book_id"));
-						book.setTitle(result.getString("title"));
-						book.setDescription(result.getString("description"));
-						book.setPublisher(result.getString("publisher"));
-						book.setQuantity(result.getInt("quantity"));
-						book.setCover(result.getString("cover"));
-						books.add(book);
-					}
-					list.put(genre, books);
+		ArrayList<String> genres = getAllGenres();
+		Connection conn = DBConnection.getConnection();
+		PreparedStatement ps;
+		/*Per ogni genere nel DB seleziono al piu' 10 libri appartenenti
+		 * a quel genere*/
+		for(String genre : genres) {
+			ps = conn.prepareStatement("SELECT * FROM books, books_genres WHERE books.book_id = books_genres.book_id AND books_genres.genre_name = ? ORDER BY RAND() LIMIT 10");
+			ps.setString(1, genre);
+			ResultSet result = ps.executeQuery();
+			if(!result.isBeforeFirst()) /*Non ci sono libri per il genere 'genre', metto null nell'hashmap*/
+				list.put(genre, null);
+			else {
+				ArrayList<BooksBean> books = new ArrayList<BooksBean>();
+				while(result.next()) {
+					BooksBean book = new BooksBean();
+					book.setBook_id(result.getInt("book_id"));
+					book.setTitle(result.getString("title"));
+					book.setDescription(result.getString("description"));
+					book.setPublisher(result.getString("publisher"));
+					book.setQuantity(result.getInt("quantity"));
+					book.setCover(result.getString("cover"));
+					books.add(book);
 				}
+				list.put(genre, books);
 			}
-			conn.close();
-			return list;
 		}
-		catch(SQLException e) {
-			System.out.println("Errore Database metodo getBookList: " + e.getMessage());
-		}
-		return null;
+		conn.close();
+		return list;
 	}
 	
 	/**
@@ -272,57 +267,50 @@ public class BooksDAO {
 	 * @param keyword Stringa che rappresenta le parole chiave.
 	 * @return Restituisce una lista di libri che rispettino filter e keyword.
 	 * Restituisce null nel caso in cui non vi sono corrispondenze.
+	 * @throws SQLException Se il servizio non è disponibile (es. mancata connessione con il database).
 	 */
-	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) {
+	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) throws SQLException {
 		
 		String[] filters = {"title", "authors.name", "publisher", "genres.genre_name"};
 		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity, books.cover "
-					+ "FROM books, authors, genres, books_authors, books_genres WHERE "+filters[filter]+" LIKE ? "
-							+ "AND authors.author_id = books_authors.author_id "
-							+ "AND books.book_id = books_authors.book_id "
-							+ "AND genres.genre_name = books_genres.genre_name "
-							+ "AND books.book_id = books_genres.book_id "
-							+ "GROUP BY title;");
-			ps.setString(1, "%"+keyword+"%");
-			ResultSet result = ps.executeQuery();
-			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
-				return null;
-			
-			/* Itero fin quando non ci sono piu' libri */
-			while(result.next()) {
-				/*Ottengo i dati del libro dal DB*/
-				int book_id = result.getInt("book_id");
-				String title = result.getString("title");
-				String publisher = result.getString("publisher");
-				String cover = result.getString("cover");
-				int quantity = result.getInt("quantity");
-				ArrayList<String> genres = getBookGenres(book_id);
-				ArrayList<String> authors = getBookAuthors(book_id);
-				
-				BooksBean book = new BooksBean();
-				book.setBook_id(book_id);
-				book.setTitle(title);
-				book.setPublisher(publisher);
-				book.setCover(cover);
-				book.setQuantity(quantity);
-				book.setGenres(genres);
-				book.setAuthors(authors);
-				
-				/*Aggiungo il libro all'Arraylist*/
-				books.add(book);
-			}
-			conn.close();
-			return books;
-
-		}
-		catch(SQLException e) {
-			System.out.println("Errore Database metodo getBooksByFilter: " + e.getMessage());
-		}
+		Connection conn = DBConnection.getConnection();
+		PreparedStatement ps = conn.prepareStatement("SELECT books.book_id, books.title, books.publisher, books.quantity, books.cover "
+				+ "FROM books, authors, genres, books_authors, books_genres WHERE "+filters[filter]+" LIKE ? "
+						+ "AND authors.author_id = books_authors.author_id "
+						+ "AND books.book_id = books_authors.book_id "
+						+ "AND genres.genre_name = books_genres.genre_name "
+						+ "AND books.book_id = books_genres.book_id "
+						+ "GROUP BY title;");
+		ps.setString(1, "%"+keyword+"%");
+		ResultSet result = ps.executeQuery();
+		if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
+			return null;
 		
-		return null;
+		/* Itero fin quando non ci sono piu' libri */
+		while(result.next()) {
+			/*Ottengo i dati del libro dal DB*/
+			int book_id = result.getInt("book_id");
+			String title = result.getString("title");
+			String publisher = result.getString("publisher");
+			String cover = result.getString("cover");
+			int quantity = result.getInt("quantity");
+			ArrayList<String> genres = getBookGenres(book_id);
+			ArrayList<String> authors = getBookAuthors(book_id);
+			
+			BooksBean book = new BooksBean();
+			book.setBook_id(book_id);
+			book.setTitle(title);
+			book.setPublisher(publisher);
+			book.setCover(cover);
+			book.setQuantity(quantity);
+			book.setGenres(genres);
+			book.setAuthors(authors);
+			
+			/*Aggiungo il libro all'Arraylist*/
+			books.add(book);
+		}
+		conn.close();
+		return books;
 	}
 	
 	/**

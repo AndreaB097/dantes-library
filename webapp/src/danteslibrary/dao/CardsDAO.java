@@ -26,23 +26,23 @@ public class CardsDAO {
 	 * Restituisce null nel caso in cui non vi sono corrispondenze.
 	 */
 	public ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
-		String[] filters = {"users.name", "users.surname", "users.email", "cards.codice_fiscale", "card_id"};
+		String[] filters = {"customers.name", "customers.surname", "customers.email", "cards.codice_fiscale", "card_id"};
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;
 		try {
 			Connection conn = DBConnection.getConnection();
 			if (filter == 0 || filter == 1 || filter == 2) {
-				PreparedStatement ps = conn.prepareStatement("SELECT users.name, users.surname,"
-						+ " cards.card_id, cards.codice_fiscale, users.email, cards.associated " 
-						+ "FROM cards, users WHERE " + filters[filter] + " = ? AND cards.codice_fiscale = users.codice_fiscale");
+				PreparedStatement ps = conn.prepareStatement("SELECT customers.name, customers.surname,"
+						+ " cards.card_id, cards.codice_fiscale, customers.email, cards.associated " 
+						+ "FROM cards, customers WHERE " + filters[filter] + " LIKE ? AND cards.codice_fiscale = customers.codice_fiscale");
 			
-				ps.setString(1, keyword);
+				ps.setString(1, "%"+keyword+"%");
 				result = ps.executeQuery();
 				if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 					return null;
 			
 				while(result.next()) {
-					/*Ottengo i dati dell'utente dal DB*/
+					/*Ottengo i dati del cliente dal DB*/
 					String name = result.getString("name");
 					String surname = result.getString("surname");
 					String email = result.getString("email");
@@ -66,7 +66,7 @@ public class CardsDAO {
 						+ "FROM cards WHERE " + filters[filter] + " = ?");
 				ps.setString(1, keyword);
 				result = ps.executeQuery();
-				/*Se la tessera appartiene ad un utente registrato ne prelevo anche nome, cognome e email */
+				/*Se la tessera appartiene ad un cliente registrato ne prelevo anche nome, cognome e email */
 
 				if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 					return null;
@@ -82,8 +82,8 @@ public class CardsDAO {
 				card.setCard_id(card_id);
 				card.setAssociated(associated);
 
-				ps = conn.prepareStatement("SELECT users.name, users.surname, users.email " 
-						+ "FROM users, cards WHERE users.codice_fiscale = cards.codice_fiscale "
+				ps = conn.prepareStatement("SELECT customers.name, customers.surname, customers.email " 
+						+ "FROM customers, cards WHERE customers.codice_fiscale = cards.codice_fiscale "
 						+ "AND "  + filters[filter] + " = ?");
 				ps.setString(1, keyword);
 				result = ps.executeQuery();
@@ -125,8 +125,8 @@ public class CardsDAO {
 		ResultSet result;
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT cards.*, users.name, users.surname, users.email " 
-					+ "FROM users, cards WHERE cards.associated= true AND users.codice_fiscale = cards.codice_fiscale");
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.*, customers.name, customers.surname, customers.email " 
+					+ "FROM customers, cards WHERE cards.associated= true AND customers.codice_fiscale = cards.codice_fiscale");
 			result = ps.executeQuery();
 			if(result.isBeforeFirst()) {
 				while (result.next()) {
@@ -191,15 +191,15 @@ public class CardsDAO {
 	
 	/**
 	 * Ottiene la tessera in base all'email passata come parametro.
-	 * @param email Email dell'utente di cui si vuole ottenere la tessera.
-	 * @return Restituisce la tessera dell'utente avente come email quella 
+	 * @param email Email del cliente di cui si vuole ottenere la tessera.
+	 * @return Restituisce la tessera del cliente avente come email quella 
 	 * passata come parametro.
 	 */
 	public CardsBean getCardByEmail(String email) {
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, users WHERE cards.codice_fiscale = users.codice_fiscale "
-					+ "AND users.email = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT cards.* FROM cards, customers WHERE cards.codice_fiscale = customers.codice_fiscale "
+					+ "AND customers.email = ?");
 			ps.setString(1, email);
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst())
@@ -221,8 +221,8 @@ public class CardsDAO {
 	
 	/**
 	 * Ottiene la tessera in base al codice fiscale passato come parametro.
-	 * @param codice_fiscale Codice fiscale dell'utente di cui si vuole ottenere la tessera.
-	 * @return Restituisce la tessera dell'utente avente come codice fiscale quello
+	 * @param codice_fiscale Codice fiscale del cliente di cui si vuole ottenere la tessera.
+	 * @return Restituisce la tessera del cliente avente come codice fiscale quello
 	 * passato come parametro.
 	 */
 	public CardsBean getCardByCodice_fiscale(String codice_fiscale) {

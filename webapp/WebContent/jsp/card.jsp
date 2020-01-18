@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
-<%if(session.getAttribute("user") != null) {
+<%if(session.getAttribute("customer") != null) {
 	response.sendRedirect("profile.jsp");
 	return;
 }
@@ -8,7 +8,7 @@ else if(session.getAttribute("admin") != null) {
 	response.sendRedirect("admin.jsp");
 	return;
 }
-else if(session.getAttribute("user_incomplete") == null) {
+else if(session.getAttribute("customer_incomplete") == null) {
 	response.sendRedirect("registration.jsp");
 	return;
 } %>

@@ -6,12 +6,12 @@
 	<a id="logo" href="./index.jsp"><img class="backup-image" title="HOMEPAGE" src="${applicationScope.library.logo}" onerror="this.onerror=null; this.src='./images/default_logo.png'"/>&nbsp;<span>${applicationScope.library.name}</span></a>
 
 	<nav id="menu">
-	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
+	<% if(session.getAttribute("customer") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp" title="LOGOUT"><i class="fas fa-sign-out-alt fa-lg"></i></a>
 	<%}%>
 	  <a href="./contacts.jsp" title="CONTATTI"><i class="fas fa-question-circle fa-lg"></i></a>
-	  <% if(session.getAttribute("user") != null) {%>
-		<a href="./profile.jsp" title="AREA UTENTE"><i class="fas fa-user fa-lg"></i><span>${user.name}</span></a>
+	  <% if(session.getAttribute("customer") != null) {%>
+		<a href="./profile.jsp" title="AREA CLIENTE"><i class="fas fa-user fa-lg"></i><span>${customer.name}</span></a>
 	  <%} else if(session.getAttribute("admin") != null) { %>
 		<a href="./admin.jsp" title="PANNELLO DI CONTROLLO"><i class="fas fa-user-shield fa-lg"></i><span>${admin.name}</span></a>
 		<%} else {%>
@@ -70,18 +70,18 @@
 	</nav>
 	
 	<nav id="menu-responsive" class="topnav">
-	<% if(session.getAttribute("user") != null) {%>
-		<a href="./profile.jsp" class="hide-tooltip"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;${user.name}</a>
+	<% if(session.getAttribute("customer") != null) {%>
+		<a href="./profile.jsp" class="hide-tooltip"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;${customer.name}</a>
 	<%} else if(session.getAttribute("admin") != null) { %>
 		<a href="./admin.jsp" class="hide-tooltip"><i class="fas fa-user-shield fa-lg"></i>&nbsp;&nbsp;&nbsp;${admin.name}</a>
 	<%} else {%>
 		<a href="./login.jsp"><i class="fas fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Accedi</a>
 	<%} %>
 	<a href="./contacts.jsp"><i class="fas fa-question-circle fa-lg"></i>&nbsp;&nbsp;&nbsp;Contatti</a>
-	<% if(session.getAttribute("user") != null || session.getAttribute("admin") != null) {%>
+	<% if(session.getAttribute("customer") != null || session.getAttribute("admin") != null) {%>
 		<a href="./logout.jsp"><i class="fas fa-sign-out-alt fa-lg"></i>&nbsp;&nbsp;&nbsp;Logout</a>
 	<%}%>
-	<form id="search-responsive" action="./search">
+	<form id="search-responsive" action="./book?search" method="post">
 		<p>Ricerca per  <select id="search-filters-responsive" class="dropdownFilters" name="filter">
 			<option value="0">Titolo</option>
 			<option value="1">Autore</option>
@@ -89,7 +89,7 @@
 			<option value="3">Genere</option>
 		</select>
 		</p>
-		<input type="search" name="q" placeholder="Seleziona il filtro ed effettua la ricerca" />
+		<input type="text" name="query" placeholder="Seleziona il filtro ed effettua la ricerca" />
 		<button type="submit"><i class="fas fa-search fa-lg"></i></button>
 	</form>
 	<script>

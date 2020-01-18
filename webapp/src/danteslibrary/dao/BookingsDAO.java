@@ -21,10 +21,10 @@ public class BookingsDAO {
 	 * 
 	 * Inserisce una nuova prenotazione nel database.
 	 * 
-	 * @param email Email dell'utente che fa la prenotazione.
+	 * @param email Email del cliente che fa la prenotazione.
 	 * @param start_date Data d'inizio prenotazione.
 	 * @param end_date Data di fine prenotazione.
-	 * @param state_name Stato della nuova prenotazione. Nel caso la prenotazione la stia creando un utente, il valore
+	 * @param state_name Stato della nuova prenotazione. Nel caso la prenotazione la stia creando un cliente, il valore
 	 * sarà "Non ancora ritirato".
 	 * @param card_id Codice della tessera con cui si vuole prenotare il libro.
 	 * @param book_id Il libro da prenotare.
@@ -35,7 +35,6 @@ public class BookingsDAO {
 	public int newBooking(String email, String start_date, String end_date, String state_name, int card_id, int book_id) throws SQLException {
 		int result = 0;
 		Connection conn = null;
-		try {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
 			PreparedStatement ps = conn.prepareStatement("SELECT books.title FROM books WHERE book_id = ?");
@@ -59,6 +58,7 @@ public class BookingsDAO {
 			ps = conn.prepareStatement("UPDATE books SET quantity = quantity - 1 WHERE book_id = ?");
 			ps.setInt(1, book_id);
 			result = ps.executeUpdate();
+		try {	
 			conn.commit();
 		}
 		catch(SQLException e) {
@@ -88,8 +88,8 @@ public class BookingsDAO {
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
 			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT bookings.booking_id, bookings.card_id, bookings.book_id, cards.codice_fiscale, bookings.state_name, bookings.start_date, bookings.end_date, bookings.title  FROM bookings, cards WHERE "+filters[filter]+"= ? AND cards.card_id = bookings.card_id");
-			ps.setString(1, keyword);
+			PreparedStatement ps = conn.prepareStatement("SELECT bookings.booking_id, bookings.card_id, bookings.book_id, cards.codice_fiscale, bookings.state_name, bookings.start_date, bookings.end_date, bookings.title  FROM bookings, cards WHERE "+filters[filter]+" LIKE ? AND cards.card_id = bookings.card_id");
+			ps.setString(1, "%"+keyword+"%");
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 				return null;
@@ -213,11 +213,11 @@ public class BookingsDAO {
 	}
 	
 	/**
-	 * Ottiene le prenotazioni effettuate da un Utente data la sua email.
-	 * @param email Email dell'utente del quale si vogliono ottenere le prenotazioni.
-	 * @return Restituisce la lista delle prenotazioni effettuate da un utente.
+	 * Ottiene le prenotazioni effettuate da un Cliente data la sua email.
+	 * @param email Email del cliente del quale si vogliono ottenere le prenotazioni.
+	 * @return Restituisce la lista delle prenotazioni effettuate da un cliente.
 	 */
-	public ArrayList<BookingsBean> getUserBookings(String email) {
+	public ArrayList<BookingsBean> getCustomerBookings(String email) {
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
 			Connection conn = DBConnection.getConnection();

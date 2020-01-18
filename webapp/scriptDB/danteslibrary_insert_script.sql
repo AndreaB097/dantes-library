@@ -63,12 +63,12 @@ INSERT INTO books_genres(book_id, genre_name) VALUES (3, "Didattica");
 INSERT INTO books_genres(book_id, genre_name) VALUES (4, "Distopia");
 
 INSERT INTO roles(role_name) VALUES("Gestore Biblioteca");
-INSERT INTO roles(role_name) VALUES("Gestore Utenti");
+INSERT INTO roles(role_name) VALUES("Gestore Clienti");
 INSERT INTO roles(role_name) VALUES("Gestore Libri");
 INSERT INTO roles(role_name) VALUES("Gestore Prenotazioni");
 INSERT INTO roles(role_name) VALUES("Gestore Tessere");
 
-INSERT INTO managers(email, password, name, surname, address, phone) VALUES("admin@admin.it", "123456", "Michele", "Almanacco", "Viale Meraviglia 10", "123456789");
+INSERT INTO managers(email, password, name, surname, address, phone) VALUES("admin@admin.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Michele", "Almanacco", "Viale Meraviglia 10", "123456789");
 INSERT INTO managers_roles(email, role_name) VALUES("admin@admin.it", "Gestore Biblioteca");
 
 INSERT INTO cards(codice_fiscale) values("1111111111111111");
@@ -76,6 +76,6 @@ INSERT INTO cards(codice_fiscale) values("2222222222222222");
 INSERT INTO cards(codice_fiscale) values("3333333333333333");
 INSERT INTO cards(codice_fiscale) values("4444444444444444");
 
-INSERT INTO users(email, password, name, surname, codice_fiscale, address) VALUES("a@a.it", "123456", "Lino", "Gargiulo", "1111111111111111", "Via dei Principati 20");
-INSERT INTO users(email, password, name, surname, codice_fiscale, address) VALUES("b@b.it", "123456", "Gennaro", "Mellia", "2222222222222222", "Via Poligono 30");
-INSERT INTO users(email, password, name, surname, codice_fiscale, address) VALUES("c@c.it", "123456", "Enza", "Amico", "3333333333333333", "Piazza Albertone 15");
+INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("a@a.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Lino", "Gargiulo", "1111111111111111", "Via dei Principati 20");
+INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("b@b.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Gennaro", "Mellia", "2222222222222222", "Via Poligono 30");
+INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("c@c.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Enza", "Amico", "3333333333333333", "Piazza Albertone 15");

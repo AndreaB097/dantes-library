@@ -12,7 +12,7 @@ pageEncoding="UTF-8"%>
 <%@ include file="./jsp/layout/navbar.jsp"%>
 
 <div class="container" style="margin-top: 75px">
-	<%if(session.getAttribute("user_email") != null) { %>
+	<%if(session.getAttribute("customer_email") != null) { %>
 		<div id="form-container">
 		<h2>Reimposta la tua password</h2>
 		<div id="error-list" tabindex="-1"></div>

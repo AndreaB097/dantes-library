@@ -11,7 +11,8 @@ create table if not exists managers(
     name varchar(30) not null,
     surname varchar(30) not null,
     address varchar(100) not null,
-    phone varchar(10) not null
+    phone varchar(10) not null,
+    tmp_link varchar(100) unique
 );
 
 create table if not exists managers_roles(
@@ -24,7 +25,7 @@ create table if not exists managers_roles(
     on update cascade on delete cascade
 );
 
-create table if not exists users(
+create table if not exists customers(
     name varchar(30) not null,
     surname varchar(30) not null,
     email varchar(100) primary key,
@@ -46,8 +47,8 @@ create table if not exists books(
     title varchar(100) not null,
     description text,
 	publisher varchar(100) not null,
-    quantity int not null,
-    cover varchar(191) default "./images/covers/default.png"
+    quantity int unsigned not null,
+    cover varchar(191) default "./images/no_image.png"
 );
 
 create table if not exists authors(
@@ -91,6 +92,7 @@ create table if not exists bookings(
     state_name varchar(100),
     card_id int not null,
     book_id int not null,
+    title varchar(100) not null,
     foreign key(state_name) references booking_states(state_name)
     on update cascade on delete set null
 );

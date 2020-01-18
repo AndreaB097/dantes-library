@@ -20,7 +20,7 @@ public class InputChecker {
 		if (email == null)
 			throw new NullPointerException("Errore: il campo email è null");
 		String regex = "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})";
-    	if(Pattern.matches(regex, email) && email.length() <= 100 && email.length() >= 5)
+    	if(Pattern.matches(regex, email) && email.length() >= 5 && email.length() <= 100)
     		return true;
     	
     	return false;
@@ -28,7 +28,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se la password passata come parametro ha un formato valido
-	 * @param password
+	 * @param password Password da controllare
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkPassword(String password) {
@@ -43,7 +43,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il nome passato come parametro ha un formato valido
-	 * @param name
+	 * @param name Nome da controllare
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkName(String name) {
@@ -58,7 +58,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il cognome passato come parametro ha un formato valido
-	 * @param surname
+	 * @param surname Cognome da controllare
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkSurname(String surname) {
@@ -73,7 +73,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se l'indirizzo stradale passato come parametro ha un formato valido
-	 * @param address
+	 * @param address Indirizzo da controllare
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkAddress(String address) {
@@ -88,7 +88,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il numero di telefono passato come parametro ha un formato valido
-	 * @param phone
+	 * @param phone Telefono da controllare
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkPhone(String phone) {
@@ -102,11 +102,11 @@ public class InputChecker {
 	}
 	
 	
-	/*Campi Utente*/
+	/*Campi Cliente*/
 		
 	/**
 	 * Controlla se il codice fiscale passato come parametro ha un formato valido
-	 * @param codice_fiscale
+	 * @param codice_fiscale Codice fiscale da controllare
 	 * @return Restituisce true se il formato è valido, altrimenti false
 	 */
 	public static boolean checkCodice_fiscale(String codice_fiscale) {
@@ -121,14 +121,15 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il card_id passato come parametro ha un formato valido.
-	 * @param card_id
+	 * @param card_id Codice tessera da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkCard_id(String card_id) {
 		if (card_id == null)
 			throw new NullPointerException("Errore: il campo card_id è null");
 		String regex = "[0-9]{5}";
-    	if(Pattern.matches(regex, card_id))
+		int tmp_id = Integer.parseInt(card_id);
+    	if(Pattern.matches(regex, card_id) && tmp_id >= 0 && tmp_id <= 99999)
     		return true;
     	
     	return false;
@@ -138,7 +139,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il booking_id passato come parametro ha un formato valido.
-	 * @param card_id
+	 * @param booking_id Codice prenotazione da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkBooking_id(String booking_id) {
@@ -155,7 +156,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il book_id passato come parametro ha un formato valido.
-	 * @param book_id
+	 * @param book_id Codice libro da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkBook_id(String book_id) {
@@ -170,7 +171,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il titolo passato come parametro ha un formato valido.
-	 * @param title
+	 * @param title Titolo da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkTitle(String title) {
@@ -186,7 +187,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se l'autore passato come parametro ha un formato valido.
-	 * @param author
+	 * @param author Autore da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkAuthor(String author) {
@@ -201,7 +202,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se la casa editrice passata come parametro ha un formato valido
-	 * @param publisher
+	 * @param publisher La Casa Editrice da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkPublisher(String publisher) {
@@ -217,13 +218,13 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il genere passato come parametro ha un formato valido
-	 * @param genre
+	 * @param genre Il nome del genere da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkGenre(String genre) {
 		if (genre == null)
 			throw new NullPointerException("Errore: il campo genre è null");
-		String regex = "[A-zÀ-ú0-9 ]{1,30}";
+		String regex = "[A-zÀ-ú ]{1,30}";
     	if(Pattern.matches(regex, genre))
     		return true;
     	
@@ -232,7 +233,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se la descrizione passata come parametro ha un formato valido
-	 * @param description
+	 * @param description Descrizione da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkDescription(String description) {
@@ -247,7 +248,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se la quantità passata come parametro ha un formato valido
-	 * @param quantity
+	 * @param quantity Quantità da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkQuantity(String quantity) {
@@ -265,7 +266,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se il nome biblioteca passata come parametro ha un formato valido
-	 * @param library_name
+	 * @param library_name Nome biblioteca da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkLibraryName(String library_name) {
@@ -280,7 +281,7 @@ public class InputChecker {
 	
 	/**
 	 * Controlla se contatti biblioteca passato come parametro ha un formato valido
-	 * @param contacts
+	 * @param contacts Contatti da controllare
 	 * @return Restituisce true se il formato è valido, false altrimenti.
 	 */
 	public static boolean checkContacts(String contacts) {

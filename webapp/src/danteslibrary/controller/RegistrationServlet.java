@@ -2,7 +2,7 @@ package danteslibrary.controller;
 
 import javax.servlet.http.*;
 
-import danteslibrary.dao.UsersDAO;
+import danteslibrary.dao.CustomersDAO;
 
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
@@ -24,15 +24,15 @@ import danteslibrary.util.InputChecker;
 public class RegistrationServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private UsersDAO usersDAO = new UsersDAO();
+	private CustomersDAO customersDAO = new CustomersDAO();
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 		
-		/*Controllo Utente già autenticato*/
-		if(session.getAttribute("user") != null) {
+		/*Controllo se il Cliente è già autenticato*/
+		if(session.getAttribute("customer") != null) {
 			response.sendRedirect("index.jsp");
 			return;
 		}
@@ -47,18 +47,18 @@ public class RegistrationServlet extends HttpServlet {
 		/*Controllo se e' stata fatta una richiesta con Ajax*/
 		if("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
 			/*Risposta JSON a registration.jsp per controllare se l'email e' gia' presente nel sistema.
-			 * Se mi viene restituito true, vuol dire che l'utente non può 
+			 * Se mi viene restituito true, vuol dire che il cliente non può 
 			 * registrarsi*/
-			if(email != null && usersDAO.checkExistingEmail(email) == true) {
+			if(email != null && customersDAO.checkExistingEmail(email) == true) {
 				response.setContentType("application/json");
 				PrintWriter pw = response.getWriter();
 				pw.write("true");
 				pw.close();
 			}
 			/*Controllo se il codice fiscale e' gia' presente nel sistema.
-			 * Se mi viene restituito true, vuol dire che l'utente non può 
+			 * Se mi viene restituito true, vuol dire che il cliente non può 
 			 * registrarsi*/
-			if(codice_fiscale != null && usersDAO.checkExistingCodice_fiscale(codice_fiscale) == true) {
+			if(codice_fiscale != null && customersDAO.checkExistingCodice_fiscale(codice_fiscale) == true) {
 				response.setContentType("application/json");
 				PrintWriter pw = response.getWriter();
 				pw.write("true");
@@ -82,7 +82,7 @@ public class RegistrationServlet extends HttpServlet {
     		request.getRequestDispatcher("registration.jsp").forward(request, response);
     		return;
         }
-        else if (usersDAO.checkExistingEmail(email)) {
+        else if (customersDAO.checkExistingEmail(email)) {
         	request.setAttribute("error", "Questo indirizzo email è già in uso.");
     		request.getRequestDispatcher("registration.jsp").forward(request, response);
     		return;
@@ -94,7 +94,7 @@ public class RegistrationServlet extends HttpServlet {
         		request.getRequestDispatcher("registration.jsp").forward(request, response);
         		return;
         }
-        else if (usersDAO.checkExistingCodice_fiscale(codice_fiscale)) {
+        else if (customersDAO.checkExistingCodice_fiscale(codice_fiscale)) {
         	request.setAttribute("error", "Questo codice fiscale è già in uso. Se non ti risulta, per favore contatta la biblioteca.");
     		request.getRequestDispatcher("registration.jsp").forward(request, response);
     		return;
@@ -133,19 +133,19 @@ public class RegistrationServlet extends HttpServlet {
 		 * Registrazione - Passo 1: Registrazione account *
 		 * ************************************************/
 		/*Il form e' stato compilato correttamente.
-		 * Creo quindi il bean del nuovo utente e lo reindirizzo in card.jsp per 
+		 * Creo quindi il bean del nuovo cliente e lo reindirizzo in card.jsp per 
 		 * l'associazione della tessera (obbligatoria per prenotare i libri)*/
-		UsersBean user = new UsersBean();
+		CustomersBean customer = new CustomersBean();
 		
 		/*Riempiamo il bean, lo inseriamo nella richiesta e inoltriamo il
 		 * tutto alla servlet CardServlet per il passo 2 della registrazione*/
-		user.setEmail(email);
-		user.setName(name);
-		user.setSurname(surname);
-		user.setPassword(password);
-		user.setCodice_fiscale(codice_fiscale);
-		user.setAddress(address);
-		session.setAttribute("user_incomplete", user);
+		customer.setEmail(email);
+		customer.setName(name);
+		customer.setSurname(surname);
+		customer.setPassword(password);
+		customer.setCodice_fiscale(codice_fiscale);
+		customer.setAddress(address);
+		session.setAttribute("customer_incomplete", customer);
 		request.getRequestDispatcher("card.jsp").forward(request, response);
 		return;
 	}

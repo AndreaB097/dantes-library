@@ -4,6 +4,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import danteslibrary.dao.BooksDAO;
@@ -35,7 +36,15 @@ public class BookServlet extends HttpServlet {
 		/*Preleva 10 libri per ogni genere e li mette in un 
 		 * hashmap(genre, libri[]) + redirect a genre.jsp per la visualizzazione*/
 		else if(request.getParameter("list") != null) {
-			request.setAttribute("list", dao.getBookList());
+			try {
+				request.setAttribute("list", dao.getBookList());
+			}
+			catch(SQLException e) {
+				System.out.println("Errore Database metodo getBookList: " + e.getMessage());
+				request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+				request.getRequestDispatcher("index.jsp").forward(request, response);
+				return;
+			}
 			request.getRequestDispatcher("genres.jsp").forward(request, response);
 			return;
 		}
@@ -55,16 +64,24 @@ public class BookServlet extends HttpServlet {
 			int filter = Integer.parseInt(request.getParameter("filter"));
 			String query = request.getParameter("query");
 			
-			/*Controllo se l'utente ha inserito correttamente filtro e keyword*/
+			/*Controllo se il cliente ha inserito correttamente filtro e keyword*/
 			if(filter < 0 || filter > 4 || query.equals("") || query == null) {
 				request.setAttribute("error", "Assicurati di aver selezionato un filtro di ricerca.");
 				request.getRequestDispatcher(request.getHeader("referer")).forward(request, response);
 				return;
 			}
-			
-			ArrayList<BooksBean> bean = dao.getBooksByFilter(filter, query);
-			request.setAttribute("search", bean);
-			request.getRequestDispatcher("search.jsp").include(request, response);
+			try {
+				ArrayList<BooksBean> bean = dao.getBooksByFilter(filter, query);
+				request.setAttribute("search", bean);
+				request.getRequestDispatcher("search.jsp").include(request, response);
+				return;
+			}
+			catch(SQLException e) {
+				System.out.println("Errore Database metodo getBooksByFilter: " + e.getMessage());
+				request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+				request.getRequestDispatcher("index.jsp").include(request, response);
+				return;
+			}
 		}
 		else {
 			response.sendError(404);

@@ -1,111 +1,109 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"
-    import="java.util.ArrayList,
-    danteslibrary.model.UsersBean, danteslibrary.model.BookingsBean,
-    danteslibrary.model.CardsBean, java.util.Locale, java.time.LocalDate,
-    java.time.format.DateTimeFormatter"%>
+    import="java.util.ArrayList,danteslibrary.model.CustomersBean,danteslibrary.model.BookingsBean,danteslibrary.model.CardsBean,java.util.Locale,java.time.LocalDate,java.time.format.DateTimeFormatter"%>
 
 <!doctype html>
 <html>
 <head>
 <%@include file="./jsp/layout/header.jsp" %>
-	<title>Dante's Library | Area Utente</title>
+	<title>Dante's Library | Area Cliente</title>
 </head>
 <body>
 
 <%@ include file="./jsp/layout/navbar.jsp" %>
 
-<% if(session.getAttribute("user") == null) {
-	response.sendRedirect("login.jsp"); /*Se l'utente non è autenticato viene 
-										reindirizzato alla pagina di login*/
+<%
+	if(session.getAttribute("customer") == null) {
+	response.sendRedirect("login.jsp"); /*Se il cliente non è autenticato viene 
+								reindirizzato alla pagina di login*/
 	return;
 }
 %>
 
 <div class="container">
 	<div class="profile-container">		
-		<div id="name"><h1>${user.name} ${user.surname }</h1></div>
+		<div id="name"><h1>${customer.name} ${customer.surname }</h1></div>
 		
-		<% if(request.getAttribute("info") != null) { %>
-			<div class="info"><%=request.getAttribute("info") %></div>
+		<%if(request.getAttribute("info") != null) { %>
+			<div class="info"><%=request.getAttribute("info")%></div>
 		<% } %>
-		<% if(request.getAttribute("error") != null) { %>
-			<div class="error"><%=request.getAttribute("error") %></div>
+		<%if(request.getAttribute("error") != null) {%>
+			<div class="error"><%=request.getAttribute("error")%></div>
 		<% } %>
 				
 		<button class="dropdown-btn"><i class="fas fa-id-card fa"></i>&nbsp;&nbsp;Tessera</button>
 		<div class="dropdown-content">
 			<div id="card">
-			<%if(session.getAttribute("card_date") != null) { %>
-				<p id="card-date">Puoi ritirare la tua tessera a partire dal: <strong><%=session.getAttribute("card_date") %></strong></p>
+			<%if(session.getAttribute("card_date") != null) {%>
+				<p id="card-date">Puoi ritirare la tua tessera a partire dal: <strong><%=session.getAttribute("card_date")%></strong></p>
 				<p>Puoi già effettuare prenotazioni. Quando ti recherai in biblioteca per ritirare il libro,
 				assicurati di ritirare anche la tua tessera!</p>
 			<%}
 			else if(session.getAttribute("card") != null) { %>
 				<p>Codice Tessera: <b>${card.card_id }</b><br/>
 				<%CardsBean card = (CardsBean) session.getAttribute("card");
-				if(card.isAssociated()) { %>
-					Stato: <i class="fas fa-check-circle fa-lg" style="color: #50ebaf"></i>
-				<%}
-				else {%>				
-					Stato: <i class="fas fa-times-circle fa-lg" style="color: #eb5050"></i>
-					<br/>
-					<br/>
-					La tua tessera non risulta associata, quindi non ti è 
-					possibile effettuare alcuna prenotazione. Per favore contatta la biblioteca.
-			  <%} %>
+					if(card.isAssociated()) { %>
+						Stato: <i class="fas fa-check-circle fa-lg" style="color: #50ebaf"></i>
+				<% }
+					else { %>				
+						Stato: <i class="fas fa-times-circle fa-lg" style="color: #eb5050"></i>
+						<br/>
+						<br/>
+						La tua tessera non risulta associata, quindi non ti è 
+						possibile effettuare alcuna prenotazione. Per favore contatta la biblioteca.
+			  	<%} %>
 				</p>
 			<%}
-			  else { %>
-				  <p><b>ATTENZIONE!</b> Non riusciamo a rilevare la tua tessera.
-				  In questo stato non potrai effettuare prenotazioni. Contatta la
-				  biblioteca per maggiori informazioni.
-				  </p>
-			<%}%>
+			else { %>
+			  <p><b>ATTENZIONE!</b> Non riusciamo a rilevare la tua tessera.
+			  In questo stato non potrai effettuare prenotazioni. Contatta la
+			  biblioteca per maggiori informazioni.
+			  </p>
+		  <%}%>
 			</div>
 		</div>
 		<button class="dropdown-btn"><i class="fas fa-address-book fa"></i>&nbsp;&nbsp;Storico prenotazioni</button>
 		<div class="dropdown-content">
 			<table id="bookings-list">
 				<%
-				UsersBean user = (UsersBean)session.getAttribute("user");
-				@SuppressWarnings("unchecked")
-				ArrayList<BookingsBean> bookings = (ArrayList<BookingsBean>) session.getAttribute("bookings");
+				CustomersBean customer = (CustomersBean)session.getAttribute("customer");
+					@SuppressWarnings("unchecked")
+					ArrayList<BookingsBean> bookings = (ArrayList<BookingsBean>) session.getAttribute("bookings");
 			if(bookings != null)  {
-				if(!bookings.isEmpty()) { %>
-				<tr>
-					<th>Codice</th>
-					<th>Libro</th>
-					<th>Data Inizio</th>
-					<th>Data Fine</th>
-					<th>Stato</th>
-					<th></th>
-				</tr>
-			<% 
-				for(int i = 0; i < bookings.size(); i++) {
-					BookingsBean booking = bookings.get(i); %>
-					<tr>
-						<td><%=booking.getBooking_id() %></td>
-						<td><%=booking.getTitle() %></td>
-						<td><%=booking.getStart_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN))%></td>
-						<td><%=booking.getEnd_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN))%></td>
-						<td><i><%=booking.getState_name() %></i></td>
-						<%if(booking.getState_name().equals("Non ancora ritirato"))  {%>
-						<td>
-						<form action="booking?cancel_booking" method="post">
-								<input type="hidden" name="booking_id" value="<%=booking.getBooking_id()%>">
-								<button id="btn-cancel_booking" type="submit">Annulla Prenotazione</button>
-						</form>
-						</td>
-						<%}
-						else {%>
-						<td></td>
-						<%}%>
-					</tr>
-				<% }
-			}else {%>
+					if(!bookings.isEmpty()) { %>
+						<tr>
+							<th>Codice</th>
+							<th>Libro</th>
+							<th>Data Inizio</th>
+							<th>Data Fine</th>
+							<th>Stato</th>
+							<th></th>
+						</tr>
+					<% 	for(int i = 0; i < bookings.size(); i++) {
+							BookingsBean booking = bookings.get(i); %>
+							<tr>
+								<td><%=booking.getBooking_id() %></td>
+								<td><%=booking.getTitle() %></td>
+								<td><%=booking.getStart_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN))%></td>
+								<td><%=booking.getEnd_date().format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN))%></td>
+								<td><i><%=booking.getState_name() %></i></td>
+								<%if(booking.getState_name().equals("Non ancora ritirato"))  {%>
+								<td>
+								<form action="booking?cancel_booking" method="post">
+										<input type="hidden" name="booking_id" value="<%=booking.getBooking_id()%>">
+										<button id="btn-cancel_booking" type="submit">Annulla Prenotazione</button>
+								</form>
+								</td>
+								<%}
+								else {%>
+								<td></td>
+								<%}%>
+							</tr>
+					<% }
+					}
+					else {%>
 					<tr><td>Non ci sono ordini da visualizzare.</td></tr>
-				<% } %>
+				<%  } %>
 			</table>
 			<!-- Tabella prenotazioni responsive -->
 			<table id="bookings-list-responsive">
@@ -115,8 +113,7 @@
 					<th>Libro</th>
 					<th>Data</th>
 				</tr>
-			<%
-				for(int i = 0; i < bookings.size(); i++) {
+			<% for(int i = 0; i < bookings.size(); i++) {
 					BookingsBean booking = bookings.get(i);
 				%>
 					<tr class="striped">
@@ -126,23 +123,24 @@
 					<tr class="striped">
 						<td colspan="2"><strong>Stato: </strong><i><%=bookings.get(i).getState_name() %></i></td>
 					</tr>
-				<% }
-			} else {%>
+			<% }
+			}
+			else {%>
 			<tr><td>Non ci sono ordini da visualizzare.</td></tr>
-		<% }
-		} else {%>
+		 <% }
+		 } else {%>
 		<tr><td>Non ci sono ordini da visualizzare.</td></tr>
-	<% } %>
+		<% } %>
 			</table>
 		</div>
 		<button class="dropdown-btn"><i class="fas fa-user"></i>&nbsp;&nbsp;Dati personali</button>
 		<div class="dropdown-content" style="margin: 0; text-align: left;">
 			<div id="error-list" tabindex="-1"></div>
 			<div class="box">
-				<form method ="post" action="login?edit_user" onsubmit="return validateSubmit()">
+				<form method ="post" action="login?edit_customer" onsubmit="return validateSubmit()">
 					<label for="email">Email</label>
-					<input id="new_email" name="new_email" class="editable" type="text" value="${user.email}" readonly style="width: 100%; margin-bottom: 20px">
-					<input id="old_email" name="old_email" type="hidden" value="${user.email}" readonly> 
+					<input id="new_email" name="new_email" class="editable" type="text" value="${customer.email}" readonly style="width: 100%; margin-bottom: 20px">
+					<input id="old_email" name="old_email" type="hidden" value="${customer.email}" readonly> 
 					
 					<label id="lbl_password" for="password">Password</label>
 					<input id="password" name="password" placeholder="Lascia vuoto per non cambiare" class="editable" type="password" value="" readonly style="width: 100%; margin-bottom: 20px">  
@@ -151,21 +149,21 @@
 					<input id="repeat" placeholder="Lascia vuoto per non cambiare" class="editable" type="password" value="" readonly style="width: 100%; margin-bottom: 20px">
 					
 					<label for="address">Indirizzo</label>
-					<input id="address" name="address" class="editable" type="text" value="${user.address}" readonly style="width: 100%; margin-bottom: 20px">
+					<input id="address" name="address" class="editable" type="text" value="${customer.address}" readonly style="width: 100%; margin-bottom: 20px">
 					
 					<button id="btn-sv" type="submit">Salva</button>
 		
-					<button type="button" id="btn-user">Modifica Dati</button>  
+					<button type="button" id="btn-customer">Modifica Dati</button>  
 					<script>
 						$("#btn-sv").hide();
 						$("#lbl_password, #password").hide();
 						$("#lbl_repeat, repeat").hide();
-						$("#btn-user").click(function() {
+						$("#btn-customer").click(function() {
 							$(".editable").removeAttr("readonly");
 							$("#btn-sv").show();
 							$("#lbl_password, #password").show();
 							$("#lbl_repeat, #repeat").show();
-							$("#btn-user").hide();
+							$("#btn-customer").hide();
 						});
 					</script>
 				</form>

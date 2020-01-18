@@ -1,11 +1,11 @@
 package danteslibrary.model;
 
 /**
- * Bean che definisce l'entità Utente
+ * Bean che definisce l'entità Cliente
  * @author Andrea Buongusto
  * @author Marco Salierno
  */
-public class UsersBean {
+public class CustomersBean {
 	private String name;
 	private String surname;
 	private String email;

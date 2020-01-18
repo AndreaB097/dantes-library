@@ -11,8 +11,8 @@ pageEncoding="UTF-8"%>
 
 <%@ include file="./jsp/layout/navbar.jsp"%>
 
-<% if(session.getAttribute("user") != null) {
-	/*Se l'utente è già autenticato viene reindirizzato alla pagina del profilo,
+<% if(session.getAttribute("customer") != null) {
+	/*Se il cliente è già autenticato viene reindirizzato alla pagina del profilo,
 	Altrimenti alla pagina che stava visitando prima di fare il login*/
 	response.sendRedirect("profile.jsp"); 
    }
@@ -39,7 +39,7 @@ pageEncoding="UTF-8"%>
 	
 				
 		<form id="sign-in-box" class="box" action="registration.jsp">
-			<small>Sei un nuovo utente?&nbsp;&nbsp;&nbsp;</small>
+			<small>Sei un nuovo cliente?&nbsp;&nbsp;&nbsp;</small>
 			<button type="submit">Registrati</button>
 		</form>
 	</div>

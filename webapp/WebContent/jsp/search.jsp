@@ -11,7 +11,7 @@
 
 <%@ include file="./jsp/layout/navbar.jsp"%>
 
-<div class="container">
+<div class="container" style="padding: 10px">
 	<% if(request.getAttribute("search") != null) {
 		@SuppressWarnings("unchecked")
 		ArrayList<BooksBean> rows = (ArrayList<BooksBean>) request.getAttribute("search"); %> 
@@ -51,9 +51,14 @@
 		<hr>
 		<%} %>
 		
-	<%} else { %>
+	<%}
+	else if(request.getAttribute("error") != null) { %>
+	<div class="error" style="width: 90%; margin: 0 auto;"><%=request.getAttribute("error") %></div>
+ <% }
+	else { %>
 	<h2 id="search-title">Nessun risultato trovato per: "<%=request.getParameter("query") %>".</h2>
 	<%} %>
+	
 </div>
 
 <%@ include file="./jsp/layout/footer.jsp"%>

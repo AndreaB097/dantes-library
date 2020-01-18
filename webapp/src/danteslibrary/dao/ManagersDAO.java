@@ -26,8 +26,9 @@ public class ManagersDAO {
 	 * @param email Email del Gestore da autenticare.
 	 * @param password Password del Gestore da autenticare.
 	 * @return Restituisce il Gestore se sono state trovate corrispondenze, altrimenti null.
+	 * @throws SQLException Se il servizio non è disponibile (es. mancata connessione con il database).
 	 */
-	public ManagersBean login(String email, String password) {
+	public ManagersBean login(String email, String password) throws SQLException {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM managers WHERE email = ?");
@@ -58,15 +59,10 @@ public class ManagersDAO {
 				return null;
 			}
 		}
-		catch(SQLException e) {
-			System.out.println("Errore Database: " + e.getMessage());
-		}
 		catch(IllegalArgumentException e) {
 			System.out.println("Invalid salt version!");
 			return null;
 		}
-		
-		return null;
 	}
 	
 	/**
@@ -84,9 +80,9 @@ public class ManagersDAO {
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT DISTINCT managers.email, managers.name, managers.surname, managers.address, managers.phone " + 
-					"FROM managers, roles, managers_roles WHERE "+filters[filter]+" = ?" + 
+					"FROM managers, roles, managers_roles WHERE "+filters[filter]+" LIKE ?" + 
 					"AND managers.email = managers_roles.email AND roles.role_name = managers_roles.role_name;");
-			ps.setString(1, keyword);
+			ps.setString(1, "%"+keyword+"%");
 			ResultSet result = ps.executeQuery();
 			if(!result.isBeforeFirst()) /*Nessuna corrispondenza trovata nel DB, restituisco null*/
 				return null;

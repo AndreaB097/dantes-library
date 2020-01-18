@@ -3,8 +3,8 @@ package danteslibrary.controller;
 import javax.servlet.http.*;
 
 import danteslibrary.dao.CardsDAO;
-import danteslibrary.dao.UsersDAO;
-import danteslibrary.model.UsersBean;
+import danteslibrary.dao.CustomersDAO;
+import danteslibrary.model.CustomersBean;
 import danteslibrary.model.CardsBean;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -13,10 +13,11 @@ import java.util.Locale;
 import javax.servlet.annotation.*;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Classe che riceve richieste GET e POST riguardanti il secondo passo della 
- * Registrazione di un nuovo Utente. Qui l’utente può scegliere se richiedere 
+ * Registrazione di un nuovo Cliente. Qui il cliente può scegliere se richiedere 
  * una nuova tessera oppure registrarne una inserendone il codice.
  * @author Andrea Buongusto
  * @author Marco Salierno
@@ -27,14 +28,16 @@ public class CardServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final int GIORNI_TESSERA = 5;
+	private CustomersDAO customersDAO = new CustomersDAO();
+	private CardsDAO cardsDAO = new CardsDAO();
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 		
-		/*Controllo Utente già autenticato*/
-		if(session.getAttribute("user") != null) {
+		/*Controllo se il cliente è già autenticato*/
+		if(session.getAttribute("customer") != null) {
 			response.sendRedirect("profile.jsp");
 			return;
 		}
@@ -43,42 +46,48 @@ public class CardServlet extends HttpServlet {
 		 * Registrazione - Passo 2: Associazione tessera *
 		 * ***********************************************/
 		/*Controllo se il passo 1 e' stato eseguito verificando l'esistenza 
-		 *dell' attributo user_incomplete settato in RegistrationServlet.
+		 *dell' attributo customer_incomplete settato in RegistrationServlet.
 		 *Se non esiste, reindirizzo alla pagina di registrazione in quanto si 
 		 *sta cercando di accedere a questa servlet senza aver eseguito il passo 1.*/
-		if(session.getAttribute("user_incomplete") == null) {
+		if(session.getAttribute("customer_incomplete") == null) {
 			response.sendRedirect("registration.jsp");
 			return;
 		}
 		else {
-			UsersBean user = (UsersBean) session.getAttribute("user_incomplete");
+			CustomersBean customer = (CustomersBean) session.getAttribute("customer_incomplete");
 			/**NUOVA TESSERA**/
 			if(request.getParameter("new_card") != null) {
-				CardsDAO cdao = new CardsDAO();
-				/*Controllo che l'utente non abbia alcuna tessera gia' associata
+				/*Controllo che il cliente non abbia alcuna tessera gia' associata
 				 *al suo codice fiscale (null = non ha tessera, altrimenti si)*/
-				if(cdao.getCardByCodice_fiscale(user.getCodice_fiscale()) == null) {
-					int card_id = cdao.newCard(user.getCodice_fiscale());
+				if(cardsDAO.getCardByCodice_fiscale(customer.getCodice_fiscale()) == null) {
+					int card_id = cardsDAO.newCard(customer.getCodice_fiscale());
 					if(card_id == 0) {
 						request.setAttribute("error", "Esiste già una tessera associata al codice fiscale: "
-								+ user.getCodice_fiscale());
+								+ customer.getCodice_fiscale());
 						request.getRequestDispatcher("card.jsp").forward(request, response);
 						return;
 					}
 					else {
-						UsersDAO udao = new UsersDAO();
-						udao.register(user);
+						customersDAO.register(customer);
 						/*Registrazione completata. Autenticazione*/
-						session.removeAttribute("user_incomplete");
-						session.setAttribute("user", udao.login(user.getEmail(), user.getPassword()));
+						session.removeAttribute("customer_incomplete");
+						try {
+							session.setAttribute("customer", customersDAO.login(customer.getEmail(), customer.getPassword()));
+						}
+						catch(SQLException e) {
+							System.out.println("Errore Database metodo login: " + e.getMessage());
+							request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+							request.getRequestDispatcher("login.jsp").forward(request, response);
+							return;
+						}
 						session.setAttribute("card_date", LocalDate.now().plusDays(GIORNI_TESSERA).format(DateTimeFormatter.ofPattern("d MMMM Y", Locale.ITALY)));
 					}
 				}
-				/*Il codice fiscale dell'utente risulta gia' associato a qualche carta,
+				/*Il codice fiscale del cliente risulta gia' associato a qualche carta,
 				 * quindi mostro un errore*/
 				else {
 					request.setAttribute("error", "Esiste già una tessera associata al codice fiscale: "
-							+ user.getCodice_fiscale());
+							+ customer.getCodice_fiscale());
 					request.getRequestDispatcher("card.jsp").forward(request, response);
 					return;
 				}
@@ -86,19 +95,25 @@ public class CardServlet extends HttpServlet {
 			/**TESSERA GIA' IN POSSESSO**/
 			else if(request.getParameter("card_id") != null && !request.getParameter("card_id").equals("")) {
 				try {
-					CardsDAO cdao = new CardsDAO();
 					int card_id = Integer.parseInt(request.getParameter("card_id"));
-					CardsBean card = cdao.getCardById(card_id);
+					CardsBean card = cardsDAO.getCardById(card_id);
 					/*Controllo se esiste la tessera, che risulti NON ancora associata
-					 * e che abbia lo stesso codice fiscale dell'utente che la sta associando*/
-					if(card != null && !card.isAssociated() && card.getCodice_fiscale().equals(user.getCodice_fiscale())) {
-						UsersDAO udao = new UsersDAO();
-						udao.register(user);
-						cdao.associateCard(card_id);
+					 * e che abbia lo stesso codice fiscale del cliente che la sta associando*/
+					if(card != null && !card.isAssociated() && card.getCodice_fiscale().equals(customer.getCodice_fiscale())) {
+						customersDAO.register(customer);
+						cardsDAO.associateCard(card_id);
 						/*Registrazione completata. Autenticazione*/
-						session.removeAttribute("user_incomplete");
-						session.setAttribute("user", udao.login(user.getEmail(), user.getPassword()));
-						session.setAttribute("card", cdao.getCardById(card_id));
+						session.removeAttribute("customer_incomplete");
+						try {
+							session.setAttribute("customer", customersDAO.login(customer.getEmail(), customer.getPassword()));
+						}
+						catch(SQLException e) {
+							System.out.println("Errore Database metodo login: " + e.getMessage());
+							request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
+							request.getRequestDispatcher("login.jsp").forward(request, response);
+							return;
+						}
+						session.setAttribute("card", cardsDAO.getCardById(card_id));
 					}
 					else {
 						request.setAttribute("error", "Questa tessera non esiste oppure è già associata a qualche cliente."

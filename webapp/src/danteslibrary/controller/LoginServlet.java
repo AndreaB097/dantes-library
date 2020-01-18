@@ -6,18 +6,18 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import danteslibrary.model.UsersBean;
+import danteslibrary.model.CustomersBean;
 import danteslibrary.util.InputChecker;
 import danteslibrary.model.BookingsBean;
 import danteslibrary.model.CardsBean;
-import danteslibrary.dao.UsersDAO;
+import danteslibrary.dao.CustomersDAO;
 import danteslibrary.dao.BookingsDAO;
 import danteslibrary.dao.CardsDAO;
 import java.util.ArrayList;
 
 /**
  * Classe che riceve richieste GET e POST riguardanti l’autenticazione degli 
- * Utenti e che produce output da inviare come risposta.
+ * Cliente e che produce output da inviare come risposta.
  * @author Andrea Buongusto
  * @author Marco Salierno
  *
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class LoginServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private UsersDAO usersDAO = new UsersDAO();
+	private CustomersDAO customersDAO = new CustomersDAO();
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
@@ -34,32 +34,32 @@ public class LoginServlet extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		
-		/*Controllo Utente già autenticato. */
-		if(session.getAttribute("user") != null) {
-			if(request.getParameter("edit_user") != null) {
-				UsersBean user = new UsersBean();
+		/*Controllo Cliente già autenticato. */
+		if(session.getAttribute("customer") != null) {
+			if(request.getParameter("edit_customer") != null) {
+				CustomersBean customer = new CustomersBean();
 				String new_email = request.getParameter("new_email");
 				String old_email = request.getParameter("old_email");
 				String password = request.getParameter("password");
 				String address = request.getParameter("address");
 
-				user = usersDAO.getUserByEmail(old_email);
+				customer = customersDAO.getCustomerByEmail(old_email);
 				
 				if (new_email != null && old_email != null && !new_email.equals(old_email)) {
 					/*Controllo se la nuova email ha un formato valido e se è già presente nel sistema,
-					 *ossia se è già in uso da qualche altro utente.*/
+					 *ossia se è già in uso da qualche altro cliente.*/
 			        if(!InputChecker.checkEmail(new_email)) {
 			        	request.setAttribute("error", "Inserire un indirizzo email valido.");
 			    		request.getRequestDispatcher("profile.jsp").forward(request, response);
 			    		return;
 			        }
-			        else if(usersDAO.checkExistingEmail(new_email) == true) {
-			        	request.setAttribute("error", "Questo indirizzo email è già in uso da un altro utente. Sceglierne un altro.");
+			        else if(customersDAO.checkExistingEmail(new_email) == true) {
+			        	request.setAttribute("error", "Questo indirizzo email è già in uso da un altro cliente. Sceglierne un altro.");
 			    		request.getRequestDispatcher("profile.jsp").forward(request, response);
 			    		return;
 					}
 			        else /*La nuova email è utilizzabile, quindi la sovrascrivo a quella vecchia.*/
-			        	user.setEmail(new_email);
+			        	customer.setEmail(new_email);
 				}
 
 				if (password != null && !InputChecker.checkPassword(password) && !password.equals("")) {
@@ -68,7 +68,7 @@ public class LoginServlet extends HttpServlet {
 	        		return;
 				}
 				else if(password != null && InputChecker.checkPassword(password))
-					usersDAO.updateUserPassword(old_email, password);
+					customersDAO.updateCustomerPassword(old_email, password);
 				
 				if (address == null || !InputChecker.checkAddress(address)) {
 					request.setAttribute("error", "L'indirizzo può contenere solo lettere e numeri e non deve essere vuoto. Lunghezza massima: 100 caratteri.");
@@ -76,12 +76,12 @@ public class LoginServlet extends HttpServlet {
 	        		return;
 				}
 				else
-					user.setAddress(address);
+					customer.setAddress(address);
 				
 				try {
-					usersDAO.updateUser(user, old_email);
+					customersDAO.updateCustomer(customer, old_email);
 					request.setAttribute("info","Il tuo profilo è stato aggiornato correttamente.");
-					session.setAttribute("user", user);
+					session.setAttribute("customer", customer);
 				} catch (SQLException e) {
 					request.setAttribute("error","Impossibile aggiornare il profilo. Si prega di riprovare più tardi.");
 					e.printStackTrace();
@@ -106,29 +106,37 @@ public class LoginServlet extends HttpServlet {
 		
 		/*Autenticazione*/
 		else {
-			UsersDAO udao = new UsersDAO();
+			CustomersDAO udao = new CustomersDAO();
 			CardsDAO cdao = new CardsDAO();
 			BookingsDAO bdao = new BookingsDAO();
-			UsersBean user = udao.login(email, password);		
-			if(user != null) {
-				ArrayList<BookingsBean> bookings = bdao.getUserBookings(email);
-				if(bookings != null)
-					session.setAttribute("bookings", bookings);
-				CardsBean card = cdao.getCardByEmail(email);
-				if(card != null)
-					session.setAttribute("card", card);
-				session.setAttribute("user", user);
-				session.removeAttribute("admin"); /*Distruggo la sessione dell'admin nel caso
-													in cui sia collegato*/
+			try {
+				CustomersBean customer = udao.login(email, password);
+				if(customer != null) {
+					ArrayList<BookingsBean> bookings = bdao.getCustomerBookings(email);
+					if(bookings != null)
+						session.setAttribute("bookings", bookings);
+					CardsBean card = cdao.getCardByEmail(email);
+					if(card != null)
+						session.setAttribute("card", card);
+					session.setAttribute("customer", customer);
+					session.removeAttribute("admin"); /*Distruggo la sessione dell'admin nel caso
+														in cui sia collegato*/
+				}
+				else {
+					request.setAttribute("error", "Indirizzo e-mail o password non validi.");
+					request.getRequestDispatcher("login.jsp").forward(request, response);
+					return;
+				}
 			}
-			else {
-				request.setAttribute("error", "Indirizzo e-mail o password non validi.");
+			catch(SQLException e) {
+				System.out.println("Errore Database metodo login: " + e.getMessage());
+				request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");
 				request.getRequestDispatcher("login.jsp").forward(request, response);
 				return;
 			}
 		}
 		
-		/*Se l'autenticazione va a buon fine, l'utente viene reindirizzato nella
+		/*Se l'autenticazione va a buon fine, il cliente viene reindirizzato nella
 		 * pagina visitata precedentemente. Se non aveva visitato alcuna pagina
 		 * (referer nullo) allora il redirect viene fatto all'homepage.*/
 		String address;

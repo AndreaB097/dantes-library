@@ -12,6 +12,9 @@
 <%@include file="./jsp/layout/navbar.jsp" %>
 	
 <section id="genres" class="home-container">
+<% if(request.getAttribute("error") != null) { %>
+			<div class="error" style="width: 90%; margin: 0 auto;"><%=request.getAttribute("error") %></div>
+<% } %>
 	<div class="centered-text">	
 		<strong>Sfoglia libri in base al genere </strong>
 		<p>Azione, Avventura, Drammatico, ...</p>

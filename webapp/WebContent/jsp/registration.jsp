@@ -91,7 +91,7 @@ var errors = [];
 			errors.push("Le password non corrispondono.");
 		
 		/*Se mi viene restituito true, vuol dire che esiste già un account con
-		questa email, quindi l'utente non si può registrare e stampo l'errore.*/
+		questa email, quindi il cliente non si può registrare e stampo l'errore.*/
 		$.ajax({
 			url: "register",
 			async: false,
@@ -105,7 +105,7 @@ var errors = [];
 		});
 		
 		/*Se mi viene restituito true, vuol dire che esiste già un account con
-		questo codice fiscale, quindi l'utente non si può registrare e stampo l'errore.*/
+		questo codice fiscale, quindi il cliente non si può registrare e stampo l'errore.*/
 		$.ajax({
 			url: "register",
 			async: false,
