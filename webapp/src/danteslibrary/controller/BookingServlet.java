@@ -101,7 +101,12 @@ public class BookingServlet extends HttpServlet {
 				request.getRequestDispatcher("book?id="+book_id).forward(request, response);
 				return;
 			}
-			
+			LocalDate max_date = start_date.plusMonths(4);
+			if(end_date.isAfter(max_date)) {
+				request.setAttribute("error", "Una prenotazione può durare massimo 4 mesi.");
+				request.getRequestDispatcher("book?id="+book_id).forward(request, response);
+				return;
+			}
 			CardsBean customer_card = cardsDAO.getCardByEmail(email);
 			if(customer_card == null) {
 				request.setAttribute("error", "Servizio al momento non disponibile. Riprovare più tardi.");

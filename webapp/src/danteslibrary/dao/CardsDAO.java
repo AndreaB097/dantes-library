@@ -26,6 +26,8 @@ public class CardsDAO {
 	 * Restituisce null nel caso in cui non vi sono corrispondenze.
 	 */
 	public ArrayList<CardsBean> getCardsByFilter(int filter, String keyword) {
+		if(keyword.length() <= 0)
+			return null;
 		String[] filters = {"customers.name", "customers.surname", "customers.email", "cards.codice_fiscale", "card_id"};
 		ArrayList<CardsBean> cards = new ArrayList<CardsBean>();
 		ResultSet result;

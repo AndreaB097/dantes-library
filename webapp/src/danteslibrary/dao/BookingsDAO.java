@@ -84,6 +84,8 @@ public class BookingsDAO {
 	 * Restituisce null nel caso in cui non vi sono corrispondenze.
 	 */
 	public ArrayList<BookingsBean> getBookingsByFilter(int filter, String keyword) {
+		if(keyword.length() <= 0)
+			return null;
 		String[] filters = {"booking_id", "book_id", "bookings.card_id", "cards.codice_fiscale", "state_name", "email", "start_date", "end_date"};
 		ArrayList<BookingsBean> bookings = new ArrayList<BookingsBean>();
 		try {
@@ -325,6 +327,10 @@ public class BookingsDAO {
 				ps.setInt(1, booking_id);
 				ResultSet rs = ps.executeQuery();
 				rs.first();
+				String current_state = rs.getString("state_name");
+				if(current_state.equals(state) && (state.equals("Annullata") || state.equals("Riconsegnato"))) {
+					return 0;
+				}
 				int book_id = rs.getInt("book_id");
 				ps = conn.prepareStatement("UPDATE books SET quantity = quantity + 1 WHERE books.book_id = ?");
 				ps.setInt(1, book_id);

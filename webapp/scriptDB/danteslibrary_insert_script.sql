@@ -20,6 +20,11 @@ ed Estasia. L’Oceania, la cui capitale è Londra, è governata dal Grande Frat
 la psicopolizia che interviene al minimo sospetto. Tutto è permesso, non c’è legge scritta. Niente, apparentemente, è proibito. Tranne pensare. Tranne amare. Tranne divertirsi. Insomma: tranne 
 vivere, se non secondo i dettami del Grande Fratello. Dal loro rifugio, in uno scenario desolante, solo Winston Smith e Julia lottano disperatamente per conservare un granello di umanità…", 
 "Oscar Mondadori", 10, "./images/covers/1984.png");
+INSERT INTO books(book_id, title, description, publisher, quantity, cover) VALUES (5, "Il codice da Vinci", "Parigi, Museo del Louvre. Nella Grande Galleria, il vecchio curatore Saunière, ferito 
+a morte, si aggrappa con un ultimo gesto disperato a un dipinto del Caravaggio, fa scattare l'allarme e le grate di ferro all'entrata della sala immediatamente scendono, chiudendo fuori il suo inseguitore.
+ L'assassino, rabbioso, non ha ottenuto quello che voleva. A Saunière restano pochi minuti di vita. Si toglie i vestiti e, disteso sul pavimento, si dispone come l'uomo di Vitruvio, il celeberrimo disegno 
+ di Leonardo da Vinci. La scena che si presenta agli occhi dei primi soccorritori è agghiacciante: il vecchio disteso sul marmo è riuscito, prima di morire, a scrivere alcuni numeri, poche parole e soltanto un nome: Robert Langdon.", 
+"Mondadori", 10, "./images/covers/davinci.jpg");
 
 INSERT INTO genres(genre_name) VALUES ("Azione");
 INSERT INTO genres(genre_name) VALUES ("Autobiografia");
@@ -49,6 +54,7 @@ INSERT INTO authors(author_id, name) VALUES (3, "Abraham Silberschatz");
 INSERT INTO authors(author_id, name) VALUES (4, "Peter Baer Galvin");
 INSERT INTO authors(author_id, name) VALUES (5, "Greg Gagne");
 INSERT INTO authors(author_id, name) VALUES (6, "George Orwell");
+INSERT INTO authors(author_id, name) VALUES (7, "Dan Brown");
 
 INSERT INTO books_authors(book_id, author_id) VALUES (1, 1);
 INSERT INTO books_authors(book_id, author_id) VALUES (2, 2);
@@ -56,11 +62,13 @@ INSERT INTO books_authors(book_id, author_id) VALUES (3, 3);
 INSERT INTO books_authors(book_id, author_id) VALUES (3, 4);
 INSERT INTO books_authors(book_id, author_id) VALUES (3, 5);
 INSERT INTO books_authors(book_id, author_id) VALUES (4, 6);
+INSERT INTO books_authors(book_id, author_id) VALUES (5, 7);
 
 INSERT INTO books_genres(book_id, genre_name) VALUES (1, "Romanzo Storico");
 INSERT INTO books_genres(book_id, genre_name) VALUES (2, "Horror e Gotico");
 INSERT INTO books_genres(book_id, genre_name) VALUES (3, "Didattica");
 INSERT INTO books_genres(book_id, genre_name) VALUES (4, "Distopia");
+INSERT INTO books_genres(book_id, genre_name) VALUES (5, "Giallo");
 
 INSERT INTO roles(role_name) VALUES("Gestore Biblioteca");
 INSERT INTO roles(role_name) VALUES("Gestore Clienti");
@@ -70,12 +78,20 @@ INSERT INTO roles(role_name) VALUES("Gestore Tessere");
 
 INSERT INTO managers(email, password, name, surname, address, phone) VALUES("admin@admin.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Michele", "Almanacco", "Viale Meraviglia 10", "123456789");
 INSERT INTO managers_roles(email, role_name) VALUES("admin@admin.it", "Gestore Biblioteca");
+INSERT INTO managers(email, password, name, surname, address, phone) VALUES("admin2@admin.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Gianluca", "Bianchi", "Via Mazzini 10", "123456789");
+INSERT INTO managers_roles(email, role_name) VALUES("admin2@admin.it", "Gestore Libri");
 
-INSERT INTO cards(codice_fiscale) values("1111111111111111");
-INSERT INTO cards(codice_fiscale) values("2222222222222222");
-INSERT INTO cards(codice_fiscale) values("3333333333333333");
-INSERT INTO cards(codice_fiscale) values("4444444444444444");
+INSERT INTO cards(codice_fiscale, associated) values("ABCABC00A00A000A", true);
+INSERT INTO cards(codice_fiscale, associated) values("ABCABC00A00A000B", true);
+INSERT INTO cards(codice_fiscale, associated) values("ABCABC00A00A000C", true);
+INSERT INTO cards(codice_fiscale, associated) values("ABCABC00A00A000D", false);
 
-INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("a@a.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Lino", "Gargiulo", "1111111111111111", "Via dei Principati 20");
-INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("b@b.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Gennaro", "Mellia", "2222222222222222", "Via Poligono 30");
-INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("c@c.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Enza", "Amico", "3333333333333333", "Piazza Albertone 15");
+INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("a@a.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Lino", "Gargiulo", "ABCABC00A00A000A", "Via dei Principati 20");
+INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("b@b.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Gennaro", "Mellia", "ABCABC00A00A000B", "Via Poligono 30");
+INSERT INTO customers(email, password, name, surname, codice_fiscale, address) VALUES("c@c.it", "$2a$10$vI9Ii5PISsqeDkI5Z8Aq9upp2aZiOGDGmlrAKFfWZbWIlH6eDjCe2", "Enza", "Amico", "ABCABC00A00A000C", "Piazza Albertone 15");
+
+INSERT INTO `danteslibrary`.`bookings` (`booking_id`, `email`, `start_date`, `end_date`, `state_name`, `card_id`, `book_id`, `title`) VALUES ('1', 'a@a.it', '2020-01-31', '2020-02-15', 'Riconsegnato', '10000', '6', 'Il codice da Vinci');
+INSERT INTO `danteslibrary`.`bookings` (`booking_id`, `email`, `start_date`, `end_date`, `state_name`, `card_id`, `book_id`, `title`) VALUES ('2', 'a@a.it', '2020-01-31', '2020-02-15', 'Annullata', '10000', '6', 'Il codice da Vinci');
+INSERT INTO `danteslibrary`.`bookings` (`booking_id`, `email`, `start_date`, `end_date`, `state_name`, `card_id`, `book_id`, `title`) VALUES ('3', 'a@a.it', '2020-02-15', '2020-03-10', 'Non ancora ritirato', '10000', '6', 'Il codice da Vinci');
+INSERT INTO `danteslibrary`.`bookings` (`booking_id`, `email`, `start_date`, `end_date`, `state_name`, `card_id`, `book_id`, `title`) VALUES ('4', 'a@a.it', '2020-03-11', '2020-04-10', 'Ritirato', '10000', '6', 'Il codice da Vinci');
+INSERT INTO `danteslibrary`.`bookings` (`booking_id`, `email`, `start_date`, `end_date`, `state_name`, `card_id`, `book_id`, `title`) VALUES ('5', 'a@a.it', '2020-05-21', '2020-05-30', 'Non ancora ritirato', '10000', '6', 'Il codice da Vinci');

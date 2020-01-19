@@ -206,6 +206,8 @@ public class CustomersDAO {
 	 * Restituisce null nel caso in cui non vi sono corrispondenze.
 	 */
 	public ArrayList<CustomersBean> getCustomersByFilter(int filter, String keyword) {
+		if(keyword.length() <= 0)
+			return null;
 		String[] filters = {"name", "surname", "email", "codice_fiscale"};
 		ArrayList<CustomersBean> customers = new ArrayList<CustomersBean>();
 		try {

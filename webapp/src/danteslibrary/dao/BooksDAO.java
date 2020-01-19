@@ -270,7 +270,8 @@ public class BooksDAO {
 	 * @throws SQLException Se il servizio non è disponibile (es. mancata connessione con il database).
 	 */
 	public ArrayList<BooksBean> getBooksByFilter(int filter, String keyword) throws SQLException {
-		
+		if(keyword.length() <= 0)
+			return null;
 		String[] filters = {"title", "authors.name", "publisher", "genres.genre_name"};
 		ArrayList<BooksBean> books = new ArrayList<BooksBean>();
 		Connection conn = DBConnection.getConnection();

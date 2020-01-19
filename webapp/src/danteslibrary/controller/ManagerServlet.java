@@ -497,6 +497,13 @@ public class ManagerServlet extends HttpServlet {
 						return;
 					}
 					
+					LocalDate max_date = start_date.plusMonths(4);
+					if(end_date.isAfter(max_date)) {
+						request.setAttribute("error", "Una prenotazione può durare massimo 4 mesi.");
+						request.getRequestDispatcher("admin.jsp?bookings").forward(request, response);
+						return;
+					}
+					
 		            String state = request.getParameter("state");
 		            
 		            String email_booking = request.getParameter("email");

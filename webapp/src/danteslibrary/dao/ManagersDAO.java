@@ -75,6 +75,8 @@ public class ManagersDAO {
 	 * Restituisce null nel caso in cui non vi sono corrispondenze.
 	 */
 	public ArrayList<ManagersBean> getManagersByFilter(int filter, String keyword) {
+		if(keyword.length() <= 0)
+			return null;
 		String[] filters = {"managers.email", "managers.name", "managers.surname", "roles.role_name"};
 		ArrayList<ManagersBean> managers = new ArrayList<ManagersBean>();
 		try {
